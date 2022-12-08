@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="login-style.css" rel="stylesheet">
+    <title>Login Page</title>
+   
+</head>
+<h1>Login Page for Island Cycling</h1>
+<body>
+    <form action="./login" method="POST"> 
+       <h2><input type="text" name="email" id="email" value="" size="40" placeholder="Enter email" ><br /></h2>
+           <h2><input type="password" name="password" size="40" placeholder="Enter password"><br /></h2>
+            <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
+    </form>
+    <script>
+        var params = (new URL(document.location)).searchParams; // use search params to find the params within the document    
+        console.log(params);
+            if (params.has("errors")) { // if params has/find errors 
+                document.getElementById("error_button").value = "Invalid Login";}; // use the id to get the element to change the button to invalid login if there are any errors
+            console.log(params.get("errors"));
+        </script>
+        <br>
+        <form action="/register" method="GET">
+            <h4><script>
+            document.write(`<p class="register"> Not a member? <a href="/register.html${location.search}"> Click here to register</a></p>`)
+        </script></h4>
+            </form>       
+</body>
+<script>
+
+</script>
+</html>

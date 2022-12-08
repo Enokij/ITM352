@@ -1,0 +1,29 @@
+<head>
+    <script src="./functions.js"></script>
+    <script>
+        var products_data;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+        });
+        nav_bar('', products_data);
+    </script>
+</head>
+<h2>You have in your shopping cart:</h2>
+<table border><th>Quantity</th><th>Item</th>
+<script>
+  for(product_key in products_data) {
+    for(i=0; i<products_data[product_key].length; i++) {
+        if(typeof shopping_cart[product_key] == 'undefined') continue;
+        qty = shopping_cart[product_key][i];
+        if(qty > 0) {
+          document.write(`<tr><td>${qty}</td><td>${products_data[product_key][i].name}</td><tr>`);
+        }
+    }
+}
+</script>
+</table>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="user-update-style.css" rel="stylesheet">
+    <title>Edit credentials</title>
+</head>
+<h1>Already have an account,edit your credentials here!</h1>
+<body>
+    <body onload="FillValues()">
+        <form action="/user_update" method="POST">
+          <h2><input type="email" id="email" name="email" size="40" placeholder=" Update email"><br/>
+                <input type="text" id="name" name="fullname" size="40" placeholder="Update full name" ><br/>
+                    <input type="password" id="password" name="password" size="40" placeholder="Update password"><br/>
+                        <input type="password" id="repeat_password" name="repeat_password" size="40" placeholder="Update password again"><br/></h2>
+                          <center><input class="submit" type="submit" value="Submit" id="submit"></center>
+
+        <script>
+    function FillValues(){
+      if(params.has("email")){
+        document.getElementById("email").innerHTML = "Email: " + params.get('email');
+        console.log(params.get('email'));
+      } if(params.has("name")){
+        document.getElementById("name").innerHTML = "Welcome " + params.get('name') + "!";
+        console.log(params.get('name'))
+      }}
+        </script>
+        </form>
+</body>
+</html>
