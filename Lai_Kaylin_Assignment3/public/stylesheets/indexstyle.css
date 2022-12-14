@@ -1,0 +1,36 @@
+body {
+    text-align: center;
+    background: rgb(252, 237, 251);
+}
+
+/* CREDIT: this was adapted from https://www.educative.io/answers/how-to-enlarge-an-image-on-hover-in-html */
+#img3{
+    transition: transform .2s;
+    width:200px;
+    height:250px;
+    margin:0 auto;
+    background-color: rgb(198, 198, 239);
+    border-radius: 10px;
+    border: 1px solid rgb(198, 198, 239);
+}
+#img3:hover{
+    transform:scale(1.1);
+}
+
+/* CREDIT: the following is from W3 Schools' "Online Website" Tutorial */
+/* Remove the navbar's default rounded borders and increase the bottom margin */ 
+.navbar {
+    margin-bottom: 50px;
+    border-radius: 0;
+}
+ 
+/* Add a gray background color and some padding to the footer */
+footer {
+    bottom: 0px;
+    left: 0px;
+    background-color: rgb(198, 198, 239);
+    padding: 10px;
+    width: 100%;
+    position: absolute;
+
+}

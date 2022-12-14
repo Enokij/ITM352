@@ -1,0 +1,88 @@
+body {
+    text-align: center;
+    background: rgb(252, 237, 251);
+}
+
+/* Remove the navbar's default rounded borders and increase the bottom margin */ 
+.navbar {
+    margin-bottom: 50px;
+    border-radius: 0;
+}
+
+.row {
+    width: 90%;
+    text-align: center;
+    margin-right: -15px;
+    margin-left: -15px;
+    position: relative;
+    left: 315px;
+    top: 50px;
+}
+
+.button {
+    background-color: white;
+}
+
+.button:hover {
+    background-color: #e7e7e7;
+}
+
+#logo {
+    border: 1px solid #ddd;
+     /* Gray border */
+    border-radius: 4px;
+    /* Rounded border */
+    padding: 1px;
+    /* Some padding */
+    width: 150px;
+     /* Set a small width */
+}
+#logotext {
+    color: rgb(243, 221, 221);
+    padding-top: 15px;
+}
+ 
+  /* Add a gray background color and some padding to the footer */
+  .footer {
+    background-color: #f2f2f2;
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 0px;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+/* CREDIT: w3schools dropdown navigation bar https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp
+/* Dropdown container - needed to position the dropdown content */
+.dropdown {
+    float: center;
+    overflow: hidden;
+}
+/* Style the dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    font-size: 14px;
+}
+/* Show the dropdown menu when the user moves the mouse over the dropdown button */
+.dropdown:hover .dropdown-content {
+    display: contents;
+    align-items: center;
+}
+/* Style the links inside the dropdown */
+.dropdown-content a {
+    float: none;
+    color: white;
+    display: block;
+    text-align: center;
+}
+/* Add a grey background to dropdown links on hover */
+.dropdown-content a:hover {
+    background: rgb(252, 237, 251);
+    color: black;
+  }

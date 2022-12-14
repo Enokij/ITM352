@@ -1,0 +1,106 @@
+body {
+        text-align: center;
+        background: rgb(252, 237, 251);
+    }
+
+/*item panels*/
+.panel-primary>.panel-heading {
+        background-color: rgb(248, 251, 193);
+    }
+.panel-body img {  
+        width: 170px;
+        height: 250px;       
+       /* display: block;*/
+        bottom: 0px;  
+        object-fit: scale-down;  
+ 
+}
+body>.item>.row {
+        display: block;
+        background-size: 750px 200px;
+        margin: 15px;
+        float: left;
+        padding-left: 150px;
+        padding-top: 10px;
+        max-width: 50px;
+        height: 750px;
+}
+
+.panel-footer {
+        margin-bottom: 10px;
+}
+
+/*item headers*/
+.panel-heading {
+        background-color: rgb(248, 251, 193);
+}
+.panel-heading {
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        font-size: 15px;
+        text-align: center;
+        font-weight: 400;
+}
+
+/*purchase button*/
+.button {
+        background-color: rgb(255, 255, 255);
+        padding: 15px 40px;
+        border-radius: 20px;
+        font-size: smaller;
+        border-color: rgb(248, 251, 193);     
+}
+.button:hover {
+        background-color: rgb(248, 251, 193);
+}
+
+/* Remove the navbar's default rounded borders and increase the bottom margin */ 
+.navbar {
+        margin-bottom: 50px;
+        border-radius: 0;
+}
+/* CREDIT: this was adapted from https://www.educative.io/answers/how-to-enlarge-an-image-on-hover-in-html */
+img:not(.non){ /* will only affect product images */
+        transition: transform .2s;
+        width:200px;
+        height:250px;
+        margin:0 auto;
+        background-color: rgb(white);
+        border-radius: 10px;
+        border: 1px solid rgb(white);
+    }
+    img:hover:not(.non){
+        transform:scale(1.07);
+    }
+/* CREDIT: w3schools responsive navigation bar how to: https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp
+/* Dropdown container - needed to position the dropdown content */
+.dropdown {
+        float: center;
+        overflow: hidden;
+    }
+    /* Style the dropdown content (hidden by default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        font-size: 14px;
+    }
+    /* Show the dropdown menu when the user moves the mouse over the dropdown button */
+    .dropdown:hover .dropdown-content {
+        display: contents;
+        align-items: center;
+    }
+    /* Style the links inside the dropdown */
+    .dropdown-content a {
+        float: none;
+        color: white;
+        display: block;
+        text-align: center;
+    }
+    /* Add a grey background to dropdown links on hover */
+    .dropdown-content a:hover {
+        background: rgb(252, 237, 251);
+        color: black;
+      }

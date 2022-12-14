@@ -1,0 +1,119 @@
+<head>
+    <script src="./functions.js"></script>
+    <link href="cart-style.css" rel="stylesheet">
+    <script>
+        var products = [];
+        var subtotal = 0;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products = JSON.parse(response);
+        });
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+        });
+    </script>
+</head>
+<header>
+    <img src='./images/logo.jpg'>
+    <nav>
+      <ul>
+        <li><a href='index.html'>HOME<a></li>
+        <li><a href='get_to_login'>Login<a></li>
+      </ul>
+    </nav>
+  </header>
+<body onload="cartFunction()">
+    <script>
+        function cartFunction(){
+                  // Get a reference to the text box and the buttons
+      var textBox = document.getElementById("quantity-box");
+      var increaseButton = document.getElementById("increaseButton");
+      var decreaseButton = document.getElementById("decreaseButton");
+
+      // Add event listeners to the buttons that will increment or decrement the value in the text box
+      increaseButton.onclick = function() {
+
+        textBox.value++;
+        
+        };
+
+        decreaseButton.onclick = function() {
+
+        textBox.value--;
+        };
+        }
+    </script>
+<center><h2>You have in your shopping cart:</h2></center>
+<center><table border><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
+
+<script>
+    `<form action="/get_to_cart" method="POST">`
+  for(product_key in products) {
+    for(i=0; i<products[product_key].length; i++) {
+        if(typeof shopping_cart[product_key] == 'undefined') continue;
+        qty = shopping_cart[product_key][i];
+        extended_price = qty * products[product_key][i].price;
+        (subtotal += extended_price)
+        if(qty > 0) {
+          document.write(`<center><tr><td><button id="increaseButton">+</button><input type="text" id="quantity-box" value="${qty}" style="width: 20px" name="quantity"><button id="decreaseButton">-</button></td>
+            <td>${products[product_key][i].name} <img src="./images/${products[product_key][i].image}" WIDTH = 60px</td>
+                <td>\$${products[product_key][i].price}</td>
+                <td>\$${extended_price}</td></tr></center>`);
+
+        }
+      
+    }
+  
+} 
+// Computer Tax
+var tax_rate = 0.0575;
+    var tax = tax_rate*subtotal;
+
+    // Computer Shipping 
+    if(subtotal <= 50) (
+      shipping =2
+    )
+    else if(subtotal <= 100)(
+      shipping = 5
+    )
+    else (
+      shipping = 0.05*subtotal
+    )
+
+    // Computer Grand total
+    var total = subtotal + tax + shipping;
+`</form>`
+</script>
+
+          <tr>
+            <td colspan="4" width="100%">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Sub-total</td>
+            <td width="54%">$<script>document.write(subtotal);</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @ <script>document.write(100*tax_rate);</script>%</span></td>
+            <td width="54%">$<script>document.write(tax.toFixed(2));</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Shipping<span style="font-family: arial;">
+            <td width="54%">$<script>document.write(shipping.toFixed(2));</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%"><strong>Total</strong></td>
+            <td width="54%"><strong>$<script>document.write(total.toFixed(2));</script></strong></td>
+          </tr>
+        </tbody>
+      </table> 
+      <div style = "font-weight: bold;">
+        OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
+        <br>
+      A subtotal $50 - $99.99 will be $5 shipping
+      <br>
+    Subtotals over $100 will be charged 5% of the subtotal amount
+      </div>
+</body>
+</footer>
+</table>

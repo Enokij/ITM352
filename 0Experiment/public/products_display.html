@@ -10,12 +10,16 @@
             products = JSON.parse(response);
         });
         loadJSON('get_cart', function (response) {
-            // Parsing JSON string into object
+            // Parsing JSON string of the session's cart
             shopping_cart = JSON.parse(response);
-            for (pk in shopping_cart) {
-                total += shopping_cart[pk].reduce((a, b) => a + b);
+            // Create an array of the cart items
+            var cartItems = Object.keys(shopping_cart);
+            // Iterate over the cart items and calculate the total number of items in the cart
+            for (var i = 0; i < cartItems.length; i++) {
+                total += shopping_cart[cartItems[i]].reduce((a, b) => a + b);
             }
         });
+
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -23,69 +27,86 @@
             var this_product_key = params.get('products_key');
         } else {
             document.write('no products key in query string');
-            document.stop;
+            (function () { return; })();;
         }
-        nav_bar(this_product_key, products);
-
-
-        //Taken from Lab13 order_page.new.html
-        //Used for the textbox check and to ultimately display error messages under textbox if errors are detected
-        function isNonNegInt(queryString, returnErrors = false) { 
-            errors = []; // assume no errors at first
-            if (Number(queryString) != queryString) {
-                errors.push('Not a number!'); // Check if string is a number value
-            } else {
-                if (queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
-                if (parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
-                if (queryString == 0 && queryString == '') errors.push('Enter valid quantity'); //result in an error if values of 0 or no value are inputted in the textbox
-            }
-            if (returnErrors) {
-                return errors;
-            } else if (errors.length == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        //Taken from Lab13 order_page.new.html      
-        function checkQuantityTextbox(theTextbox) { 
-                //checks the textbox for errors and sets true outputs to variable errs. 
-                errs = isNonNegInt(theTextbox.value, true);
-                //if errors are found, then will write the errors in the quantity_message textbox
-                document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", "); 
-               }
     </script>
 </head>
-<h2>You have <span id="cart_total">0</span> items in your shopping cart: <a href='./cart.html'>View Cart</a></h2>
+
+<header>
+  <img src='./images/logo.jpg'>
+  <nav>
+    <ul>
+      <li><a href='index.html'>HOME<a></li>
+      <li><script>nav_bar(this_product_key, products);</script></li>
+      <li><a href='get_to_login'>Login<a></li>
+      <li>You have <span id="cart_total">0</span> items in your shopping cart: <a href='./cart.html'>View Cart</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- Move the script tag containing the nav_bar() function outside of the <ul> element -->
 <script>
+    
+</script>
+
+
+<script>
+    //Taken from Lab13 order_page.new.html
+    //Used for the textbox check and to ultimately display error messages under textbox if errors are detected
+    function isNonNegInt(queryString, returnErrors = false) {
+        errors = []; // assume no errors at first
+        if (Number(queryString) != queryString) {
+            errors.push('Not a number!'); // Check if string is a number value
+        } else {
+            if (queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
+            if (parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
+            if (queryString == 0 && queryString == '') errors.push('Enter valid quantity'); //result in an error if values of 0 or no value are inputted in the textbox
+        }
+        if (returnErrors) {
+            return errors;
+        } else if (errors.length == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //Taken from Lab13 order_page.new.html      
+    function checkQuantityTextbox(theTextbox) {
+        //checks the textbox for errors and sets true outputs to variable errs. 
+        errs = isNonNegInt(theTextbox.value, true);
+        //if errors are found, then will write the errors in the quantity_message textbox
+        document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
+
+    }
     cart_total.innerHTML = total;
-// This function takes a string assumed to be a key in the products array above to display and select the corresponding products
+    // This function takes a string assumed to be a key in the products array above to display and select the corresponding products
     var order_str = '';
 
-    order_str += `<h1>Please select what ${this_product_key} you want</h1><br>`;
+    order_str += `<h1>Your One Stop Shop for Cycling ${this_product_key}</h1><br>`;
     // We put the whole table in the form so that anything entered in it will get submitted
     order_str += `<FORM action="/add_to_cart" method="GET">
-                <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}">`;
+               <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}"><center><body><div><main>`;
+                
     products = products[this_product_key];
     for (i = 0; i < products.length; i++) {
-        order_str += `<section class="item">
+        order_str += `
+        <section class="item">
             <h2>${products[i].name}</h2>
-            <h4>Enter Quantities:</h4>
             <p>$${products[i].price}</p>
             <img src=./images/${products[i].image}>
             <h6>Left in Stock: ${products[i].qty_available}</h6>
             <br>
             <h6>Total Sold: ${products[i].total_sold}</h6>
-            <input class= "error_msg" type="text" name="quantities[${i}]" value="${(typeof shopping_cart[this_product_key]!='undefined')?shopping_cart[this_product_key][i]:0}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
-            <span class= "textbox" id="quantity${i}_message">Enter a quantity</span>
+            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+            <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
             </section>
-    `;}
+    `;
+    }
 
-    order_str += `</TABLE><br>
+    order_str += `</TABLE>
     <input class="submit_button" type="submit" name = "submit_button" value="Check Out!" id="button"></input>
-    </FORM>`;
+    </FORM></main></div></body></center>`;
     document.write(order_str);
-    console.log (order_str);
 </script>
 
 
@@ -99,11 +120,10 @@
 //products[i].name pulls the name from the .json file for each element in the product array
 //products[i].price pulls the price from each element in the product array
 //products[i].image pulls the image from each element in the product array and displays it
-/*products[i].qty_available is updated through the server.js post request and is then updated to the .json. 
-The updated qty_available is then pulled and displayed*/
+    /*products[i].qty_available is updated through the server.js post request and is then updated to the .json.
+    The updated qty_available is then pulled and displayed*/
 //products[i].total_sold goes through similar process as qty_available
 //input class = error_msg, is the textbox and runs through the checkquantitytextbox function upon keyup 
-/*span class = textbox, displays the errors detected by the input class = error_msg which will                
-acitvely shows the user if an was error was inputed into the quantity textbox*/
+    /*span class = textbox, displays the errors detected by the input class = error_msg which will                
+    acitvely shows the user if an was error was inputed into the quantity textbox*/
 </script>
-<script>

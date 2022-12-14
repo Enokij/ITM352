@@ -1,0 +1,132 @@
+<!--author: kaylin lai
+this is the login page for users, it allows them to checkout-->
+<!DOCTYPE html>
+
+<!--CREDIT: login template from https://mdbootstrap.com/docs/standard/extended/login/#section-4, code modified from Momoka Michimoto F21, and assignment 3 code examples-->
+
+<script src="/user_data.js" type="json"></script>
+<script src="./products.js"></script>
+<script src="./functions.js"></script>
+<script>
+window.onload = function() {
+let params = (new URL(document.location)).searchParams;
+//credit: function from momoka michimoto FW21
+    if (params.has('login_err')) { //searches for login_err array generated on the server and alerts the errors to the client
+        alert (params.get('login_err'));
+      } //sticky
+      if (params.has('email')) { //params searches 'email' and changes the email value textbox to the email entered
+        email.value = params.get('email')
+      }
+    }
+    // from assignment 3 code examples
+    var shopping_cart;
+    var total = 0;
+    let params = (new URL(document.location)).searchParams;
+    // get the query string
+    if (params.has('products_key')) {
+      var products_key = params.get('products_key');
+    } else { // if no params then default to mains product page
+      products_key = "Main Dishes"
+    }
+    var products;
+    loadJSON('get_products_data', function (response) {
+      // Parsing JSON string into object
+      products = JSON.parse(response);
+    });
+  loadJSON('./get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
+</script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./stylesheets/loginstyle.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Login || Kaylin's Kirby Cafe</title>
+</head>
+
+<body>
+  <!--title header-->
+   <div class="container text-center">
+    <h2>Kaylin's Kirby Cafe</h2>      
+    <h5>made with pink stuff</h5>
+    <img id = img1 class = "non" src = "./images/cooksprite2.png" height = 80px>
+  </div>
+
+<!--navigation bar-->
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+<!--clickables--> 
+<!--star home icon-->
+<a class="navbar-brand" href = "index.html"> <img id = "img2" class = "non" src = "./images/cook_icon.png" height = 50px style = "position: relative; top: -15px;"></a>
+</div>
+<!--home and products-->
+<div class="collapse navbar-collapse" id="myNavbar">
+  <ul class="nav navbar-nav">
+    <li><a href="index.html">Home</a></li>
+    <script>
+      nav_bar(products_key, products);</script>
+    </script>
+  </ul>
+  <ul class="nav navbar-nav navbar-right">
+     <li class = "active"><a href="#"><span class="glyphicon glyphicon-user"></span> Account</a></li>
+          <li><a href="cart.html"><span class="glyphicon glyphicon-shopping-cart"></span> Cart (<span id="cart_total">0</span>)</a></li>
+          <script>cart_total.innerHTML = total; </script>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+          <div class="row d-flex align-items-center h-100 gradient-custom-3">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+              <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                  <div class="mb-md-5 mt-md-4 pb-5">
+
+                  <form name="process_login" action="/process_login" method="POST">    
+                    <h2 class="fw-bold mb-2 text-uppercase"> User Login</h2>
+                    <p class="text-white-50 mb-5">Enter your email and password below:</p>
+      
+                    <div class="form-outline form-white mb-4">
+                      <input type="email" placeholder = "Email" name="email" id="email" class="form-control form-control-lg" />
+                      <label class="form-label" id="email_label" for="email"></label>
+                    </div>
+                    <div class="form-outline form-white mb-4">
+                      <input type="password" placeholder="Password" name="password" id="password" class="form-control form-control-lg" />
+                      <label class="form-label" id="password_label" for="password"></label>
+                    </div>
+                     <BR> 
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary btn-block" value="login" name="login">Log in</button>
+                      </div>
+                  <div>
+                    <p class="mb-0">Don't have an account? <a href="registration.html" class="text-white-50 fw-bold">Sign Up!</a>
+                    </p>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    
+</body>
+
+</html>

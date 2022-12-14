@@ -1,0 +1,252 @@
+<!--author: kaylin lai
+  this is a cart that holds a user's selected items and where they can also edit quantities-->
+
+<!--CREDIT: cart template from https://www.bootdey.com/snippets/view/bs4-cart, w3schools cookies https://www.w3schools.com/js/js_cookies.asp, w3schools dropdown navigation bar https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp, code modified from Momoka Michimoto F21-->
+<!DOCTYPE html>
+<html lang="en">
+<script src="./products.js" type="text/javascript"></script>
+<script src="./functions.js"></script>
+<script> // from assignment 3 code examples
+  var products;
+  var total = 0;
+  loadJSON('./get_products_data', function (response) {
+    // Parsing JSON string into object
+    products = JSON.parse(response);
+  });
+  loadJSON('./get_cart', function (response) {
+    // Parsing JSON string into object
+    shopping_cart = JSON.parse(response);
+  });
+  // get the query string
+  let params = (new URL(document.location)).searchParams;
+  if (params.has('products_key')) {
+    var products_key = params.get('products_key');
+  }; 
+
+  function getCookie(cname) { // credit: w3schools cookies https://www.w3schools.com/js/js_cookies.asp, reads value of cookie
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+</script>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./stylesheets/cartstyle.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <title>Cart || Kaylin's Kirby Cafe</title>
+</head>
+
+<body>
+<!--title header-->
+<div class="container text-center">
+  <h2>Kaylin's Kirby Cafe</h2>      
+  <h5>made with pink stuff</h5>
+  <img id = img1 class = "non" src = "./images/cooksprite2.png" height = 80px>
+</div>
+<!--navigation bar-->
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+<!--clickables--> 
+<!--star home icon-->
+<a class="navbar-brand" href = "index.html"> <img id = "img2" class = "non" src = "./images/cook_icon.png" height = 50px style = "position: relative; top: -15px;"></a>
+</div>
+<!--home and products-->
+<div class="collapse navbar-collapse" id="myNavbar">
+  <ul class="nav navbar-nav">
+    <li><a href="index.html">Home</a></li>
+    <script>
+      nav_bar(products_key, products);
+    </script>
+  </ul>
+  <ul class="nav navbar-nav navbar-right">
+          <script>
+            if (getCookie('user_cookie') != false) { /*if user is logged in, navbar will display logout and update info dropdown. onclick, user is logged out = cookie expires. if user isn't logged in, navbar displays login href*/
+            //CREDIT: dropdown navbar from w3schools https://www.w3schools.com/howto/howto_js_responsive_navbar_dropdown.asp
+              var user_cookie = getCookie('user_cookie');
+              document.write(`<li class = "dropdown"><a href="/logout" id="login"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+              <span class="dropdown-content">
+                <a href="update_info.html">Update Info</a></li>
+              </span>`); 
+              // on logout, cookie expires
+              login.onclick = function () {
+                document.cookie = "user_cookie=; expires=Sun, 22 July 2001 00:00:00 UTC; path=/;";
+              }
+            } else {
+              document.write(`<li><a href="login.html" id="login"><span class="glyphicon glyphicon-user"></span> Account</a></li>`);
+            }
+          </script>
+          <li class = "active"><a href="cart.html"><span class="glyphicon glyphicon-shopping-cart"></span> Cart<span
+            id="cart_total"></span>
+            </a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container px-3 my-5 clearfix">
+    <!--cart table -->
+    <div class="card">
+      <div class="card-header"> <!--if user is logged in before going to cart, cart will display their name for personalization-->
+        <h2>
+          <script> if (getCookie('user_cookie') != false) {
+            document.write(`${user_cookie}`);
+            document.write(`'s Cart`)}
+            else {
+              document.write(`Cart`)
+            } 
+            </script>
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <form method="POST" action="/update_cart">
+            <table class="table table-bordered m-0" id="myTable">
+              <thead>
+                <tr>
+                  <!-- Set columns width -->
+                  <th class="text-center py-3 px-4" style="min-width: 300px;">Product Name</th>
+                  <th class="text-center py-3 px-4" style="width: 150px;">Price</th>
+                  <th class="text-center py-3 px-4" style="width: 140px;">Quantity</th>
+                  <th class="text-center py-3 px-4" style="width: 140px;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <script>
+                  // Compute sub-total
+                  subtotal = 0;
+
+                  for (let pkey in shopping_cart) { 
+                    for (let i in shopping_cart[pkey]) {
+                      let quantities = shopping_cart[pkey][i];
+                      if (quantities > 0) {
+                        // product row
+                        extended_price = quantities * products[pkey][i].price
+                        subtotal += extended_price;
+                        document.write(`
+                  <tr>
+                    <td class="p-4">
+                      <div class="media align-items-center">
+                     <img src="${products[pkey][i].image}"
+                          class="d-block ui-w-40 ui-bordered mr-4" alt=""> ${products[pkey][i].item}
+                      </div>
+                    </td>
+                    <td class="text-center font-weight-semibold align-middle p-4">\$${products[pkey][i].price.toFixed(2)}</td>
+                    <td class="align-middle p-4"><input type="number" id="qty${pkey}${i}" name="qty${pkey}${i}" class="form-control text-center" 
+                    value="${quantities}" min="0" max="${products[pkey][i].quantity_available}"><input type="submit" class="btn btn-md btn-default md-btn-flat mt-2 mr-3" value="Update Cart"></td>
+                    <td class="text-center font-weight-semibold align-middle p-4">\$${extended_price.toFixed(2)}</td>
+                  </tr>`)
+                      }
+                    }
+                  }
+                  // if there are no items in cart, user will be redirected back to shop
+                  if (subtotal == 0) {
+                    alert(`No items in cart`);
+                    location.href = "shop.html";
+                    var tax = 0;
+                    var shipping = 0;
+                    var grand_total = 0;
+                  }
+                  else {
+                    // Compute tax
+                    var tax_rate = 0.045;
+                    var tax = tax_rate * subtotal;
+
+                    // Compute shipping
+                    if (subtotal <= 20) {
+                      shipping = 5;
+                    }
+                    else if (subtotal <= 50) {
+                      shipping = 8;
+                    }
+                    else {
+                      shipping = 0.1 * subtotal; // 10% of subtotal
+                    }
+                    // Compute grand total
+                    var grand_total = subtotal + tax + shipping;
+                  }
+                </script>
+              </tbody>
+            </table>
+        </div>
+        <table class="table-condensed table-hover">
+          </form>
+          </tr>
+        </table>
+
+        <!-- cart table  -->
+        <div class="d-flex">
+          <div class="text-right mt-4 mr-5">
+            <label class="text-muted font-weight-normal m-0">Subtotal</label>
+            <div class="text-large"><strong>$
+                <script>document.write(subtotal.toFixed(2))</script>
+              </strong></div>
+        <div class="d-flex">
+          <div class="text-right mt-4 mr-5">
+            <label class="text-muted font-weight-normal m-0">Shipping</label>
+            <div class="text-large"><strong>$
+                <script>document.write(shipping.toFixed(2))</script>
+              </strong></div>
+          </div>
+          <div class="d-flex">
+            <div class="text-right mt-4 mr-5">
+              <label class="text-muted font-weight-normal m-0">Taxes</label>
+              <div class="text-large"><strong>$
+                  <script>document.write(tax.toFixed(2))</script>
+                </strong></div>
+            </div>
+            <div class="text-right mt-4">
+              <label class="text-muted font-weight-normal m-0">Total price</label>
+              <div class="text-large"><strong>$
+                  <script>document.write(grand_total.toFixed(2))</script>
+                </strong></div>
+              <div></div>
+              <br>
+              <b>
+              <p>OUR SHIPPING POLICY:</p>
+              </b>
+              <p>A subtotal $0 - $19.99 will be charged $5 for shipping.</p>
+              <p>A subtotal $19.99 - $49.99 will be charged $8 for shipping.</p>
+              <p>A subtotal over $50 will be charged 10% of the subtotal. </p>
+              <p>All orders are non-cancellable and non-refundable. 
+                <br>
+                All sales final.</p>
+            </div>
+          </div>
+        </div>
+        <div class="float-right">
+          <!--go to invoice-->
+          <form action="/checkout" method="GET">
+            <input type="button" class="btn btn-primary btn-block" value="Checkout" name="checkout"
+              onclick="location.href='./invoice.html';">
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

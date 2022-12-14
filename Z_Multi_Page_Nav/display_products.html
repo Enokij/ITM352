@@ -41,7 +41,7 @@
             order_str += `You want ${params.get(`quantities${i}`)} of ${products[i]['name']}<br>`;
         }
     } else {
-        order_str += `<h1>Please select what ${products_key} you want</h1><br>`;
+        order_str += `<h1>Please select what ${this_products_key} you want</h1><br>`;
         // We put the whole table in the form so that anything entered in it will get submitted
         order_str += `
             <FORM action="" method="GET">
