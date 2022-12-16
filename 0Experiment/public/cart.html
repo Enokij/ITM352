@@ -49,23 +49,24 @@
 <center><table border><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
 
 <script>
-  for(product_key in products) {
-    for(i=0; i<products[product_key].length; i++) {
-        if(typeof shopping_cart[product_key] == 'undefined') continue;
-        qty = shopping_cart[product_key][i];
-        extended_price = qty * products[product_key][i].price;
+  for(header in products) {
+    console.log(header)
+    for(i=0; i<products[header].length; i++) {
+        if(typeof shopping_cart[header] == "undefined") continue;
+        qty = shopping_cart[header][i];
+        extended_price = qty * products[header][i].price;
         (subtotal += extended_price)
         if(qty > 0) {
-          var product = products[product_key][i];
+          var product = products[header][i];
           document.write(`
           <tr>
           <td><center>
-                <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${product_key}'">+</button>
+                <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${header}'">+</button>
               <input type="text" id="textbox" value="${qty}" style="width: 20px">
-              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&product_key=${product_key}'">-</button>
+              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&product_key=${header}'">-</button>
             </center></td>
-            <td>${products[product_key][i].name} <img src="./images/${products[product_key][i].image}" WIDTH = 60px</td>
-                <td>\$${products[product_key][i].price}</td>
+            <td>${products[header][i].name} <img src="./images/${products[header][i].image}" WIDTH = 60px</td>
+                <td>\$${products[header][i].price}</td>
                 <td>\$${extended_price}</td></tr></center>
                 <tr>
                   `);

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,10 +8,6 @@
   <script src="./functions.js"></script>
   <link href="invoice-style.css" rel="stylesheet">
 </head>
-
-
-
-
 <script>
   var products;
   var total = 0;
@@ -73,7 +68,6 @@
   };
 
   //create dynamic login/logout button
-
   user_email = cookie.email;
   ifLoggedIn = cookie.loggedIn;
   if (ifLoggedIn == 'true') {
@@ -99,7 +93,6 @@
     }
   };
 </script>
-
 <body>
   <center>
     <h1> Products You Purchased!</h1>
@@ -109,27 +102,29 @@
   <script>
     //write for loop to populate invoice table 
     for (header in products) {
+      var qty=0;
       for (i = 0; i < products[header].length; i++) {
-        if (typeof shopping_cart[header] == "undefined") continue;
+        if (typeof shopping_cart[header] != undefined) {
         qty = shopping_cart[header][i];
+        console.log(qty);
         extended_price = qty * products[header][i].price;
         (subtotal += extended_price)
         if (qty > 0) {
           var product = products[header][i];
           document.write(`
           <tr>
-          <td><center>
-              <span id="${qty}" style="width: 20px">
-            </center></td>
+          <td><center>${qty}</center></td>
             <td>${products[header][i].name} <img src="./images/${products[header][i].image}" WIDTH = 60px</td>
                 <td>\$${products[header][i].price}</td>
                 <td>\$${extended_price}</td></tr></center>
                 <tr>
                   `);
-          document.getElementById(`${qty}`).innerHTML = qty;
         }
+      } else {
+        continue;
       }
     }
+  }
 </script>
 <script>
     // Computer Tax
@@ -195,5 +190,4 @@
     </center>
   </h4>
 </footer>
-
 </html>

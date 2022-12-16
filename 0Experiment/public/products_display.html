@@ -1,4 +1,6 @@
-<head>
+
+
+<head onload="">
     <script src="./functions.js"></script>
     <link href="products-style.css" rel="stylesheet">
 
@@ -9,6 +11,7 @@
             // Parsing JSON string into object
             products = JSON.parse(response);
         });
+
         loadJSON('get_cart', function (response) {
             // Parsing JSON string of the session's cart
             shopping_cart = JSON.parse(response);
@@ -19,7 +22,6 @@
                 total += shopping_cart[cartItems[i]].reduce((a, b) => a + b);
             }
         });
-
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -46,48 +48,47 @@
 
 <!-- Move the script tag containing the nav_bar() function outside of the <ul> element -->
 <script>
-    
-</script>
-
-
-<script>
-    //Taken from Lab13 order_page.new.html
-    //Used for the textbox check and to ultimately display error messages under textbox if errors are detected
-    function isNonNegInt(queryString, returnErrors = false) {
-        errors = []; // assume no errors at first
-        if (Number(queryString) != queryString) {
-            errors.push('Not a number!'); // Check if string is a number value
-        } else {
-            if (queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
-            if (parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
-            if (queryString == 0 && queryString == '') errors.push('Enter valid quantity'); //result in an error if values of 0 or no value are inputted in the textbox
-        }
-        if (returnErrors) {
-            return errors;
-        } else if (errors.length == 0) {
-            return true;
-        } else {
-            return false;
-        }
+//Taken from the Stor1 WOD
+//check if there are any invalid quantity inputs
+function quantityValidation(quantityString, returnErrors = false) {
+    errors = []; // assume no errors at first
+    if (Number(quantityString) != quantityString) {
+        errors.push('Not a number!'); // Check if string is a number value
+    } else if (Number(quantityString) < 0) {
+        errors.push('Negative value!'); // Check if it is non-negative
+    } else if(quantityString == '') {
+        quantityString = 0;  
+    } else if (parseInt(quantityString) != quantityString) {
+        errors.push('Not an integer!'); // Check that it is an integer
+    } 
+    if (returnErrors) {
+        return errors;
+    } else if (errors.length == 0) {
+        return true;
+    } else {
+        return false;
     }
+};
     //Taken from Lab13 order_page.new.html      
     function checkQuantityTextbox(theTextbox) {
         //checks the textbox for errors and sets true outputs to variable errs. 
-        errs = isNonNegInt(theTextbox.value, true);
+        errs = quantityValidation(theTextbox.value, true);
         //if errors are found, then will write the errors in the quantity_message textbox
         document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
 
     }
     cart_total.innerHTML = total;
     // This function takes a string assumed to be a key in the products array above to display and select the corresponding products
+if(params.has('products_key')){
+    productCatagory = params.get('products_key')
     var order_str = '';
 
-    order_str += `<h1>Your One Stop Shop for Cycling ${this_product_key}</h1><br>`;
+    order_str += `<h1>Your One Stop Shop for Cycling ${productCatagory}</h1><br>`;
     // We put the whole table in the form so that anything entered in it will get submitted
     order_str += `<FORM action="/add_to_cart" method="GET">
-               <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}"><center><body><div><main>`;
+               <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${productCatagory}"><center><body><div><main>`;
                 
-    products = products[this_product_key];
+    products = products[productCatagory];
     for (i = 0; i < products.length; i++) {
         order_str += `
         <section class="item">
@@ -97,33 +98,49 @@
             <h6>Left in Stock: ${products[i].qty_available}</h6>
             <br>
             <h6>Total Sold: ${products[i].total_sold}</h6>
-            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[productCatagory] != 'undefined') ? shopping_cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
             <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
             </section>
     `;
     }
 
-    order_str += `</TABLE>
-    <input class="submit_button" type="submit" name = "submit_button" value="Check Out!" id="button"></input>
-    </FORM></main></div></body></center>`;
+    order_str += `</TABLE>`;
     document.write(order_str);
+} else {
+    let str = `
+    <h2>Please Select a Product Catagory to Begin Shopping!</h2>
+    `;
+    document.write(str);
+}
 </script>
 
+<footer onload="">
+    <h1>
+        The Source for the #1 Triathalon Equipement!
+        <br>
+        <input class="submit_button" type="submit" name = "submit_button" value="Check Out!" id="button"></input>
+    </FORM></main></div></body></center>
+        <script>
+            //Taken from Lab13 order_page.new.html
+            // changes what the button text value 
+            //For Individual Requirement 4 of Assignment 1
+            //Searches through the params string and parses out the submit_button parameter from the string
+            /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
+            button to submit_button (which has already been set to equal the desired error message on the server side)*/
+            if (params.get("error") == 'Please Enter Valid Quantity!') {
+                document.getElementById("button").value = params.get("error");
+            /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value
+            to equal submit_button (Same explanation as above)*/
+            } else if (params.get("error") == 'Not Enough Left In Stock!') {
+                document.getElementById("button").value = params.get("error");
+            } else if (params.get("error") == 'Need to select quantity to purchase'){
+                document.getElementById("button").value = params.get("error");
+            };
+            //Parses out the submit_button's parameter and displays its value in the console
+            console.log(params.get("error"));
+                </script>
+        
+    </h1>
+</footer>
 
 
-
-<script>
-//////////////////////////////////////////////
-//comment section for the following for loop//
-//////////////////////////////////////////////
-
-//products[i].name pulls the name from the .json file for each element in the product array
-//products[i].price pulls the price from each element in the product array
-//products[i].image pulls the image from each element in the product array and displays it
-    /*products[i].qty_available is updated through the server.js post request and is then updated to the .json.
-    The updated qty_available is then pulled and displayed*/
-//products[i].total_sold goes through similar process as qty_available
-//input class = error_msg, is the textbox and runs through the checkquantitytextbox function upon keyup 
-    /*span class = textbox, displays the errors detected by the input class = error_msg which will                
-    acitvely shows the user if an was error was inputed into the quantity textbox*/
-</script>
