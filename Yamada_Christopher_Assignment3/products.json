@@ -1,0 +1,134 @@
+{ 
+    "Razer":[ 
+        {
+            "name": "DeathadderV3 Pro",
+            "price": 75,
+            "image": "./prodimages/deathadderV3.jpg",
+            "description": "Victory takes on a new shape with the Razer DeathAdder V3 Pro. Refined and reforged with the aid of top esports pros, its iconic ergonomic form is now more than 25% lighter than its predecessor, backed by a set of cutting-edge upgrades to push the limits of competitive play.",
+            "quantity_available": 12
+        },
+        {
+            "name": "Mamba Elite Wired",
+            "price": 41,
+            "image": "./prodimages/mambaelite.jpg",
+            "description": "The Razer Mamba Elite features our acclaimed Razer 5G Advanced Optical Sensor with true 16,000 DPI, 9 programmable buttons, and on-board memory. With extended Razer Chroma lighting zones on each side, customize lighting effects from 16.8 million color options.",
+            "quantity_available": 15
+        },
+        {
+            "name": "DeathadderV2",
+            "price": 32,
+            "image": "./prodimages/deathadderV2.jpg",
+            "description": "With over 10 million Razer DeathAdders sold, the most celebrated and awarded gaming mouse in the world has earned its popularity through its exceptional ergonomic design. Perfectly suited for a palm grip, it also works well with claw and fingertip styles.",
+            "quantity_available": 10
+        },
+        {
+            "name": "Basilisk X",
+            "price": 35,
+            "image": "./prodimages/basiliskX.jpg",
+            "description": "Basilisk X had a high-speed transmission, extremely low latency, and seamless frequency switching in the noisiest environments, you won't even realize that you're gaming with a wireless mouse. Includes a thumb wing to increase comfort while in use.",
+            "quantity_available": 23
+        },
+        {
+            "name": "Atheris",
+            "price": 28,
+            "image": "./prodimages/atheris.jpg",
+            "description": "The Razer Atheris focuses on delivering performance and productivity, packed with features optimized for work and play, all in a compact ergonomic body. Bring your A-game whether you're on the battlefield or shuffling between meetings.",
+            "quantity_available": 9
+        },
+        {
+            "name": "OrochiV2",
+            "price": 45,
+            "image": "./prodimages/orochiV2.jpg",
+            "description": "Introducing the Razer Orochi V2—a compact, ultra-lightweight wireless gaming mouse with the longest battery life that’s second to none. Armed with both Razer HyperSpeed Wireless & Bluetooth modes, it’s your perfect companion for gaming on the go.",
+            "quantity_available": 13
+        }
+    ],
+    "Logitech": [ 
+        {
+            "name": "GProSuperlight",
+            "price": 40,
+            "image": "./prodimages/gpx.jpg",
+            "description": "Less than 63 grams. Advanced low-latency LIGHTSPEED wireless. Sub-micron precision with HERO 25K sensor. Remove all obstacles with our lightest and fastest PRO mouse ever.",
+            "quantity_available": 8
+        },
+        {
+            "name": "G502 Lightspeed",
+            "price": 90,
+            "image": "./prodimages/g502.jpg",
+            "description": "G502 is the best gaming mouse from Logitech G, completely redesigned from the inside out with Light speed wireless and power play compatibility so you can game faster and more accurately.",
+            "quantity_available": 19
+        },
+        {
+            "name": "G403 Hero",
+            "price": 48,
+            "image": "./prodimages/g403.jpg",
+            "description": "Logitech G403 Hero gaming mouse features the advanced next-gen Hero 25K sensor for next-gen gameplay. Comfortable design, removable weight, and six programmable buttons with G hub.",
+            "quantity_available": 7
+        },
+        {
+            "name": "G703 Lightspeed",
+            "price": 77,
+            "image": "./prodimages/g703.jpg",
+            "description": "Logitech G G703 Lightspeed gaming mouse Meets the next-gen Hero 25K sensor. Go Pro with precise gameplay at 25, 600 Max DPI and zero smoothing for optimal gaming performance.",
+            "quantity_available": 8
+        },
+        {
+            "name": "G903 Lightspeed",
+            "price": 90,
+            "image": "./prodimages/g903.jpg",
+            "description": "The flagship Logitech G G903 light speed wireless gaming mouse with next-gen Hero 25K gaming sensor for incredibly precise game play and 10x the battery efficiency of previous generations.",
+            "quantity_available": 10
+        },
+        {
+            "name": "G603 Lightspeed",
+            "price": 50,
+            "image": "./prodimages/g603.jpg",
+            "description": "G603 is a next-generation gaming mouse for a wireless world. It features the new HERO sensor for unrivaled performance with up to 10x the battery efficiency compared to prior generations.",
+            "quantity_available": 21
+        }
+    ],
+    "Steelseries": [
+        {
+            "name": "Rival 600",
+            "price": 54,
+            "image": "./prodimages/rival600.jpg",
+            "description": "The rival 600 features an exclusive custom center of gravity tuning system with 256 weight configurations and a customizable range from 96g to 128g, ensuring the perfect weight and balance for everyone. The rival 600 introduces gamers to the world's most advanced dual sensor system, truemove3+.",
+            "quantity_available": 6
+        },
+        {
+            "name": "Aerox 3",
+            "price": 56,
+            "image": "./prodimages/aerox3.jpg",
+            "description": "The SteelSeries Aerox 3 2022 Edition mouse has an ultra lightweight 59g design for effortless gameplay with silky 100% PTFE glide skates, water resistant AquaBarrier, and USB-C super mesh cable, combined with other performance-focused features.",
+            "quantity_available": 9
+        },
+        {
+            "name": "Rival 310",
+            "price": 69,
+            "image": "./prodimages/rival310.jpg",
+            "description": "Rival 310 delivers true esports performance. Featuring the new custom TrueMove3 12,000 CPI, 350 IPS optical sensor and exclusive split trigger buttons, you'll have the power of ultra low latency, rapid response tracking and the performance of lightning quick clicks.",
+            "quantity_available": 31
+        },
+        {
+            "name": "Aerox 9",
+            "price": 109,
+            "image": "./prodimages/aerox9.jpg",
+            "description": "The lightest MMO/MOBA mouse on the market, the Aerox 9 Wireless boasts an 89g build, optimal for long play sessions. Armed with an arsenal of 18 programmable buttons, including a 12-button side panel and a tilt-click scroll wheel, gamers gain a powerful edge in shortcut-heavy games.",
+            "quantity_available": 28
+        },
+        {
+            "name": "Aerox 5",
+            "price": 48,
+            "image": "./prodimages/aerox5.jpg",
+            "description": "Empower yourself to command any battlefield with the versatile, ultra-lightweight Aerox 5. Victory is in your hand with a lightning-fast 66g build, engineered to excel in any gaming genre with a wide range of customization. 9 programmable buttons provide gamers with quick shortcuts.",
+            "quantity_available": 15
+        },
+        {
+            "name": "Rival 650",
+            "price": 70,
+            "image": "./prodimages/rival650.jpg",
+            "description": "The Rival 650 Wireless gaming mouse features Quantum Wireless lag free performance paired with the world's most advanced dual sensor system, TrueMove3+ for uncompromised freedom. With 24+ hour battery life, rapid charging and, custom center of gravity tuning.",
+            "quantity_available": 11
+        }
+    ]
+}

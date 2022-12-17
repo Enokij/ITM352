@@ -2,25 +2,27 @@
   <script src="./functions.js"></script>
   <link href="cart-style.css" rel="stylesheet">
   <script>
-      var cookie;
-      var products;
-      var user_data;
-      var subtotal = 0;
-      var cookieCart;
-      loadJSON('get_products_data', function (response) {
-          // Parsing JSON string into object
-          products = JSON.parse(response);
-      });
-      loadJSON('get_cookies', function (response) {
+        var cookie;
+        var user_data;
+        var products;
+        var subtotal = 0;
+        loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
-            cookie = JSON.parse(response);
-            cookieCart = Object.keys(cookie.cart);
-            // Iterate over the cart items and calculate the total number of items in the cart
+            products = JSON.parse(response);
         });
-  loadJSON('get_users', function(response) {
-       // Parsing JSON string into object
-       user_data = JSON.parse(response);
-  });
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+        });
+
+        loadJSON('get_cookies', function(response) {
+         // Parsing JSON string into object
+         cookie = JSON.parse(response);
+    });
+    loadJSON('get_users', function(response) {
+         // Parsing JSON string into object
+         user_data = JSON.parse(response);
+    });
 
   </script>
 </head>
@@ -54,30 +56,37 @@
 
 
 <script>
-for(product_key in products) {
-  for(i=0; i<products[product_key].length; i++) {
-      if(typeof cookie.cart[product_key] == 'undefined') continue;
-      qty = cookie.cart[product_key][i];
-      extended_price = qty * products[product_key][i].price;
-      (subtotal += extended_price)
-      if(qty > 0) {
-        var product = products[product_key][i];
-        document.write(`
-        <tr>
-        <td><center>
-              <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&product_key=${product_key}'">+</button>
-            <input type="text" name="textbox" id="textbox" value="${qty}" style="width: 20px">
-            <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&product_key=${product_key}'">-</button>
-          </center></td>
-          <td>${products[product_key][i].name} <img src="./images/${products[product_key][i].image}" WIDTH = 60px</td>
-              <td>\$${products[product_key][i].price}</td>
-              <td>\$${extended_price}</td></tr></center>
-              <tr>
-                `);
+checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
+
+  for(product_key in products) {
+    for(i=0; i<products[product_key].length; i++) {
+        if(typeof shopping_cart[product_key] == 'undefined') continue;
+        qty = shopping_cart[product_key][i];
+        extended_price = qty * products[product_key][i].price;
+        (subtotal += extended_price)
+        if(qty > 0) {
+          var product = products[product_key][i];
+          document.write(`
+          <tr>
+          <td>
+            <input type="checkbox" id="favorite-<%= ${i} %>">
+            <label for="favorite-<%= ${i} %>"><%= ${product[i]} %></label> 
+          </td>
+          <td><center>
+                <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?prodID=${product.id}&product_key=${product_key}'">+</button>
+              <input type="text" id="textbox" value="${qty}" style="width: 20px">
+              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?prodID=${product.id}&product_key=${product_key}'">-</button>
+            </center></td>
+            <td>${products[product_key][i].name} <img src="./images/${products[product_key][i].image}" WIDTH = 60px</td>
+                <td>\$${products[product_key][i].price}</td>
+                <td>\$${extended_price}</td></tr></center>
+                <tr>
+                  `);
+
+        }
     }
-  }
-} 
+}  
   if (subtotal == 0) {
     alert(`No items in cart`);
     location.href = "index.html";

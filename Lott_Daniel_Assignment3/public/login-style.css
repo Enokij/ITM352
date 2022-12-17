@@ -55,25 +55,6 @@ header {
     border-radius: 4px; /* Add rounded corners to the link */
   }
 
-.nav-link {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-link button {
-  background-color: transparent;
-  border: none;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-}
-
-.nav-link button:hover {
-  background-color: #555;
-  border-radius: 4px;
-}
   
 h1 {
     letter-spacing: 1.5vw;

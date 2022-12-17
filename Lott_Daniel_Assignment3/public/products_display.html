@@ -12,16 +12,20 @@
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products = JSON.parse(response);
-        });
+        })
         loadJSON('get_cookies', function (response) {
             // Parsing JSON string into object
             cookie = JSON.parse(response);
             cookieCart = Object.keys(cookie.cart);
             // Iterate over the cart items and calculate the total number of items in the cart
-            for (var i = 0; i < cookieCart.length; i++) {
-                total += [cookie.cart[cookieCart][i]].reduce((a, b) => a + b);
-                console.log(cookie.cart)
-        }});
+        })
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -43,25 +47,22 @@
           <script>nav_bar(this_product_key, products);</script>
         </li>
         <li>You have <span id="cart_total">0</span> items in your shopping cart: <a href='cart.html'>View Cart</a></li>
-        <li>
-          <script>
-            //Updates the number of items in cart
-            cart_total.innerHTML = total;
-            //Defines user_email to be what email was entered and saved into the cookies
-            user_email = cookie.email;
-            //Defines ifLoggedIn to be 
-            ifLoggedIn = cookie.loggedIn;
-            if (ifLoggedIn == 'true') {
-              document.write('<a href="get_to_logout">Logout</a>')
-            } else {
-              document.write('<a href="get_to_login">Login</a>');
-            }
-          </script>
-        </li>
+        <script>
+          //Updates the number of items in cart
+          cart_total.innerHTML = total;
+          //Defines user_email to be what email was entered and saved into the cookies
+          user_email = cookie.email;
+          //Defines ifLoggedIn to be 
+          ifLoggedIn = cookie.loggedIn;
+          if (ifLoggedIn == 'true') {
+            document.write('<li><a href="get_to_logout">Logout</a></li>')
+          } else {
+            document.write('<li><a href="get_to_login">Login</a></li>');
+          }
+        </script>
       </ul>
     </nav>
   </header>
-  
 
 <!-- Move the script tag containing the nav_bar() function outside of the <ul> element -->
 <script>
@@ -108,23 +109,27 @@ if(params.has('products_key')){
                <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${productCatagory}"><center><body><div><main>`;
                 
     product = products[productCatagory];
-    for (i = 0; i < product.length; i++) {
-        order_str += `
-        <section class="item">
-            <h2>${product[i].name}</h2>
-            <p>$${product[i].price}</p>
-            <img src=./images/${product[i].image}>
-            <h6>Left in Stock: ${product[i].qty_available}</h6>
-            <br>
-            <h6>Total Sold: ${product[i].total_sold}</h6>
-            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof cookie.cart[productCatagory] != 'undefined') ? cookie.cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
-            <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
-            </section>
-    `;
-    }
+    order_str += `<TABLE>`;
 
-    order_str += `</TABLE>`;
-    document.write(order_str);
+for (let i = 0; i < product.length; i++) {
+  order_str += `
+    <section class="item">
+      <h2>${product[i].name}</h2>
+      <p>$${product[i].price}</p>
+      <img src=./images/${product[i].image}>
+      <h6>Left in Stock: ${product[i].qty_available}</h6>
+      <br>
+      <input type="checkbox" id="favorite-${i}" name="favorite-${i}">
+      <h6>Total Sold: ${product[i].total_sold}</h6>
+      <input class="textbox" type="text" name="quantity[${i}]" value="${(typeof cookie.cart[productCatagory] != 'undefined') ? cookie.cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+      <span class="error_msg" id="quantity[${i}]_message">Enter a quantity</span>
+    </section>
+  `;
+}
+
+order_str += `</TABLE>`;
+document.write(order_str);
+
 } else {
     let str = `
     <h2>Please Select a Product Catagory to Begin Shopping!</h2>
@@ -148,7 +153,7 @@ if(params.has('products_key')){
         /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
         button to submit_button (which has already been set to equal the desired error message on the server side)*/
         window.addEventListener('load', function () {
-            let params = (new URL(document.location)).searchParams;
+            var params = (new URL(document.location)).searchParams;
             if (params.get("error") == 'Please Enter Valid Quantity') {
                 document.getElementById("button").value = params.get("error"); 
                 /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value

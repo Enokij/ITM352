@@ -81,6 +81,32 @@ nav ul li a:hover {
   background-color: #555;
   border-radius: 4px;
 }
+input[type="checkbox"] {
+  right:50px;
+  top:30px;
+  z-index: 10000;
+  position:absolute;
+}
+
+input[type="checkbox"]input {
+  left: 1000px;
+  top:30px;
+  z-index: 10000;
+}
+
+input[type="checkbox"]:checked {
+  background-color: yellow;
+  right:50px;
+  top:30px;
+  z-index: 3000;
+}
+
+input[type="checkbox"]:checked + label {
+  color: red;
+  right:50px;
+  top:30px;
+  z-index: 3000;
+}
 
 body {
   width: 100%;

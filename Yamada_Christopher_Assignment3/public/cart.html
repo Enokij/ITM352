@@ -1,0 +1,223 @@
+<!-- Author: Christopher Y. This file displays product store -->
+<!-- This page is adapted from a W3 Schools Template: https://www.w3schools.com/w3css/tryw3css_templates_black.htm -->
+<head>
+    <title>Shopping Cart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <!-- Calling for products data -->
+    <!--<script src="./products.js" type="text/javascript"></script> -->
+    <script src="./functions.js"></script>
+    <script>
+        var products_data;
+        // Function is taken from Assignment 3 code example website: https://dport96.github.io/ITM352/morea/180.Assignment3/reading-code-examples.html
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+        // Function is taken from Assignment 3 code example website: https://dport96.github.io/ITM352/morea/180.Assignment3/reading-code-examples.html
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+        });
+
+        // Code from W3 schools: https://www.w3schools.blog/get-cookie-by-name-javascript-js
+        // Function gets browser cookies and returns cookie value(s)
+        function getCookie(cookieName) {
+            let cookie = {};
+            document.cookie.split(';').forEach(function (el) {
+                let [key, value] = el.split('=');
+                cookie[key.trim()] = value;
+            })
+            return cookie[cookieName];
+        }
+        // Code from stack overflow: https://stackoverflow.com/questions/5968196/how-do-i-check-if-a-cookie-exists
+        // Function checks if username cookie exists to display if a user is logged in or not. If logged in it displays their username
+        function checkLogin() {
+            var loginCookie = getCookie("username");
+
+            if (loginCookie == null) {
+                document.write(`<a href="/login" class="w3-bar-item w3-button w3-padding-16">Login/Register</a>`);
+            }
+            else {
+                document.write(`
+                            <a href="#" class="w3-bar-item w3-button w3-padding-16">Logged In: ${getCookie("username")}</a>
+                            `);
+            }
+        }
+        // Function checks if the user is logged in to checkout
+        function loginCheckout() {
+            // Fetches username cookie
+            var loginCookie = getCookie("username");
+            // If no loginCookie then displays message for user to login
+            if (loginCookie == null) {
+                document.write(`<div class="w3-center"><p>Please Login or Register to checkout!</p></div>`);
+            }
+            else {
+                // If user is logged in then allows user to checkout
+                document.write(`
+                <form action="./invoice" method="GET">
+                <div class="w3-center">
+                <br>
+                <button class="w3-button w3-theme" type="submit" value="Purchase">Checkout</button>
+                </form>
+                `);
+            }
+        }
+
+        // Code from stack overflow: https://stackoverflow.com/questions/5968196/how-do-i-check-if-a-cookie-exists
+        // Function checks if username cookie exists to display if a user is logged in or not. If logged in it displays their username
+        function checkLogout() {
+            var loginCookie = getCookie("username");
+
+            if (loginCookie == null) {
+                var nothing = "";
+            }
+            else {
+                document.write(`
+                            <a href="/logout" class="w3-bar-item w3-button ">Logout</a>
+                            `);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="w3-container w3-theme w3-padding" id="myHeader">
+        <div class="w3-container">
+            <div class="w3-bar w3-theme">
+                <!-- Home button -->
+                <a href="index.html" class="w3-bar-item w3-button w3-padding-16">Home</a>
+                <div class="w3-dropdown-hover">
+                    <!-- Mice dropdown to go to different mice product pages -->
+                    <button class="w3-button w3-padding-16">
+                        Mice <i class="fa fa-caret-down"></i>
+                    </button>
+                    <div class="w3-dropdown-content w3-card-4 w3-bar-block">
+                        <!-- Mice product page links that checks the visitpage in server to assign current page -->
+                        <script>
+                            document.write(`
+                            <form action="/visitedpage" method"GET">
+	                            <input type="hidden" name="visitingpage" value="Razer">
+	                            <button class="w3-bar-item w3-button" type="submit" value="visit" name="Submit">Razer Mice</button>
+                                </form>
+                                <form action="/visitedpage" method"GET">
+	                            <input type="hidden" name="visitingpage" value="Logitech">
+	                            <button class="w3-bar-item w3-button" type="submit" value="visit" name="Submit">Logitech Mice</button>
+                                </form>
+                                <form action="/visitedpage" method"GET">
+	                            <input type="hidden" name="visitingpage" value="Steelseries">
+	                            <button class="w3-bar-item w3-button" type="submit" value="visit" name="Submit">Steelseries Mice</button>
+                                </form>
+                            `);
+                        </script>
+
+                    </div>
+                </div>
+                <!-- Cart button -->
+                <p class="w3-right">
+                    <a href='./cart.html'><i class="fa fa-shopping-cart w3-margin-right w3-xlarge"></i></a>
+                    <script>
+                        checkLogout();
+                    </script>
+                </p>
+                <!-- Calls checkLogin function to allow checkout if user is logged in -->
+                <script>
+                    checkLogin();
+                </script>
+            </div>
+        </div>
+        <div class="w3-center">
+            <h1 class="w3-xxxlarge w3-animate-bottom">Christopher's Mouse Store</h1>
+        </div>
+    </header>
+    <div class="w3-center">
+        <h1>Shopping Cart</h1><br><br>
+        </form>
+    </div>
+    <!-- Product Display -->
+    <div class="w3-responsive w3-card-4">
+        <table class="w3-table w3-striped w3-bordered">
+            <thead>
+                <tr class="w3-theme">
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Extended Price</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <script>
+                    var subtotal = 0
+                    // Sales tax rate
+                    var salestax = 0.0575;
+                    for (product_key in products_data) {
+                        for (i = 0; i < products_data[product_key].length; i++) {
+                            if (typeof shopping_cart[product_key] == 'undefined') continue;
+                            qty = shopping_cart[product_key][i];
+                            let extended_price = (products_data[product_key][i].price * qty); // calculates extended price
+                            subtotal += extended_price; // adds extendedprice to collective subtotal
+                            if (qty > 0) {
+                                document.write(`<tr><td>${products_data[product_key][i].name}</td><td>${qty}</td><td>${products_data[product_key][i].price}</td><td>${extended_price}</td><tr>`);
+                            }
+                        }
+                    }
+                    var taxedamount = salestax * subtotal; // calculates tax amount
+                    //Shipping
+                    if (subtotal < 50) {
+                        shipping = 2;
+                    } else if (subtotal < 100) {
+                        shipping = 5;
+                    } else {
+                        shipping = 0.05 * subtotal;
+                    }
+                    // Total amount that needs to be paid
+                    var grandtotal = taxedamount + subtotal + shipping;
+                    document.write(`
+                    <tr>
+                        <td colspan="4" width="100%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;" colspan="3" width="67%">Sub-total</td>
+                        <td width="54%">$${subtotal}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @
+                                5.75%</span></td>
+                        <td width="54%">$${taxedamount.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;" colspan="3" width="67%"><span
+                                style="font-family: arial;">Shipping</span></td>
+                        <td width="54%">$${shipping.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;" colspan="3" width="67%"><strong>Total</strong></td>
+                        <td width="54%"><strong>$${grandtotal.toFixed(2)}</strong></td>
+                    </tr>
+                    </tbody>
+                    </table>`);
+                    loginCheckout();
+                    document.write(`
+            <br><br><br>
+</body>
+
+
+<!-- Shipping pricing disclaimer -->
+<b>OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
+    A subtotal $50 - $99.99 will be $5 shipping
+    Subtotals over $100 will be charged 5% of the subtotal amount <b>
+<br><br><br><br><br><br><br><br><br>
+
+<!-- Footer -->
+    <footer class="w3-center w3-container w3-theme-dark w3-padding-16">
+      <h3>Your one stop shop for computer mice!</h3>
+    </footer>
+
+
+</html>`);
+</script>

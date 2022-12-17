@@ -13,6 +13,7 @@ var fs = require('fs');
 const crypto = require('crypto');
 let secretekey = 'secretekey';
 var cookieParser = require('cookie-parser');
+const { request } = require('node:http');
 
                                                                     /////////////////
                                                                     ///*FUNCTIONS*///
@@ -76,28 +77,6 @@ function quantityValidation(quantityString, returnErrors = false) {
 for (let key in products_data) {
   products_data[key].forEach((prod) => { prod.total_sold = 0 });
 }
-
-// Define the increaseQuantity() function and pass the products_key variable as an argument
-function decreaseQuantity(request, products_key, productId, product_key, products_data) {
-    // Use the passed product_key variable to access the correct array of products in the products_data object
-    var product = products_data[product_key];
-    var index = product.findIndex(product => product.id === productId);
-    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
-    request.session.cart[product_key][index] -= 1;
-    if (request.session.cart[product_key][index] == 0) {
-        response.redirect("./products_display");
-    }
-}
-
-// Define the increaseQuantity() function and pass the products_key variable as an argument
-function increaseQuantity(request, products_key, productId, product_key, products_data) {
-    // Use the passed product_key variable to access the correct array of products in the products_data object
-    var product = products_data[product_key];
-    var index = product.findIndex(product => product.id === productId);
-    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
-    request.session.cart[product_key][index] += 1;
-}
-
 
 
                                                                     ///////////////
@@ -164,6 +143,10 @@ app.get('/', function (req, res) {
 //Puts in JSON format
 app.get("/get_cookies", function (request, response) {
     response.json(request.cookies);
+});
+
+app.get("/get_cart", function (request, response) {
+    response.json(request.session.cart);
 });
 
 //Gets the user's data file in JSON format
@@ -262,6 +245,7 @@ app.get("/register", function (request, response) {
 
 app.get("/get_to_logout", function (request, response) {
     let loggedIn = false;
+    request.session.destroy();
     let str = `
 <!DOCTYPE html>
 <html lang="en">
@@ -293,12 +277,15 @@ app.get("/add_to_cart", function (request, response) {
     let valid_num = true;
     let qty_name = 'quantity'; //name of textbox in products_data.html
     let qtys = request.query[qty_name]; //gets the quantities of the entered data 
+    let favorite_name = request.query["favorite-"]
     request.session.qty = qtys;
+    request.session.favorite = favorite_name;
     let zero_qty = false;
     console.log(Number(qtys));
     let product = request.query['products_key'];
     for (i = 0; i < products_data[product].length; i++) { // Runs loop for all products and their respective entered quantities
         let qty = qtys[i];
+        var favorite = favorite_name[i];
         if (qty == 0 || qty == '') continue; //if no inputs are entered into a product quantity textbox, then continue to the next product in the qty array.
         if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty) > 0) {
             //if the qty meets the above criteria, then update the product's qty sold and available with the respective product quantities entered   
@@ -330,35 +317,55 @@ app.get("/add_to_cart", function (request, response) {
         request.session.cart[products_key] = quantities; // store the quantities array in the session cart object with the same products_key. 
         console.log(request.session.cart[products_key])
         response.cookie('cart', request.session.cart);
-              response.redirect('./cart.html');
+        response.cookie('favorite', favorite);
+        response.redirect('./cart.html');
         }
     } 
 );
 
+
+// Code help from Justin Enoki 
+// Define the increaseQuantity() function and pass the products_key variable as an argument
+function increaseQuantity(request, products_key, prodID, product_key, products_data) {
+    // Use the passed product_key variable to access the correct array of products in the products object
+    var products = products_data[product_key];
+    var index = products.findIndex(product => product.id === prodID);
+    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+    request.session.cart[product_key][index] += 1;
+}
+
 // Define the app.get() method and pass the products_key variable as an argument
 app.get("/increase_quantity", function (request, response) {
     // Get the index of the item from the request query string
-    var productId = request.query.productId;
+    var prodID = request.query.prodID;
     // Get the product_key of the selected product from the request query string
     var product_key = request.query.product_key;
     // Increase the value of the item in the array by 1
-    increaseQuantity(request, products_key, productId, product_key, products_data);
+    increaseQuantity(request, products_key, prodID, product_key, products_data);
     // Redirect the user back to the shopping cart page
     response.redirect("./cart.html");
 });
+
+// Define the increaseQuantity() function and pass the products_key variable as an argument
+function decreaseQuantity(request, products_key, prodID, product_key, products_data) {
+    // Use the passed product_key variable to access the correct array of products in the products object
+    var products = products_data[product_key];
+    var index = products.findIndex(product => product.id === prodID);
+    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+    request.session.cart[product_key][index] -= 1;
+}
 
 // Define the app.get() method and pass the products_key variable as an argument
 app.get("/decrease_quantity", function (request, response) {
     // Get the index of the item from the request query string
-    var productId = request.query.productId;
+    var prodID = request.query.prodID;
     // Get the product_key of the selected product from the request query string
     var product_key = request.query.product_key;
     // Increase the value of the item in the array by 1
-    decreaseQuantity(request, products_key, productId, product_key, products_data);
+    decreaseQuantity(request, products_key, prodID, product_key, products_data);
     // Redirect the user back to the shopping cart page
     response.redirect("./cart.html");
 });
-
 
                                                                     ////////////////
                                                                     ///*APP.POST*///
@@ -384,7 +391,6 @@ app.post("/checkout", function(request, response) {
         response.redirect('./invoice.html')
     }
 });
-
 app.get("/submit_login", function (request, response) {
     // Process login form POST and redirect to logged in page if ok, back to login page if not
     // User entered inputs are set to the variable POST
@@ -393,20 +399,20 @@ app.get("/submit_login", function (request, response) {
     var user_pass = generateCipher(POST['password']);
     let loggedIn = false;
     console.log("User name=" + entered_email + " password=" + user_pass);
-
     if (user_data[entered_email] != undefined) {
         if (user_data[entered_email].password == user_pass) {
             loggedIn = true;
             request.session.email = entered_email;
             user_data[entered_email].num_loggedIn += 1;
-            data = JSON.stringify(user_data);
+            user_data[entered_email].last_date_loggin = Date();
             fs.writeFileSync(fname, data, 'utf-8');
-            if (typeof request.session.last_login != "undefined") {
-                request.session.lastlogin = new Date().toLocaleString();
+            if (typeof request.session.last_date_loggin != "undefined") {
+                user_data[entered_email].last_date_loggin = Date();;
             }
         }    
         //sends cookie back to the client
         response.cookie('email', entered_email)
+        response.cookie('cart', request.session.cart);
         response.cookie('loggedIn', loggedIn)
         response.redirect(`index.html`);
     } else {
@@ -456,7 +462,7 @@ app.post("/register", function (request, response) {
     if ((POST['password'].length) < 10) { // used .length so that it reads the length of password that is inputted
         reg_error['password'] = 'Password must be longer than 10 characters' // message appears in query string
     }
-    if ((POST['password']) != POST['repeat_password']) { // make sure both password match 
+    if ((POST['password']) != POST['repeat_password']) { // make sure both password loginmatch 
         reg_error['repeat_password']
     }
     // used object.keys for the array to check that errors equal to zero
@@ -473,6 +479,9 @@ app.post("/register", function (request, response) {
         // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
         fs.writeFileSync(fname, JSON.stringify(user_data), "utf-8");
         // redirect to login page if all registered data is good, we want to keep the name enter so that when they go to the invoice page after logging in with their new user account
+        response.cookie('loggedIn', LogStatus);
+        response.cookie('email', email);
+        response.cookie('cart', request.session.cart);
         response.redirect('/get_to_login');
     } else {
         POST['reg_error'] = JSON.stringify(reg_error); // if there are errors we want to create a string 
