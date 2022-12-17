@@ -51,25 +51,6 @@ if (fs.existsSync(fname)) { // reads entire file
     console.log("Sorry file " + fname + " does not exist.");
 }
 
-
-// Define the increaseQuantity() function and pass the products_key variable as an argument
-function increaseQuantity(request, products_key, productId, product_key, products_data) {
-    // Use the passed product_key variable to access the correct array of products in the products_data object
-    var product = products_data[product_key];
-    var index = product.findIndex(product => product.id === productId);
-    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
-    request.session.cart[product_key][index] += 1;
-}
-
-// Define the increaseQuantity() function and pass the products_key variable as an argument
-function decreaseQuantity(request, products_key, productId, product_key, products_data) {
-    // Use the passed product_key variable to access the correct array of products in the products_data object
-    var product = products_data[product_key];
-    var index = product.findIndex(product => product.id === productId);
-    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
-    request.session.cart[product_key][index] -= 1;
-}
-
 //Taken from the Stor1 WOD
 //check if there are any invalid quantity inputs
 function quantityValidation(quantityString, returnErrors = false) {
@@ -80,9 +61,7 @@ function quantityValidation(quantityString, returnErrors = false) {
         errors.push('Negative value!'); // Check if it is non-negative
     } else if (parseInt(quantityString) != quantityString) {
         errors.push('Not an integer!'); // Check that it is an integer
-    } else if(quantityString == '') {
-        quantityString = 0
-    }
+    } 
     if (returnErrors) {
         return errors;
     } else if (errors.length == 0) {
@@ -94,10 +73,31 @@ function quantityValidation(quantityString, returnErrors = false) {
 
 //Taken from Lab13, Ex5 
 //Runs through each element in the product array and initiailly set the total_sold 0
-var products_data = require('./product_data.json');
 for (let key in products_data) {
   products_data[key].forEach((prod) => { prod.total_sold = 0 });
 }
+
+// Define the increaseQuantity() function and pass the products_key variable as an argument
+function decreaseQuantity(request, products_key, productId, product_key, products_data) {
+    // Use the passed product_key variable to access the correct array of products in the products_data object
+    var product = products_data[product_key];
+    var index = product.findIndex(product => product.id === productId);
+    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+    request.session.cart[product_key][index] -= 1;
+    if (request.session.cart[product_key][index] == 0) {
+        response.redirect("./products_display");
+    }
+}
+
+// Define the increaseQuantity() function and pass the products_key variable as an argument
+function increaseQuantity(request, products_key, productId, product_key, products_data) {
+    // Use the passed product_key variable to access the correct array of products in the products_data object
+    var product = products_data[product_key];
+    var index = product.findIndex(product => product.id === productId);
+    // Use the passed products_key variable inside the function to update the quantity of the selected product in the request.session.cart array
+    request.session.cart[product_key][index] += 1;
+}
+
 
 
                                                                     ///////////////
@@ -132,12 +132,20 @@ app.use(express.urlencoded({ extended: true }));
                                                                     ///*APP.ALL*///
                                                                     ///////////////
 
+// monitor all requests
 app.all('*', function (request, response, next) {
-    // need to initialize an object to store the cart in the session. We do it when there is any request so that we don't have to check it exists
-    // anytime it's used
-    if (typeof request.session.cart == 'undefined') { request.session.cart = {}; }
+    console.log(request.method + ' to ' + request.path);
+    // cart session
+    if (typeof request.session.cart == 'undefined') {  
+       request.session.cart = {};
+       shopping_cart = request.session.cart
+       response.cookie('cart', shopping_cart);
+    } // email session
+    if (typeof request.session.email == 'undefined') { 
+       request.session.email = {};
+    }
     next();
-});
+ });
 
                                                                     ///////////////
                                                                     ///*APP.GET*///
@@ -161,11 +169,6 @@ app.get("/get_cookies", function (request, response) {
 //Gets the user's data file in JSON format
 app.get("/get_users", function (request, response) {
     response.json(user_data);
-});
-
-//Gets the session's cart in JSON format so that it can be used in HTML
-app.get("/get_cart", function (request, response) {
-    response.json(request.session.cart);
 });
 
 //Gets the product's data file in JSON format
@@ -203,7 +206,14 @@ app.get("/get_to_login", function (request, response) {
 </header>
     <h1>Login</h1>
     <body>
-        <form action="./get_to_login" method="POST"> 
+    <span id="error_msg">
+    <script>
+        if ('${params.get("error")}' == 'Not Logged In') {
+            document.getElementById("error_msg").innerHTML = "<center>Please login or create an account to continue purchase.</center>";
+            console.log('${params.get("error")}');
+        };
+    </script>
+        <form action="./submit_login" method="get"> 
            <h2><input type="text" name="email" id="email" value="" size="40" placeholder="Enter email" ><br /></h2>
                <h2><input type="password" name="password" size="40" placeholder="Enter password"><br /></h2>
                 <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
@@ -252,7 +262,6 @@ app.get("/register", function (request, response) {
 
 app.get("/get_to_logout", function (request, response) {
     let loggedIn = false;
-
     let str = `
 <!DOCTYPE html>
 <html lang="en">
@@ -263,7 +272,7 @@ app.get("/get_to_logout", function (request, response) {
     <title>Document</title>
 </head>
 <body>
-    <form action="logout" method="POST">
+    <form action="logout" method="get">
         <script>
             document.write(
                 'Thank you for shopping at Island Cycling! <br> You have been successfully logged out.' 
@@ -281,44 +290,50 @@ app.get("/get_to_logout", function (request, response) {
 // creates the cart for the sesison
 app.get("/add_to_cart", function (request, response) {
     let valid = true;  //going to use the boolean to verify if the quantity entered is less than the qty_available 
-    let valid_num= true;   
+    let valid_num = true;
     let qty_name = 'quantity'; //name of textbox in products_data.html
     let qtys = request.query[qty_name]; //gets the quantities of the entered data 
+    request.session.qty = qtys;
+    let zero_qty = false;
+    console.log(Number(qtys));
     let product = request.query['products_key'];
     for (i = 0; i < products_data[product].length; i++) { // Runs loop for all products and their respective entered quantities
         let qty = qtys[i];
-        if(qty == 0 || qty =='') continue; //if no inputs are entered into a product quantity textbox, then continue to the next product in the qty array.
-            if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty)>0) {
+        if (qty == 0 || qty == '') continue; //if no inputs are entered into a product quantity textbox, then continue to the next product in the qty array.
+        if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty) > 0) {
             //if the qty meets the above criteria, then update the product's qty sold and available with the respective product quantities entered   
-            } else if(quantityValidation(qty) != true) { // if quantities is not equal to a valid number than it is false 
-                valid_num = false;
-            } else if(Number(qty) >= products_data[product][i].qty_available) { // If the quantities enter are greater then the qty_available, then valid = false (returns)
-                valid = false;
-             } if(qty > 0) { //if quantities is greater than 0 than this statement returns true
-                var zero_qty = true;
-             }
-            }
+        } else if (quantityValidation(qty) != true) { // if quantities is not equal to a valid number than it is false 
+            valid_num = false;
+        } else if (Number(qty) >= products_data[product][i].qty_available) { // If the quantities enter are greater then the qty_available, then valid = false (returns)
+            valid = false;
+        }
+        if (qty > 0) {
+            zero_qty = true;
+        }
+    }
     //from Lab 13 info_server.new.js. For Individual Requirement 4 Assignment 1 (Erin)
     /*if the number entered is not a valid number as identified through the quantityValidation(qty) or did not meet the other conditions set in the if statement,
     then redirect user back to the products_display page and set the submit_button parameter to the respective error message*/
-    if(valid_num == false){ 
-        response.redirect(`products_display.html?products_key=${product}?error=Please Enter Valid Quantity`);
-    /*if quantity available is less then the amount of quantity ordered, then redirect user back to the products_display page
-    and set the submit_button parameter to the respective error message*/
-    }else if(typeof zero_qty == false) {
-        response.redirect(`products_display.html?products_key=${product}?error=Need to select quantity to purchase`);
+    if (valid_num == false) {
+        response.redirect(`products_display.html?products_key=${product}&error=Please Enter Valid Quantity`);
+        /*if quantity available is less then the amount of quantity ordered, then redirect user back to the products_display page
+        and set the submit_button parameter to the respective error message*/
+    } else if (zero_qty == false) {
+        response.redirect(`products_display.html?products_key=${product}&error=Need to select quantity to purchase`);
     }
     else if (valid == false) {
-        response.redirect(`products_display.html?products_key=${product}?error=Not Enough Left In Stock!`);
-    } else if (typeof qtys == "") {
-        response.redirect(`products_display.html?products_key=${product}?error=Enter Quantity To Continue!`);
+        response.redirect(`products_display.html?products_key=${product}&error=Not Enough Left In Stock!`);
     } else {
         // If no errors are found, then redirect to the invoice page.
-        products_key= request.query['products_key'];
+        products_key = request.query['products_key'];
         quantities = request.query['quantity'].map(Number); // Get quantities from the form post and convert strings from form post to numbers
         request.session.cart[products_key] = quantities; // store the quantities array in the session cart object with the same products_key. 
-        response.redirect('./cart.html');
-}});
+        console.log(request.session.cart[products_key])
+        response.cookie('cart', request.session.cart);
+              response.redirect('./cart.html');
+        }
+    } 
+);
 
 // Define the app.get() method and pass the products_key variable as an argument
 app.get("/increase_quantity", function (request, response) {
@@ -332,7 +347,6 @@ app.get("/increase_quantity", function (request, response) {
     response.redirect("./cart.html");
 });
 
-
 // Define the app.get() method and pass the products_key variable as an argument
 app.get("/decrease_quantity", function (request, response) {
     // Get the index of the item from the request query string
@@ -345,55 +359,55 @@ app.get("/decrease_quantity", function (request, response) {
     response.redirect("./cart.html");
 });
 
+
                                                                     ////////////////
                                                                     ///*APP.POST*///
                                                                     ////////////////
 
+
+
 // updates the cart 
-app.post("/update_cart", function(request, response) {
+app.post("/update_cart",function(request, response){
+    updated_qty = request.session.cart
+    response.cookie('cart', updated_qty);
     if(request.cookies.loggedIn == "true"){
-        updated_qty = request.session.cart
-        console.log('updated_qty = ' + updated_qty);
-        for(i=0; i<updated_qty.length; i++){
-        products_data[products_key][i].quantity_available -= Number(updated_qty[i]);//subtracts quantities from quantity_available
-        console.log('products' + products_data[products_key][i].quantity_available)
-        products_data[products_key][i].total_sold += Number(updated_qty[i]); //increments quantities to quantities sold 
-        fs.writeFileSync(fname, JSON.stringify(products_data), "utf-8");
-    }
-        response.cookie('cart', updated_qty);
-        response.redirect('./invoice.html')
+        response.redirect('./cart.html?update=Cart Has Been Updated!')
     } else {
-        response.redirect("/get_to_login")
+        response.redirect("/get_to_login?error=Not Logged In")
     }
 });
 
-app.post("/get_to_login", function (request, response) {
+app.post("/checkout", function(request, response) {
+    if(request.cookies.loggedIn == "true"){
+        updated_qty = request.session.cart
+        response.cookie('cart', updated_qty);
+        response.redirect('./invoice.html')
+    }
+});
+
+app.get("/submit_login", function (request, response) {
     // Process login form POST and redirect to logged in page if ok, back to login page if not
     // User entered inputs are set to the variable POST
-    let POST = request.body;
+    let POST = request.query;
     entered_email = POST["email"].toLowerCase();
     var user_pass = generateCipher(POST['password']);
     let loggedIn = false;
     console.log("User name=" + entered_email + " password=" + user_pass);
 
     if (user_data[entered_email] != undefined) {
-        let loggedIn = true;
         if (user_data[entered_email].password == user_pass) {
+            loggedIn = true;
+            request.session.email = entered_email;
+            user_data[entered_email].num_loggedIn += 1;
+            data = JSON.stringify(user_data);
+            fs.writeFileSync(fname, data, 'utf-8');
             if (typeof request.session.last_login != "undefined") {
-                request.session.email = entered_email;
                 request.session.lastlogin = new Date().toLocaleString();
-                var msg = `You last logged in: ${request.session.last_login}`;
-                var now = new Date();
-            } else {
-                var msg = '';
-                var now = "First visit";
             }
-        }
-        request.session.last_login = now;
+        }    
         //sends cookie back to the client
         response.cookie('email', entered_email)
         response.cookie('loggedIn', loggedIn)
-        response.cookie('cart', request.session.cart)
         response.redirect(`index.html`);
     } else {
         response.send({ success: false, error: "Invalid username or password" });

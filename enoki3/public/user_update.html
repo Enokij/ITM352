@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="homepage.css" rel="stylesheet">
+    <script src="./functions.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <title>Edit credentials</title>
+
+    <script>
+        total = 0;
+        var cookie;
+        var user_data;
+        var products;
+
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
+        });
+
+        loadJSON('get_users', function (response) {
+            user_data = JSON.parse(response);
+        });
+
+    </script>
+</head>
+<h1>Already have an account,edit your credentials here!</h1>
+
+<body>
+
+    <body onload="FillValues()">
+        <ul>
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Products</a>
+                <div class="dropdown-content">
+                    <script>
+                        document.write(`<a href='./products.html?products_key=keyboards'>Keyboards`);
+                        document.write(`<a href='./products.html?products_key=switches'>Switches`);
+                        document.write(`<a href='./products.html?products_key=keycaps'>Keycaps`);
+                    </script>
+                </div>
+            </li>
+            <li>
+                <p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p>
+            </li>
+            <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+        </ul>
+        <script>
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
+                loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+            }
+        </script>
+        <form action="/user_update" method="POST">
+            <h2><input type="email" id="email" name="email" size="40" placeholder=" Update email"><br />
+                <input type="text" id="name" name="fullname" size="40" placeholder="Update full name"><br />
+                <input type="password" id="password" name="password" size="40" placeholder="Update password"><br />
+                <input type="password" id="repeat_password" name="repeat_password" size="40"
+                    placeholder="Update password again"><br />
+            </h2>
+            <center><input class="submit" type="submit" value="Submit" id="submit"></center>
+
+            <script>
+                function FillValues() {
+                    if (params.has("email")) {
+                        document.getElementById("email").innerHTML = "Email: " + params.get('email');
+                        console.log(params.get('email'));
+                    } if (params.has("name")) {
+                        document.getElementById("name").innerHTML = "Welcome " + params.get('name') + "!";
+                        console.log(params.get('name'))
+                    }
+                }
+            </script>
+        </form>
+    </body>
+
+</html>

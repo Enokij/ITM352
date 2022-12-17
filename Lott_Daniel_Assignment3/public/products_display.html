@@ -7,21 +7,21 @@
     <script>
         var products;
         var total = 0;
+        var cookie;
+        var cookieCart;
         loadJSON('get_products_data', function (response) {
             // Parsing JSON string into object
             products = JSON.parse(response);
         });
-
-        loadJSON('get_cart', function (response) {
-            // Parsing JSON string of the session's cart
-            shopping_cart = JSON.parse(response);
-            // Create an array of the cart items
-            var cartItems = Object.keys(shopping_cart);
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
+            cookieCart = Object.keys(cookie.cart);
             // Iterate over the cart items and calculate the total number of items in the cart
-            for (var i = 0; i < cartItems.length; i++) {
-                total += shopping_cart[cartItems[i]].reduce((a, b) => a + b);
-            }
-        });
+            for (var i = 0; i < cookieCart.length; i++) {
+                total += [cookie.cart[cookieCart][i]].reduce((a, b) => a + b);
+                console.log(cookie.cart)
+        }});
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -35,16 +35,33 @@
 </head>
 
 <header>
-  <img src='./images/logo.jpg'>
-  <nav>
-    <ul>
-      <li><a href='index.html'>HOME<a></li>
-      <li><script>nav_bar(this_product_key, products);</script></li>
-      <li><a href='get_to_login'>Login<a></li>
-      <li>You have <span id="cart_total">0</span> items in your shopping cart: <a href='./cart.html'>View Cart</a></li>
-    </ul>
-  </nav>
-</header>
+    <img src='./images/logo.jpg'>
+    <nav>
+      <ul>
+        <li><a href='index.html'>HOME<a></li>
+        <li>
+          <script>nav_bar(this_product_key, products);</script>
+        </li>
+        <li>You have <span id="cart_total">0</span> items in your shopping cart: <a href='cart.html'>View Cart</a></li>
+        <li>
+          <script>
+            //Updates the number of items in cart
+            cart_total.innerHTML = total;
+            //Defines user_email to be what email was entered and saved into the cookies
+            user_email = cookie.email;
+            //Defines ifLoggedIn to be 
+            ifLoggedIn = cookie.loggedIn;
+            if (ifLoggedIn == 'true') {
+              document.write('<a href="get_to_logout">Logout</a>')
+            } else {
+              document.write('<a href="get_to_login">Login</a>');
+            }
+          </script>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  
 
 <!-- Move the script tag containing the nav_bar() function outside of the <ul> element -->
 <script>
@@ -60,7 +77,9 @@ function quantityValidation(quantityString, returnErrors = false) {
         quantityString = 0;  
     } else if (parseInt(quantityString) != quantityString) {
         errors.push('Not an integer!'); // Check that it is an integer
-    } 
+    } else {
+        errors.push('<h7>You want:</h7>')
+    }
     if (returnErrors) {
         return errors;
     } else if (errors.length == 0) {
@@ -88,17 +107,17 @@ if(params.has('products_key')){
     order_str += `<FORM action="/add_to_cart" method="GET">
                <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${productCatagory}"><center><body><div><main>`;
                 
-    products = products[productCatagory];
-    for (i = 0; i < products.length; i++) {
+    product = products[productCatagory];
+    for (i = 0; i < product.length; i++) {
         order_str += `
         <section class="item">
-            <h2>${products[i].name}</h2>
-            <p>$${products[i].price}</p>
-            <img src=./images/${products[i].image}>
-            <h6>Left in Stock: ${products[i].qty_available}</h6>
+            <h2>${product[i].name}</h2>
+            <p>$${product[i].price}</p>
+            <img src=./images/${product[i].image}>
+            <h6>Left in Stock: ${product[i].qty_available}</h6>
             <br>
-            <h6>Total Sold: ${products[i].total_sold}</h6>
-            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[productCatagory] != 'undefined') ? shopping_cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+            <h6>Total Sold: ${product[i].total_sold}</h6>
+            <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof cookie.cart[productCatagory] != 'undefined') ? cookie.cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
             <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
             </section>
     `;
@@ -109,38 +128,41 @@ if(params.has('products_key')){
 } else {
     let str = `
     <h2>Please Select a Product Catagory to Begin Shopping!</h2>
-    `;
+    </main></div></body></FORM>`;
     document.write(str);
 }
 </script>
 
-<footer onload="">
+<footer>
     <h1>
         The Source for the #1 Triathalon Equipement!
+    </h1>
         <br>
         <input class="submit_button" type="submit" name = "submit_button" value="Check Out!" id="button"></input>
-    </FORM></main></div></body></center>
-        <script>
-            //Taken from Lab13 order_page.new.html
-            // changes what the button text value 
-            //For Individual Requirement 4 of Assignment 1
-            //Searches through the params string and parses out the submit_button parameter from the string
-            /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
-            button to submit_button (which has already been set to equal the desired error message on the server side)*/
-            if (params.get("error") == 'Please Enter Valid Quantity!') {
-                document.getElementById("button").value = params.get("error");
-            /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value
-            to equal submit_button (Same explanation as above)*/
+    </center>
+    <script>
+        //Taken from Lab13 order_page.new.html
+        // changes what the button text value 
+        //For Individual Requirement 4 of Assignment 1
+        //Searches through the params string and parses out the submit_button parameter from the string
+        /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
+        button to submit_button (which has already been set to equal the desired error message on the server side)*/
+        window.addEventListener('load', function () {
+            let params = (new URL(document.location)).searchParams;
+            if (params.get("error") == 'Please Enter Valid Quantity') {
+                document.getElementById("button").value = params.get("error"); 
+                /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value
+                to equal submit_button (Same explanation as above)*/
             } else if (params.get("error") == 'Not Enough Left In Stock!') {
                 document.getElementById("button").value = params.get("error");
-            } else if (params.get("error") == 'Need to select quantity to purchase'){
+            } else if (params.get("error") == 'Need to select quantity to purchase') {
                 document.getElementById("button").value = params.get("error");
             };
             //Parses out the submit_button's parameter and displays its value in the console
             console.log(params.get("error"));
-                </script>
-        
-    </h1>
-</footer>
+        });
+    </script>
+
+    </footer>
 
 

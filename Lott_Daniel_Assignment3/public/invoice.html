@@ -17,18 +17,15 @@
     // Parsing JSON string into object
     products = JSON.parse(response);
   });
-  loadJSON('get_cart', function (response) {
-    // Parsing JSON string into object
-    shopping_cart = JSON.parse(response);
-    for (pk in shopping_cart) {
-      total += shopping_cart[pk].reduce((a, b) => a + b);
-    }
-  });
   loadJSON('get_cookies', function (response) {
-    // Parsing JSON string into object
-    cookie = JSON.parse(response);
-    console.log('cookie=' + cookie);
-  });
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
+            cookieCart = Object.keys(cookie.cart);
+            // Iterate over the cart items and calculate the total number of items in the cart
+            for (var i = 0; i < cookieCart.length; i++) {
+                total += [cookie.cart[cookieCart][i]].reduce((a, b) => a + b);
+                console.log(cookie.cart)
+        }});
   loadJSON('get_users', function (response) {
     // Parsing JSON string into object
     user_data = JSON.parse(response);
@@ -71,7 +68,7 @@
   user_email = cookie.email;
   ifLoggedIn = cookie.loggedIn;
   if (ifLoggedIn == 'true') {
-    document.write('<h4>Welcome ' + user_data[user_email].name +
+    document.write('<h4>Thank you for your purchase ' + user_data[user_email].name + '!' +
       '<br> Number of Logins: ' + user_data[user_email].num_loggedIn +
       '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>' + '<center><form action="get_to_logout"><button "submit"="get_to_logout">Logout</a></form></center>'
     )
@@ -98,33 +95,31 @@
     <h1> Products You Purchased!</h1>
   </center>
     <center><table border><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
+  
+
 
   <script>
     //write for loop to populate invoice table 
-    for (header in products) {
-      var qty=0;
-      for (i = 0; i < products[header].length; i++) {
-        if (typeof shopping_cart[header] != undefined) {
-        qty = shopping_cart[header][i];
-        console.log(qty);
-        extended_price = qty * products[header][i].price;
+    for (product_key in products) {
+      for (i = 0; i < products[product_key].length; i++) {
+        qty = [];
+        if (typeof cookie.cart[product_key] == "undefined") continue;
+        qty = cookie.cart[product_key][i];
+        extended_price = qty * products[product_key][i].price;
         (subtotal += extended_price)
         if (qty > 0) {
-          var product = products[header][i];
+          var product = products[product_key][i];
           document.write(`
           <tr>
           <td><center>${qty}</center></td>
-            <td>${products[header][i].name} <img src="./images/${products[header][i].image}" WIDTH = 60px</td>
-                <td>\$${products[header][i].price}</td>
+            <td>${products[product_key][i].name} <img src="./images/${products[product_key][i].image}" WIDTH = 60px</td>
+                <td>\$${products[product_key][i].price}</td>
                 <td>\$${extended_price}</td></tr></center>
                 <tr>
                   `);
         }
-      } else {
-        continue;
       }
-    }
-  }
+    };
 </script>
 <script>
     // Computer Tax

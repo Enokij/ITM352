@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./functions.js"></script>
+    <link href="homepage.css" rel="stylesheet">
+    <!-- Include any necessary dependencies (e.g. jQuery) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <title>Justin's Keyboard Store</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        img {
+            border: 1px solid #ddd;
+            /* Gray border */
+            border-radius: 4px;
+            /* Rounded border */
+            padding: 5px;
+            /* Some padding */
+            width: 300px;
+            /* Set a small width */
+        }
+
+        img:hover {
+            box-shadow: 0 0 5px 1px black;
+        }
+    </style>
+    <script>
+        var products_data;
+        total = 0;
+        var cookie;
+        var user_data;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products_data = JSON.parse(response);
+        });
+
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string into object
+            shopping_cart = JSON.parse(response);
+            for (pk in shopping_cart) {
+                total += shopping_cart[pk].reduce((a, b) => a + b);
+            }
+        });
+
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
+        });
+
+        loadJSON('get_users', function (response) {
+            user_data = JSON.parse(response);
+        });
+
+
+        // get the query string
+        var params = (new URL(document.location)).searchParams;
+        if (params.has('products_key')) {
+            var this_product_key = params.get('products_key');
+        } else {
+            document.write('no products key in query string');
+            document.stop;
+        }
+
+        function highlightRow(checkbox) {
+  var row = checkbox.parentNode.parentNode;
+  if (checkbox.checked) {
+    row.style.backgroundColor = "yellow";
+  } else {
+    row.style.backgroundColor = "";
+  }
+}
+
+
+    </script>
+</head>
+
+
+
+<body>
+    <ul>
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/register">Register</a></li>
+        <li class="dropdown">
+            <a href="javascript:void(0)" class="dropbtn">Products</a>
+            <div class="dropdown-content">
+                <script>
+                    document.write(`<a href='./products.html?products_key=keyboards'>Keyboards`);
+                    document.write(`<a href='./products.html?products_key=switches'>Switches`);
+                    document.write(`<a href='./products.html?products_key=keycaps'>Keycaps`);
+                </script>
+            </div>
+        </li>
+        <li>
+            <p style="color:white; position: relative;">Items in cart: <span id="cart_total">0</span></p>
+        </li>
+        <li style="float:right"><a class="active" href="./cart.html">Cart</a></li>
+    </ul>
+
+    <main>
+        <script>
+
+            function quantityValidation(quantityString, returnErrors = false) {
+                errors = []; // assume no errors at first
+                if (Number(quantityString) != quantityString) {
+                    errors.push('Not a number!'); // Check if string is a number value
+                } else if (Number(quantityString) < 0) {
+                    errors.push('Negative value!'); // Check if it is non-negative
+                } else if (quantityString == '') {
+                    quantityString = 0;
+                } else if (parseInt(quantityString) != quantityString) {
+                    errors.push('Not an integer!'); // Check that it is an integer
+                } else {
+                    errors.push('<h7>You want:</h7>')
+                }
+                if (returnErrors) {
+                    return errors;
+                } else if (errors.length == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+    //Taken from Lab13 order_page.new.html      
+    function checkQuantityTextbox(theTextbox) {
+        //checks the textbox for errors and sets true outputs to variable errs. 
+        errs = quantityValidation(theTextbox.value, true);
+        //if errors are found, then will write the errors in the quantity_message textbox
+        document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
+
+    }
+            ifLoggedIn = cookie.loggedIn;
+            user_email = cookie.email;
+            // Check if the user is logged in
+            if (ifLoggedIn) {
+                // Select the login link element
+                var loginLink = document.querySelector('a[href="/login"]');
+                var profileInfo = document.querySelector('a[href="/register"]');
+                // Update the login link element to display the logout link
+                loginLink.setAttribute('href', '/logout');
+                profileInfo.setAttribute('href', './user_update.html');
+                loginLink.innerHTML = 'Logout';
+                profileInfo.innerHTML = user_data[user_email].name;
+            }
+            cart_total.innerHTML = total;
+            var order_str = '';
+
+            order_str += `<h1>Please select what ${this_product_key} you want</h1><br>`;
+            // We put the whole table in the form so that anything entered in it will get submitted
+            order_str += `<FORM action="/add_to_cart" method="GET">
+                <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${this_product_key}">`;
+            products = products_data[this_product_key];
+            for (i = 0; i < products_data[this_product_key].length; i++) {
+                order_str +=
+                    `<TR>
+        <TD><img src="${products[i]['image']}"></TD>
+        <br>
+        <td><center><input type="checkbox" class="checkbox" id="favCheck" name="checkbox" onclick="highlightRow(this)"></center></td>
+        <br>
+        <TD>${products[i]['brand']}</TD>
+        <br>
+        <TD>$${products[i]['price'].toFixed(2)}</TD>
+        <br>
+        <TD>Total Sold: ${products[i].total_sold}</TD>
+        <br>
+        <TD>Available: ${products[i]['quantity_available']}</TD>
+        <br>
+        <TD><p class="error_msg" id="quantity[${i}]_message">Quantity:</p></TD>
+        <br>
+        <TD>
+        <INPUT TYPE="TEXT"  id="quantity[${i}]" name="quantity[${i}]" value="${(typeof shopping_cart[this_product_key] != 'undefined') ? shopping_cart[this_product_key][i] : ""}" placeholder="0" onkeyup="checkQuantityTextbox(this)"></TD><br><br></TR>`;
+            }
+            order_str += `</TABLE><br>
+    <INPUT TYPE="SUBMIT" id="the_submit" name="Submit" value="Add to cart">
+    </FORM>`;
+            document.write(order_str);
+        </script>
+    </main>
+</body>
+
+
+</html>

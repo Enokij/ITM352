@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+        
+        <head>
+            <meta charset="utf-8">
+            <title>Island Cycling</title>
+            <link href="https://fonts.googleapis.com/css?family=Cherry+Swash%7CRaleway" rel="stylesheet">
+            <link href="products-style.css" rel="stylesheet">
+            <script src="./product_data.js"></script>
+        </head>
+        
+        <form name="submit_form" action="./getToLogin" method="POST">
+            <header>
+                <h1>Island Cycling</h1>
+            </header>
+        
+            <script>
+                //Taken from Lab13 order_page.new.html
+                //Used for the textbox check and to ultimately display error messages under textbox if errors are detected
+                function isNonNegInt(queryString, returnErrors = false) { 
+                    errors = []; // assume no errors at first
+                    if (Number(queryString) != queryString) {
+                        errors.push('Not a number!'); // Check if string is a number value
+                    } else {
+                        if (queryString < 0) errors.push('Negative value!'); // Check if it is non-negative
+                        if (parseInt(queryString) != queryString) errors.push('Not an integer!'); // Check that it is an integer
+                        if (queryString == 0 && queryString == '') errors.push('Enter valid quantity'); //result in an error if values of 0 or no value are inputted in the textbox
+                    }
+                    if (returnErrors) {
+                        return errors;
+                    } else if (errors.length == 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                //Taken from Lab13 order_page.new.html      
+                function checkQuantityTextbox(theTextbox) { 
+                        //checks the textbox for errors and sets true outputs to variable errs. 
+                        errs = isNonNegInt(theTextbox.value, true);
+                        //if errors are found, then will write the errors in the quantity_message textbox
+                        document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", "); 
+                    }
+        
+        
+        
+            </script>
+        <body>
+            <div>
+                <main>
+                    <script>
+                                                //////////////////////////////////////////////
+                                                //comment section for the following for loop//
+                                                //////////////////////////////////////////////
+        
+                        //products[i].name pulls the name from the .json file for each element in the product array
+                        //products[i].price pulls the price from each element in the product array
+                        //products[i].image pulls the image from each element in the product array and displays it
+                        /*products[i].qty_available is updated through the server.js post request and is then updated to the .json. 
+                        The updated qty_available is then pulled and displayed*/
+                        //products[i].total_sold goes through similar process as qty_available
+                        //input class = error_msg, is the textbox and runs through the checkquantitytextbox function upon keyup 
+                        /*span class = textbox, displays the errors detected by the input class = error_msg which will                
+                            acitvely shows the user if an was error was inputed into the quantity textbox*/
+                    </script>
+                <script>
+                for(i = 0; i < products.length; i++) {
+                document.write(`
+                    <section class="item">
+                        <h2>${products[i].name}</h2>
+                        <h4>Enter Quantities:</h4>
+                        <p>$${products[i].price}</p>
+                        <img src=./images/${products[i].image}>
+                        <h6>Left in Stock: ${products[i].qty_available}</h6>
+                        <br>
+                        <h6>Total Sold: ${products[i].total_sold}</h6>
+                        <input class= "error_msg" type="text" name="quantity${i}" id="quantity${i}"" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+                        <span class= "textbox" id="quantity${i}_message">Enter a quantity</span>
+                    </section>
+                    `)
+                };
+                </script>
+        
+        </body>
+        
+                </main>
+            </div>
+            <footer onload="">
+                <h1>
+                    The Source for the #1 Triathalon Equipement!
+                    <br>
+                    <input class="submit_button" type="submit" name = "submit_button" value="Check Out!" id="button"></input>
+                    </form>
+                    <script>
+                        //Taken from Lab13 order_page.new.html
+                        //Taken from Lab13 order_page.new.html
+                        // changes what the button text value 
+                        //Sets the URL string of the window's search to the variable params
+                        let params = (new URL(window.location)).searchParams;
+                        console.log(params);
+                        //For Individual Requirement 4 of Assignment 1
+                        //Searches through the params string and parses out the submit_button parameter from the string
+                        /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
+                        button to submit_button (which has already been set to equal the desired error message on the server side)*/
+                        if (params.get("submit_button") == 'Please Enter Valid Quantity!') {
+                            document.getElementById("button").value = params.get("submit_button");
+                        /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value
+                        to equal submit_button (Same explanation as above)*/
+                        } else if (params.get("submit_button") == 'Not Enough Left In Stock!') {
+                            document.getElementById("button").value = params.get("submit_button");
+                        } else if (params.get("submit_button") == 'Need to select quantity to purchase'){
+                            document.getElementById("button").value = params.get("submit_button");
+                        };
+                        //Parses out the submit_button's parameter and displays its value in the console
+                        console.log(params.get("submit_button"));
+                            </script>
+                    
+                </h1>
+            </footer>
+        </html>

@@ -7,6 +7,8 @@ html {
 }
 
 
+
+
 header {
   background-color: #333; /* Set the background color of the header */
   display: flex; /* Display the header as a flex container */
@@ -14,12 +16,11 @@ header {
   padding: 20px; /* Add some padding to the header */
   height: 10px;
 }
-    /* Style the logo */
-    header img {
-        height: 50px; /* Set the height of the logo image */
-    }
+/* Style the logo */
+header img {
+  height: 50px; /* Set the height of the logo image */
+}
 
-    
 /* Style the navigation bar */
 nav {
   margin-left: auto; /* Move the navigation bar to the right side of the header */
@@ -42,8 +43,8 @@ nav ul li a {
   color: white; /* Set the text color of the links */
   text-decoration: none;
   padding: 10px; /* Add some padding to the links */
-  float: left; /* Float the navbar links to the left by default */
 }
+
 
 /* Style the home link */
 nav ul li a:first-child {
@@ -51,18 +52,35 @@ nav ul li a:first-child {
   float: left; /* Float the home link to the left */
 }
 
-/* Style the cart link */
-nav ul li a:last-child {
-  /* The last-child pseudo-class selects the last link in the navbar */
-  float: right; /* Float the cart link to the right */
+nav ul li:last-child a {
+  float: right;
+  margin-right: 10px;
 }
-
 /* Add a hover effect to the links */
 nav ul li a:hover {
   background-color: #555; /* Change the background color of the link on hover */
   border-radius: 4px; /* Add rounded corners to the link */
 }
 
+.nav-link {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.nav-link button:hover {
+  background-color: #555;
+  border-radius: 4px;
+}
 
 body {
   width: 100%;
@@ -143,13 +161,18 @@ h6 {
   width: 75px;
   height: 20px;
   position: absolute;
-  right: 20px;
+  right: 70px;
   z-index: 3000;
-  bottom: 50px;
+  bottom: 80px;
   display: block;
   margin-top: auto;
   word-wrap: normal;
 }
+.error_msg h7 {
+  color: black;
+
+}
+
 .textbox{
   position: absolute;
   margin-top: auto;
@@ -218,7 +241,8 @@ section p {
   text-align: center;
   border-radius: 20%;
   position: absolute;
-  right: 100px;
+  right: 30px;
+  top: 150px;
   z-index: 2000;
   white-space: normal;
   border-radius: 50%;
