@@ -34,15 +34,6 @@
     // Parsing JSON string into object
     user_data = JSON.parse(response);
   });
-  loadJSON("/get_favorited", function (response) {
-    let favorites = JSON.parse(response);
-    if (typeof favorites[productCatagory] != 'undefined') {
-      for (i = 0; i < product.length; i++) {
-        let checkboxValue = favorites[productCatagory][i];
-      }
-    }
-    console.log(checkboxValue);
-  });
 
   //validation on the invoice
   //checks if entered values are valid and will return true or false
@@ -78,15 +69,7 @@
     }
   };
 
-  //create dynamic login/logout button
-  user_email = cookie.email;
-  ifLoggedIn = cookie.loggedIn;
-  if (ifLoggedIn == 'true') {
-    document.write('<h4>Welcome ' +  +
-      '<br> Number of Logins: ' + user_data[user_email].num_loggedIn + '</h4>')
-  } else {
-    document.write('<h3><a href="get_to_login">Login</a></h3>');
-  }
+
   // Compute Subtotal
   subtotal = 0;
 
@@ -107,7 +90,18 @@
   <center>
     <h1> Products You Purchased!</h1>
   </center>
-  <table border width="70%"><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th>
+  <script>
+      //create dynamic login/logout button
+  user_email = cookie.email;
+  ifLoggedIn = cookie.loggedIn;
+  if (ifLoggedIn == 'true') {
+    document.write('<h4>Welcome ' + user_data[cookie.email].name +
+      '<br> Number of Logins: ' + user_data[user_email].num_loggedIn + 
+      '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>'
+      )
+  } 
+  </script>
+  <table border><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
   <script>
     //write for loop to populate invoice table 
     for (header in products) {
@@ -119,13 +113,13 @@
         (subtotal += extended_price)
         if (qty > 0) {
           var product = products[header][i];
-          document.write(`
+          document.write(`<center>
           <tr>
           <td><center>${qty}</center></td>
             <td>${products[header][i].name} <img src="./images/${products[header][i].image}" WIDTH = 60px</td>
                 <td>\$${products[header][i].price}</td>
                 <td>\$${extended_price}</td></tr></center>
-                <tr>
+                <tr></center>
                   `);
         }
       } 
@@ -149,6 +143,7 @@
     // Computer Grand total
     var total = subtotal + tax + shipping;
   </script>
+  
   <tr>
     <td colspan="4" width="100%">&nbsp;</td>
   </tr>
@@ -186,10 +181,11 @@
     A subtotal $50 - $99.99 will be $5 shipping
     <br>
     Subtotals over $100 will be charged 5% of the subtotal amount
-  </div>
+  </div></center>
 </body>
 <footer>
   <h4>
+  <center>
       <form action="/email_inv" method="POST">
         <button class="submit">Confirm</button>
       </form>

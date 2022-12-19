@@ -81,6 +81,7 @@ if (fs.existsSync(fname)) { // reads entire file
 //Runs through each element in the product array and initiailly set the total_sold 0
 products.forEach( (prod,i) => {prod.total_sold = 0}); 
 
+
 //stringify the products array on product_data.json to the variable products_str
 app.get('/product_data.js', function (request, response, next) { 
    response.type('.js');
@@ -162,6 +163,7 @@ app.post("/getToLogin", function (request, response) {
         response.redirect(`login.html?${order_str}`);
     }
 });
+
 
 // taken from lab14 and Assignment 2 examples 
 app.post("/login", function (request, response) {

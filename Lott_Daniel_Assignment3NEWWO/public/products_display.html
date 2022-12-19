@@ -150,11 +150,21 @@
 <footer>
     <h3>The Source for the #1 Triathalon Equipement!</h3>
         <br>
-        <input class="submit_button" type="submit" name="submit_button" value="Check Out!" id="button"></input>
+        <input class="submit_button" type="submit" name="submit_button" value="Add To Cart" id="button" onclick="getValue(this); return false;"></input>
         </center>
         <h9>
         <script>
-           
+           function getValue() {
+            var checks = document.getElementById('favorite-')
+            let str = '';
+            for (header in products){
+                for (i=0; i<products[header].length; i++) {
+                    if (checks[i].check === true){
+                        str += checks[i].value + " ";
+                    }
+                }
+                alert(str)
+           }}
             //Taken from Lab13 order_page.new.html
             // changes what the button text value 
             //For Individual Requirement 4 of Assignment 1

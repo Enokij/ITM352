@@ -1,8 +1,35 @@
-<script>var JSON_Obj = { "one":1, "two":2, "three":3, "four":4, "five":5 };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+</head>
+<body>
+   <div class="container">
+      <input type="checkbox" class="checks" value="Apple" onclick="sendAjaxRequest(this)"> A___<br>
+      <a href="/server-route" onclick="getValue(); return false;">Get Value</a>
+      <script>
+        function sendAjaxRequest(checkbox) {
+          // Send an AJAX request to the server with the value of the checkbox
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/server-route', true);
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          xhr.send(`checkboxValue=${checkbox.value}`);
+        }
 
-// Read key
-for (var key in JSON_Obj) {
-   console.log(key);
-   console.log(JSON_Obj[key]);
-}
-</script>
+        function getValue() {
+          var checks = document.getElementsByClassName('checks');
+          var str = " ";
+          for (i=0; i<1; i++) {
+             if (checks[i].checked === true){
+                str += checks[i].value + ' ';
+             }
+          }
+        }
+      </script>
+   </div>
+</body>
+</html>
+

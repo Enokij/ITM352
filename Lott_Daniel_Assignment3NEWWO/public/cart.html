@@ -58,7 +58,7 @@
     '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
 }
 </script>
-<center><table border width="70%"><th>Favorited</th><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
+<center><table border><th>Favorited</th><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
 
 <script>
   for(header in products) {
@@ -73,7 +73,7 @@
           document.write(`
           <tr>
             <td>
-            <label><input type="checkbox" id="favorite-<%= ${i} %>"></label>
+            <label><input type="checkbox" id="favorite-${i}"></label>
           </td>
             <td><center>
               <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&catagory_key=${header}'">+</button>

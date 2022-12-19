@@ -286,7 +286,7 @@ app.get("/get_to_login", function (request, response) {
 
         `<!DOCTYPE html>
     <html lang="en">
-    <head>
+    <head> 
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -353,18 +353,12 @@ app.post("/get_to_login", function (request, response) {
     //IR1 we want to encrypt the password entered in the login page
     var user_pass = generateCipher(POST['password']);
     console.log("User name=" + entered_email + " password=" + user_pass);
-
-    request.session.loginDate = new Date();
-
     if (user_data[entered_email] != undefined) {
         if (user_data[entered_email].password == user_pass) {
             let loggedIn = true;
             if (fs.existsSync(fname)) {
-                let data = fs.readFileSync(fname, 'utf-8');
-                let users = JSON.parse(data);
-                users[entered_email].num_loggedIn += 1; // IR4 A2 Daniel Lott - counts how many times user logged in 
-                data = JSON.stringify(users);
-                fs.writeFileSync(fname, data, 'utf-8');
+                request.session.loginDate = new Date();
+                user_data[entered_email].num_loggedIn += 1; // IR4 A2 Daniel Lott - counts how many times user logged in 
                 //sends cookie back to the client
     
                 response.cookie('email', entered_email);
@@ -400,6 +394,7 @@ app.get('/loggedIn', function(request, response){
       loadJSON('get_users', function (response) {
         // Parsing JSON string into object
         user_data = JSON.parse(response);
+        console.log(user_data);
       });
       ifLoggedIn = cookie.loggedIn;
     var this_product_key = ''
@@ -418,15 +413,14 @@ app.get('/loggedIn', function(request, response){
         </ul>
     </nav>
     </header>
-    <center><h2>Welcome <span id="username"></span>!</h2></center> 
+    <center><h2>Welcome <span id="username"></span>!</h2>
     <br> You last logged in on ${request.session.loginDate}<br>
-    Number of Logins: <span id="numLogs"></span><br> 
-    <center>
+    Number of Logins: <span id="numLog"></span><br> 
         <button type="button" class="submit" onclick="window.location.href = './index.html'">Continue shopping</button>
         <br>
         <script>
+        numLog.innerHTML = user_data[cookie.email].num_loggedIn
         username.innerHTML = user_data[cookie.email].name
-        numLogs.innerHTML = user_data[cookie.email].num_loggedIn
         </script>
     </center>`
 response.send(str);
@@ -529,7 +523,7 @@ app.post("/register", function (request, response) {
     let reg_error = {}; // made this an open string for errors within the registation page 
     user_name = POST["name"];
     user_pass = POST["password"].toLowerCase();
-    user_email = POST["email"];
+    entered_email = POST["email"];
     user_pass2 = POST["repeat_password"];
     request.session.loginDate = new Date();
     let loggedIn = false;
@@ -554,7 +548,7 @@ app.post("/register", function (request, response) {
     } else {
         reg_error['email'] = 'Please enter valid email'; // if it does not meet the requirements for valid email then this message appears in query string 
     }
-    if (typeof users[user_email] != 'undefined') { // if the email is already within the our user_data.json 
+    if (typeof users[entered_email] != 'undefined') { // if the email is already within the our user_data.json 
         reg_error['email'] = 'Email already exsist' // then send this message to the query string 
     }
 
@@ -591,72 +585,6 @@ app.post("/register", function (request, response) {
         response.redirect('register?' + JSON.stringify(reg_error)); // then we will redirect them to the register if they have errors
     }
 });
-app.post("/user_update", function (request, response) {
-    // Retrieve the request body and store it in the POST variable
-    let POST = request.body;
-  
-    // Initialize variables to store specific pieces of information from the POST variable
-    let reg_error = {};
-    let user_name = POST["name"];
-    let user_pass = POST["password"];
-    let encrpt_user_password = generateCipher(user_pass);
-    let user_email = POST["email"].toLowerCase();
-    let user_pass2 = POST["repeat_password"];
-  
-    // Define regular expressions for validating the user's name and email address
-    let onlyletters = /^[A-Za-z/s]+$/;
-    let email_valid_input = /^[A-Za-z0-9_.]+@([A-Za-z0-9_.]*\.)+([a-zA-Z]{2}|[a-zA-Z]{3})$/;
-  
-    // Validate the user's name using the onlyletters regular expression
-    if(onlyletters.test(POST.name)) {
-    } else {
-      reg_error['name'] = 'Must only use valid letters';
-    }
-  
-    // Validate the length of the user's name
-    if(POST.name.legth > 30 || POST.name.length < 2) {
-      reg_error['name'] = 'Full name must be at least 2 characters long, no more than 30 character allowed'
-    } 
-  
-    // Validate the user's email address using the email_valid_input regular expression
-    if(email_valid_input.test(POST.email)) {
-    } else {
-      reg_error['email'] = 'Please enter valid email';
-    }
-  
-    if (typeof users[user_email] != 'undefined') {
-    // Validate the length of the user's password
-    if((POST['password'].length) < 10) {
-      reg_error['password'] = 'Password must be longer than 10 characters';
-    }
-
-    // Validate that the user's password and repeat password are the same
-    if(user_pass !== user_pass2) {
-      reg_error['repeat_password'] = 'Passwords do not match';
-    }
-    if (request.body.password && request.body.repeat_password == user_pass) {
-        reg_error['password'] = `Password has already been used`;
-}}
-  
-    // Update the user's information
-    users[user_email].name = user_name;
-    users[user_email].password = encrpt_user_password;
-    users[user_email].email = user_email;
-  
-    // If there are no errors, write the updated userData object back to the user_data.json file
-    if (Object.keys(reg_error).length == 0) {
-      fs.writeFileSync('user_data.json', JSON.stringify(userData), 'utf8');
-        request.session.registration_error = undefined;
-        response.cookie('email', email);
-        response.redirect('./index.html' ); // direct to the invoice page if all data is valid
-    } else {
-        //if there are errors we want to create a string
-        request.session.registration_error = reg_error;
-        POST['reg_error'] = JSON.stringify(reg_error);
-        // then we will redirect them to the register if they have errors
-        response.redirect('./user_update.html?' + JSON.stringify(reg_error)); 
-    }
- });
 
 app.get("/get_to_logout", function (request, response) {
     let loggedIn = false;

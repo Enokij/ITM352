@@ -207,9 +207,9 @@ app.get("/get_to_login", function (request, response) {
                 <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
         </form>
         <script>
-                if (${params.has("errors")})  { // if params has/find errors 
+                if (${params.has("login_error")})  { // if params has/find errors 
                     document.getElementById("error_button").value = "Invalid Login";}; // use the id to get the element to change the button to invalid login if there are any errors
-                console.log(${params.get("errors")});
+                console.log(${params.get("login_error")});
             </script>
             <br>
             <form action="/register" method="GET">
@@ -389,8 +389,6 @@ app.get("/decrease_quantity", function (request, response) {
                                                                     ////////////////
                                                                     ///*APP.POST*///
                                                                     ////////////////
-
-
 
 // updates the cart 
 app.post("/update_cart",function(request, response){

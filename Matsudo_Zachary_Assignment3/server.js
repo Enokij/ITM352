@@ -224,8 +224,7 @@ app.post("/update_info", function (request, response) {
             new_errors['password'] = 'Incorrect password';
          }
          // Validate that new password and repeat new password match
-         if (request.body.newpassword != request.body.repeatnewpassword) {
-            new_errors['repeatnewpassword'] = 'Passwords must match';
+         if (request.body.newpassword && request.body.repeatnewpassword == login_password) {
          }
          // Validate that new password is different from previous one
          if (request.body.newpassword && request.body.repeatnewpassword == login_password) {
