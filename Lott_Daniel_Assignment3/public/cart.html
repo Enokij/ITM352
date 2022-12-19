@@ -1,0 +1,177 @@
+<head>
+  <script src="./functions.js"></script>
+  <link href="cart-style.css" rel="stylesheet">
+  <script>
+    var products;
+    var subtotal = 0;
+    var shopping_cart;
+    loadJSON('get_products_data', function (response) {
+      // Parsing JSON string into object
+      products = JSON.parse(response);
+    });
+    loadJSON('get_cart', function (response) {
+      // Parsing JSON string into object
+      shopping_cart = JSON.parse(response);
+    });
+    loadJSON('get_cookies', function (response) {
+      // Parsing JSON string into object
+      cookie = JSON.parse(response);
+    });
+    loadJSON('get_users', function (response) {
+      // Parsing JSON string into object
+      user_data = JSON.parse(response);
+    });
+    //gets params and if params has 'update', then display alert message
+    let params = (new URL(document.location)).searchParams;
+    if (params.get("updated") == 'Your Cart Has Been Updated!') {
+      alert(params.get("updated"));
+    }
+  </script>
+</head>
+<script>
+  //below displays a simple navigation bar:
+</script>
+<header>
+    <img src='./images/logo.jpg'>
+    <nav>
+      <ul>
+        <li><a href='index.html'>HOME<a></li>
+        <li>
+          <script>nav_bar('', products);
+          //Defines user_email to be what email was entered and saved into the cookies
+          user_email = cookie.email;
+          //Defines ifLoggedIn to be 
+          ifLoggedIn = cookie.loggedIn;
+          if (ifLoggedIn == 'true') {
+            document.write('<li><a href="get_to_logout">Logout</a></li>')
+          } else {
+            document.write('<li><a href="get_to_login">Login</a></li>');
+          }
+        </script>
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+<form action="update_cart" method="post">
+<body>
+<center><h2>Edit Your Cart Here or Proceed to Checkout:</h2></center>
+<script>
+  //displays users information when logged in
+  if (ifLoggedIn == 'true') {
+  document.write('<h4>Welcome ' + user_data[user_email].name +
+    '<br>Number of Logins: ' + user_data[user_email].num_loggedIn +
+    '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
+}
+</script>
+<center><table border><th>Favorited</th><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
+
+<script>
+// This script displays the products in a shopping cart and allows the user to increase or decrease
+// the quantity of each product. The subtotal of the cart is also displayed.
+// Loop through the headers (categories) of the products data file
+
+for(header in products) {
+    console.log(header)
+    for(i=0; i<products[header].length; i++) {
+        // Skip the current product if it is not in the shopping cart
+        if(typeof shopping_cart[header] == "undefined") continue;
+        qty = shopping_cart[header][i];
+        extended_price = qty * products[header][i].price;
+        (subtotal += extended_price)
+        if(qty > 0) {
+          var product = products[header][i];
+          //INDIVIDUAL REQUIREMENT 4
+          //below displays the cart items as well as the favorited checkbox
+          document.write(`
+          <tr>
+            <td>
+              <input type="checkbox" id="Term_button" name="Term_button" value="agreed">
+          </td>
+            <td><center>
+              <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&catagory_key=${header}'">+</button>
+              <input type="text" id="textbox" value="${qty}" style="width: 20px">
+              <button type="button" id="decreaseButton" onclick="window.location.href = '/decrease_quantity?productId=${product.id}&catagory_key=${header}'">-</button>
+            </center></td>
+            <td><img src="./images/${products[header][i].image}" WIDTH = 60px > ${products[header][i].name}</td>
+                <td>\$${products[header][i].price}</td>
+                <td>\$${extended_price}</td></tr></center>
+                <tr>
+                  `);
+
+        }
+    }
+} 
+// Computer Tax
+if (subtotal == 0) {
+    alert(`No items in cart`);
+    location.href = "index.html";
+    var tax = 0;
+    var shipping = 0;
+    var grand_total = 0;
+  }
+  else {
+    // Compute tax
+    var tax_rate = 0.045;
+    var tax = tax_rate * subtotal;
+
+    // Compute shipping
+    if (subtotal <= 20) {
+      shipping = 5;
+    }
+    else if (subtotal <= 50) {
+      shipping = 8;
+    }
+    else {
+      shipping = 0.1 * subtotal; // 10% of subtotal
+    }
+    // Compute grand total
+    var grand_total = subtotal + tax + shipping;
+  }
+
+</script>
+
+          <tr>
+            <td colspan="5" width="100%">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Sub-total</td>
+            <td colspan="2">$<script>document.write(subtotal);</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%"><span style="font-family: arial;">Tax @ <script>document.write(100*tax_rate);</script>%</span></td>
+            <td colspan="2">$<script>document.write(tax.toFixed(2));</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%">Shipping<span style="font-family: arial;">
+            <td colspan="2">$<script>document.write(shipping.toFixed(2));</script></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;" colspan="3" width="67%"><strong>Total</strong></td>
+            <td colspan="2"><strong>$<script>document.write(grand_total.toFixed(2));</script></strong></td>
+          </tr>
+        </tbody>
+      </table> 
+      <div style = "font-weight: bold;">
+        OUR SHIPPING POLICY IS:A subtotal $0 - $49.99 will be $2 shipping
+        <br>
+      A subtotal $50 - $99.99 will be $5 shipping
+      <br>
+    Subtotals over $100 will be charged 5% of the subtotal amount
+      </div>
+</body>
+</footer>
+</table>
+<input type="submit" class="submit" value="Update"><br>
+</form>
+
+<script>
+  // Creates button for check out once user logs in, or if already logged 
+  if(ifLoggedIn == "true") {
+  document.write(`
+  <form action="checkout" method=post>
+    <input type="submit" class="submit" value="Checkout"></input>
+  </form>
+  `)
+}
+</script>
+</div>

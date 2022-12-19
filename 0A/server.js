@@ -33,7 +33,7 @@ app.post('/server-route', (req, res) => {
     // Retrieve the query parameter
     const values = req.query.values;
  
-    // Render a new HTML page with the checked values
+    // Render a new HTML page with the checkboxes
     res.send(`
        <!DOCTYPE html>
        <html lang="en">
@@ -43,12 +43,12 @@ app.post('/server-route', (req, res) => {
        </head>
        <body>
           <h1>Checked Values:</h1>
-          <p>${values}</p>
+          ${values}
        </body>
        </html>
     `);
  });
 
-  app.listen(8080, () => {
-    console.log('Express server listening on port 8080');
+  app.listen(3000, () => {
+    console.log('Express server listening on port 3000');
   });

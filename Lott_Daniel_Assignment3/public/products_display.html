@@ -1,0 +1,215 @@
+<head onload="">
+    <script src="./functions.js"></script>
+    <link href="products-style.css" rel="stylesheet">
+    <script>
+        var ifLoggedIn;
+        var products;
+        var total = 0;
+        loadJSON('get_products_data', function (response) {
+            // Parsing JSON string into object
+            products = JSON.parse(response);
+        });
+
+        loadJSON('get_cart', function (response) {
+            // Parsing JSON string of the session's cart
+            shopping_cart = JSON.parse(response);
+            // Create an array of the cart items
+            var cartItems = Object.keys(shopping_cart);
+            // Iterate over the cart items and calculate the total number of items in the cart
+            for (var i = 0; i < cartItems.length; i++) {
+                total += shopping_cart[cartItems[i]].reduce((a, b) => a + b);
+            }
+        });
+        loadJSON('get_cookies', function (response) {
+            // Parsing JSON string into object
+            cookie = JSON.parse(response);
+            // Iterate over the cart items and calculate the total number of items in the cart
+        })
+        loadJSON('get_users', function (response) {
+            // Parsing JSON string into object
+            user_data = JSON.parse(response);
+        });
+
+        // get the query string
+        let params = (new URL(document.location)).searchParams;
+        if (params.has('products_key')) {
+            var productCatagory = params.get('products_key');
+        } else {
+            document.write('no products key in query string');
+            (function () { return; })();;
+        }
+        //Defines user_email to be what email was entered and saved into the cookies
+    </script>
+</head>
+<header>
+    <img src='./images/logo.jpg'>
+    <nav>
+        <ul>
+            <li><a href='index.html'>HOME<a></li>
+            <li>
+                <script>nav_bar(productCatagory, products);</script>
+            </li>
+            <li><span id='username'></span>You have <span id="cart_total">0</span> items in your shopping cart: <a
+                    href='cart.html'>View Cart</a>
+            </li>
+            <script>
+                //Updates the number of items in cart
+                cart_total.innerHTML = total;
+                //Defines ifLoggedIn to be 
+                ifLoggedIn = cookie.loggedIn;
+                if (ifLoggedIn == 'true') {
+                    user_email = cookie.email;
+                    user_name = user_data[user_email].name;
+                    username.innerHTML = `${user_name}` + ' | ';
+                    document.write('<li><a href="get_to_logout">Logout</a></li>')
+                } else {
+                    document.write('<li><a href="get_to_login">Login</a></li>');
+                }
+            </script>
+        </ul>
+    </nav>
+</header>
+<div>
+
+    <!-- Move the script tag containing the nav_bar() function outside of the <ul> element -->
+    <script>
+        //Taken from the Stor1 WOD
+        //check if there are any invalid quantity inputs
+        function quantityValidation(quantityString, returnErrors = false) {
+            errors = []; // assume no errors at first
+            if (Number(quantityString) != quantityString) {
+                errors.push('Not a number!'); // Check if string is a number value
+            } else if (Number(quantityString) < 0) {
+                errors.push('Negative value!'); // Check if it is non-negative
+            } else if (quantityString == '') {
+                quantityString = 0;
+            } else if (parseInt(quantityString) != quantityString) {
+                errors.push('Not an integer!'); // Check that it is an integer
+            } else {
+                errors.push('<h7>You want:</h7>')
+            }
+            if (returnErrors) {
+                return errors;
+            } else if (errors.length == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        //Taken from Lab13 order_page.new.html      
+        function checkQuantityTextbox(theTextbox) {
+            //checks the textbox for errors and sets true outputs to variable errs. 
+            errs = quantityValidation(theTextbox.value, true);
+            //if errors are found, then will write the errors in the quantity_message textbox
+            document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
+
+        }
+
+        // Refered back also to Lab 15 for sending data back to the server
+        // Reference to Javapoint https://www.javatpoint.com/how-to-get-all-checked-checkbox-value-in-javascript
+
+        cart_total.innerHTML = total;
+        // This function takes a string assumed to be a key in the products array above to display and select the corresponding products
+        // get the query string
+
+        var order_str = '';
+        order_str += `<h1>Your One Stop Shop for Cycling ${productCatagory}</h1><br>
+                
+                <h5>Please Select a Product Catagory to Begin Shopping!</h5>`;
+        // We put the whole table in the form so that anything entered in it will get submitted
+        order_str += `<FORM action="/add_to_cart" name='form' method="GET">
+           <INPUT TYPE="HIDDEN" NAME="products_key" VALUE="${productCatagory}"><center><body><main>`;
+
+        product = products[productCatagory];
+        for (i = 0; i < product.length; i++) {
+            order_str += `
+    <section class="item">
+        <h2>${product[i].name}</h2>
+        <p>$${product[i].price}</p>
+        <img src=./images/${product[i].image}>
+        <h6>Left in Stock: ${product[i].qty_available}</h6><br>
+        <center> <input type="checkbox" name="fav[${i}]" id="fav${i}" onclick="user_favorite('${productCatagory}','${i}', this)"> </center>
+        <span class="total_sold">Total Sold: ${product[i].total_sold}</span>
+        <span class="favorite">Favorite:</span>
+        <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[productCatagory] != 'undefined') ? shopping_cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
+        <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
+        </section>
+`;
+        }
+
+        order_str += `</TABLE>`;
+        document.write(order_str);
+        let str = `
+</main></body></FORM>`;
+        document.write(str);
+
+    </script>
+
+    <footer>
+        <h3>The Source for the #1 Triathalon Equipement!</h3>
+        <br>
+        <input class="submit_button" type="submit" name="submit_button" value="Add To Cart" id="button"
+            onclick="getValue(this); return false;"></input>
+        </center>
+        <script>
+            //FOR INDIVIDUAL REQUIREMENT 4 ASSIGNMENT 3
+            // Loads a JSON file from the specified URL and calls the callback function with the response
+            function loadJSON(url, callback) {
+                let xobj = new XMLHttpRequest();
+                xobj.overrideMimeType("application/json");
+                xobj.open('GET', url, true);
+                xobj.onreadystatechange = function () {
+                    if (xobj.readyState == 4 && xobj.status == "200") {
+                        // Call the callback function with the response text
+                        callback(xobj.responseText);
+                    }
+                };
+                xobj.send(null);
+            }
+
+            // Loads the favorites data from the add_to_fav file and updates the page to reflect the stored favorites
+            loadJSON('./add_to_fav', function (response) {
+                // Parse the JSON string into an object
+                favorites = JSON.parse(response);
+                // If the productCatagory is a property of the favorites object
+                if (typeof favorites[productCatagory] != 'undefined') {
+                    // Iterate through each property of the favorites[productCatagory] object
+                    for (let i in favorites[productCatagory]) {
+                        // Set the checked property of the element with the ID "fav{i}" to the value of the favorites[productCatagory][i] property
+                        document.getElementById(`fav${i}`).checked = favorites[productCatagory][i];
+                    }
+                }
+            });
+
+            // Sends an HTTP request to the add_to_fav URL with the specified prod_key, pindex, and favorite values
+            function user_favorite(prod_key, pindex, fav) {
+                console.log(prod_key, pindex, fav.checked);  // Log the prod_key, pindex, and checked values to the console
+                // Send an HTTP GET request to the add_to_fav URL with the specified prod_key, pindex, and favorite values as query parameters
+                loadJSON(`./add_to_fav?prod_key=${prod_key}&pindex=${pindex}&favorite=${fav.checked}`, function (response) {
+                    // The callback function does nothing with the response
+                });
+            }
+
+            //Taken from Lab13 order_page.new.html
+            // changes what the button text value 
+            //For Individual Requirement 4 of Assignment 1
+            //Searches through the params string and parses out the submit_button parameter from the string
+            /*If the parameter is set to equal 'Please Enter Valid Quantity', then change the value of the 
+            button to submit_button (which has already been set to equal the desired error message on the server side)*/
+            window.addEventListener('load', function () {
+                let params = (new URL(document.location)).searchParams;
+                if (params.get("error") == 'Please Enter Valid Quantity') {
+                    document.getElementById("button").value = params.get("error");
+                    /*If submit_button's parameter equals 'Not Enough Left In Stock', then set the button's value
+                    to equal submit_button (Same explanation as above)*/
+                } else if (params.get("error") == 'Not Enough Left In Stock!') {
+                    document.getElementById("button").value = params.get("error");
+                } else if (params.get("error") == 'Need to select quantity to purchase') {
+                    document.getElementById("button").value = params.get("error");
+                };
+                //Parses out the submit_button's parameter and displays its value in the console
+                console.log(params.get("error"));
+            });
+        </script>
+</div>
+</footer>

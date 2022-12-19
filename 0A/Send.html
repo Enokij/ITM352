@@ -26,17 +26,15 @@
       }
 
       function getValue() {
-         var checks = document.getElementsByClassName('checks');
-         var str = "";
-         for (i = 0; i < checks.length; i++) {
-            if (checks[i].checked === true) {
-               str += checks[i].value + ' ';
-            }
-         }
+   var checks = document.getElementsByClassName('checks');
+   var str = "";
+   for (i=0; i<checks.length; i++) {
+      str += `<input type="checkbox" value="${checks[i].value}" ${checks[i].checked ? 'checked' : ''}> ${checks[i].value}<br>`;
+   }
 
-         // Redirect to another page and pass the checked values as a query parameter
-         window.location.href = '/another-server-route?values=' + str;
-      }
+   // Redirect to another page and pass the checked values as a query parameter
+   window.location.href = '/another-server-route?values=' + str;
+}
 
    </script>
 </body>
