@@ -30,12 +30,24 @@ app.post('/server-route', (req, res) => {
   });
 
   app.get('/another-server-route', (req, res) => {
-    // Retrieve the value of the checkbox from the user's session
-    const checkboxValue = req.session.checkboxValue;
-  
-    // Use the value of the checkbox as needed
-    console.log(`Checkbox value: ${checkboxValue}`);
-  });
+    // Retrieve the query parameter
+    const values = req.query.values;
+ 
+    // Render a new HTML page with the checked values
+    res.send(`
+       <!DOCTYPE html>
+       <html lang="en">
+       <head>
+          <meta charset="UTF-8">
+          <title>Checked Values</title>
+       </head>
+       <body>
+          <h1>Checked Values:</h1>
+          <p>${values}</p>
+       </body>
+       </html>
+    `);
+ });
 
   app.listen(8080, () => {
     console.log('Express server listening on port 8080');

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Checkbox Example</title>
+</head>
+<body>
+   <div class="container">
+      <input type="checkbox" class="checks" value="Apple" onclick="sendAjaxRequest(this)"> Apple<br>
+      <input type="checkbox" class="checks" value="Banana" onclick="sendAjaxRequest(this)"> Banana<br>
+      <input type="checkbox" class="checks" value="Orange" onclick="sendAjaxRequest(this)"> Orange<br>
+      <br>
+      <button onclick="getValue()">Get Value</button>
+      <br><br>
+      <div id="result"></div>
+   </div>
+   <script>
+      function sendAjaxRequest(checkbox) {
+         // Send an AJAX request to the server with the value of the checkbox
+         const xhr = new XMLHttpRequest();
+         xhr.open('POST', '/server-route', true);
+         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+         xhr.send(`checkboxValue=${checkbox.value}`);
+      }
+
+      function getValue() {
+         var checks = document.getElementsByClassName('checks');
+         var str = "";
+         for (i = 0; i < checks.length; i++) {
+            if (checks[i].checked === true) {
+               str += checks[i].value + ' ';
+            }
+         }
+
+         // Redirect to another page and pass the checked values as a query parameter
+         window.location.href = '/another-server-route?values=' + str;
+      }
+
+   </script>
+</body>
+</html>
+
