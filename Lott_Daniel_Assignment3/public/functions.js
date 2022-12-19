@@ -21,13 +21,13 @@ function nav_bar(this_product_key, products_data) {
     }
 }
 
-const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
 
 checkboxes.forEach(checkbox => {
   checkbox.addEventListener('click', event => {
     const checked = event.target.checked;
     const id = event.target.id;
-
     session[id] = checked;
+    console.log(checked);
   });
 });

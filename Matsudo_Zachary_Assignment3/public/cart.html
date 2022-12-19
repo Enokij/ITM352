@@ -1,0 +1,279 @@
+<!-- Zachary Matsudo Assignment 3 -->
+<!-- Cart page where users can view what items they added to the cart. Also can edit quanitity of items in cart.
+     Favorited items will also appear in cart page and users have the option to add them. 
+     Purchase summary with sub total, taxes, shipping and grand total also shown-->
+<!DOCTYPE html>
+<html>
+<!-- Gets product data and functions --> 
+<!-- Functions taken from Professor Port A3 examples repo -->
+<script src="./products.js" type="text/javascript"></script>
+<script src="./functions.js"></script>
+<script>
+  // Referenced from A3 code examples
+  var products;
+  var total = 0;
+  loadJSON('./cart', function (response) {
+    // Parse JSON string into an object
+    shop_cart = JSON.parse(response);
+  });
+
+  // Referenced from A3 code examples
+  loadJSON('./product_data', function (response) {
+    // Parse JSON string into an object
+    products = JSON.parse(response);
+  });
+
+  // Referenced from A3 code examples
+  loadJSON('./get_fav', function (response) {
+    // Parse JSON into an object
+    favorites = JSON.parse(response);
+  });
+
+  // Referenced from A3 code examples
+  // Gets the query string
+  let params = (new URL(document.location)).searchParams;
+  if (params.has('products_key')) {
+    var products_key = params.get('products_key');
+  }
+
+  // Read the values of a specific cookie
+  // Referenced form Lab 15 and W3 schools https://www.w3schools.com/js/js_cookies.asp
+  function getCookie(cookie_name) {
+    let name = cookie_name + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let split_cookie = decodedCookie.split(';');
+    for (let i = 0; i < split_cookie.length; i++) {
+      let cookie = split_cookie[i];
+      while (cookie.charAt(0) == ' ') {
+        cookie = cookie.substring(1);
+      }
+      if (cookie.indexOf(name) == 0) {
+        return cookie.substring(name.length, cookie.length);
+      }
+    }
+    return "";
+  }
+
+  // Requires user agrees to terms before checking out
+  // Referenced from Youtube video https://www.youtube.com/watch?v=QQ8UZb1Mv_0 
+  window.addEventListener("load", function(){
+    Term_button.addEventListener("click", function(){
+      if(Term_button.checked) {
+        checkout.style.visibility = "visible";
+      } else {
+        checkout.style.visibility = "hidden";
+      }
+    }, false);
+  }, false);
+  
+
+</script>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Template taken from W3 schools https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_templates_food_blog&stacked=h-->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+  <!-- My own css that I created to adjsut other elements-->
+  <link rel="stylesheet" href="./css/cart.css">
+  <title>Cart Summary</title>
+</head>
+
+<body>
+  <!-- Navigation bar -->
+  <!-- Style referenced from W3 schools https://www.w3schools.com/w3css/w3css_navigation.asp-->
+<nav>
+  <div class="w3-bar w3-black">
+    <a class="w3-bar-item w3-button w3-mobile" href="index.html">Zach's Candy Store </a>
+    <a class="w3-bar-item w3-button w3-mobile" href="./products_page.html?products_key=hard"> Hard </a>
+    <a class="w3-bar-item w3-button w3-mobile" href="./products_page.html?products_key=soft"> Soft </a>
+    <a class="w3-bar-item w3-button w3-mobile" href="./products_page.html?products_key=chocolate"> Chocolate</a>
+    <script>  cart_total.innerHTML = total; </script>
+  <script>
+    // If statement to display account if not logged in or logout if user is logged in
+    // Referenced from W3 Schools https://www.w3schools.com/js/js_cookies.asp 
+    if (getCookie('user_cookie') != false) {
+      var user_cookie = getCookie('user_cookie');
+      document.write(`<a href="/logout" class="w3-bar-item w3-button w3-mobile" id="login">Logout</a>`);
+      login.onclick = function () {
+        document.cookie = "user_cookie=; expires=Tue, 5 Feb 2019 00:00:00 UTC; path=/;";
+      }
+    } else {
+      document.write(`<a href="login.html" class="w3-bar-item w3-button w3-mobile" id="login">Account</a>`);
+    }
+  </script>
+</nav>
+<!-- Shopping cart table -->
+<center>
+  <script>if(getCookie('user_cookie') != false) {
+    document.write(`<h2><b> ${user_cookie} Cart Summary </b><h2>`)
+    };</script>
+  </center> 
+<form method="POST" action="/cart_change">
+  <table border="5" class="table1">
+    <thead>
+      <!-- Referenced from Store 1 WOD. Creates the table headers for the invoice table-->
+      <tr>
+        <th style="text-align: center;" width="20%">Item</th>
+        <th style="text-align: center;" width="10%"> Image </th>
+        <th style="text-align: center;" width="10%">Price</th>
+        <th style="text-align: center;" width="30%">Quantity</th>
+        <th style="text-align: center;" width="30%">Cart Total</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    <script>
+      // Compute sub-total
+      subtotal = 0;
+
+      // Shows what items are in the cart
+      for (let prod_key in shop_cart) {
+        for (let i in shop_cart[prod_key]) {
+          let quantities = shop_cart[prod_key][i];
+          if (quantities > 0) {
+            // Computes extended price and sub total if there is items in the cart
+            extended_price = quantities * products[prod_key][i].price
+            subtotal += extended_price;
+            document.write(`
+          <tr>
+            <td> ${products[prod_key][i].brand} </td>
+            <td> <img src="${products[prod_key][i].image}"> </td>
+            <td>\$${products[prod_key][i].price.toFixed(2)}</td>
+            <td><input type="number" id="qty${prod_key}${i}" name="qty${prod_key}${i}" value="${quantities}" min="0" max="${products[prod_key][i].quantity_available}"><input type="submit" value="Update"></td>
+            <td>\$${extended_price.toFixed(2)}</td>
+          </tr>`)
+          }
+        }
+      }
+      // Checks to see if there are items in cart. 
+      if (subtotal == 0) {
+         alert(`No items in cart`)
+      }
+      else {
+
+        // Compute tax. Hawaii state tax rate is 4% so I used that number
+        var tax_rate = 0.04;
+        var tax = tax_rate * subtotal;
+
+        // Compute Shipping. Referenced from invoice 2 WOD.
+        // Orders less than $20 will have free shipping, between $21-$40 is $2.50 shipping and orders over $40 is $5 shipping
+        if (subtotal <= 20) {
+          shipping = 0;
+        }
+        else if (subtotal <= 40) {
+          shipping = 2.50;
+        }
+        else {
+          shipping = 5;
+        }
+        // Compute grand total
+        // Taken from invoice 2 WOD
+        var total = subtotal + tax + shipping;
+      }
+    </script>
+  </tbody>
+</table>
+
+
+<!-- Table to show favorited items-->
+<!-- INDIVIDUAL REQUIRMENT 4-->
+<center>
+<table>
+  </form>
+  <br>
+  <h3><strong> Add Favorites</strong></h3>
+  <tr>
+    <th style="text-align: center;" width="20%">Item</th>
+    <th style="text-align: center;" width="10%"> Image </th>
+    <th style="text-align: center;" width="10%">Price</th>
+    <th style="text-align: center;" width="30%">Quantity</th>
+    <th style="text-align: center;" width="30%"></th>
+  </tr>
+<script>
+  // Shows favorited items in cart page
+  // IR4 referenced from Stackoverflow https://stackoverflow.com/questions/10033215/how-do-i-add-an-add-to-favorites-button-or-link-on-my-website and https://stackoverflow.com/questions/66762798/how-do-i-add-a-favorite-option-on-my-site
+  // Also referenced Lab 15 and watched video https://www.hackingwithswift.com/books/ios-swiftui/letting-the-user-mark-favorites
+  for (let prod_key in favorites) {
+    for (let i in favorites[prod_key]) {
+      if (typeof favorites[prod_key] != 'undefined') {
+        // If the item is a favorite then it will show the item information in table
+        if (favorites[prod_key][i] === true) {
+          extended_price = favorites[prod_key][i] * products[prod_key][i].price
+          subtotal += extended_price;
+          document.write(`
+            <form action="./cart_change" method="POST">
+              <tr>
+                <td>${products[prod_key][i].brand}</td>
+                <td><img src="${products[prod_key][i].image}"></td>
+                <td>\$${products[prod_key][i].price.toFixed(2)}</td>
+                <td><input type="number" value="1" min="0" max="${products[prod_key][i].quantity_available}" id="qty_${prod_key}_${i}" name="qty_${prod_key}_${i}"></td><td>
+                  <input type="submit" value="Add"></td>
+               </tr>
+            </form>`);
+        }
+      }
+    }
+  }
+
+</script>
+</table>
+</center>
+
+<!-- New Table to separate cart summary and payment summary-->
+<h2>
+  Payment Summary
+</h2>
+<table class="table2">
+  <!-- Referenced from Store 1 WOD and is used to display the sub-total, tax, shipping costs and total. 
+  sub-total, tax, shipping and total are called using document.write and toFixed used to have it display 2 decimal places-->
+  <tr>
+    <td style="text-align: center;" width="50%">Sub-total</td>
+    <td>$
+      <script>document.write(subtotal);</script>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center;" width="50%">Tax @
+      <script>document.write(100 * tax_rate);</script>%
+    </td>
+    <td>$
+      <script>document.write(tax.toFixed(2));</script>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center;" width="50%">Shipping</td>
+    <td>$
+      <script>document.write(shipping.toFixed(2));</script>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center;" width="50%"><strong>Total</strong></td>
+    <td><strong>$
+        <script>document.write(total.toFixed(2));</script>
+    </strong></td>
+  </tr>
+  </tbody>
+</table>
+<!-- Shipping memo to show shipping price for each price range -->
+<div id="ship_memo">
+  <br>
+  <b>
+    <center> Zachary Matsudo Candy Store Shipping Prices : <br> Orders $20 and under are free! Orders between $21-$40
+      will have a $2.50 shipping cost and orders over $30 will have $5 shipping </center>
+  </b>
+</div>
+
+<!-- Must check box and agree to terms before checking out -->
+<center><strong><p> Check box below to confirm that you have read and accept shipping policy for Zachs Candy Store </p></strong>
+  <input type="checkbox" id="Term_button" name="Term_button" value="agreed">
+</center>
+
+<form action="/purchase" method="GET">
+  <center><input type="button" value="Checkout" name="checkout" id="checkout"
+      onclick="location.href='./invoice.html';"></center>
+</form>
+</body>
+</html>

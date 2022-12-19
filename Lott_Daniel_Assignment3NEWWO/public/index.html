@@ -1,0 +1,188 @@
+<style>
+  html {
+    background-color: lightgray;
+    border-color: #ff6961;
+
+  }
+
+  header {
+    background-color: #333;
+    /* Set the background color of the header */
+    display: flex;
+    /* Display the header as a flex container */
+    align-items: center;
+    /* Center the header items vertically */
+    padding: 20px;
+    /* Add some padding to the header */
+    height: 10px;
+  }
+
+  /* Style the logo */
+  header img {
+    height: 50px;
+    /* Set the height of the logo image */
+  }
+
+
+  /* Style the navigation bar */
+  nav {
+    margin-left: auto;
+    /* Move the navigation bar to the right side of the header */
+    width: 100%;
+    /* Set the width of the navbar to 100% of the container */
+  }
+
+  /* Style the links inside the navbar */
+  nav ul {
+    list-style-type: none;
+    /* Remove the default bullet points from the list */
+    margin: 0;
+    /* Remove the default margin */
+    padding: 0;
+    /* Remove the default padding */
+    overflow: hidden;
+    /* Hide any elements that overflow the navbar */
+    display: flex;
+    /* Display the navbar as a flex container */
+    align-items: center;
+    /* Center the navbar items vertically */
+  }
+
+  /* Style the links inside the navbar */
+  nav ul li a {
+    color: white;
+    font-family: "Segoe UI";
+    /* Set the text color of the links */
+    text-decoration: none;
+    padding: 10px;
+    /* Add some padding to the links */
+    float: left;
+    /* Float the navbar links to the left by default */
+  }
+
+  /* Style the home link */
+  nav ul li a:first-child {
+    /* The first-child pseudo-class selects the first link in the navbar */
+    float: left;
+    /* Float the home link to the left */
+  }
+
+  /* Style the cart link */
+  nav ul li a:last-child {
+    /* The last-child pseudo-class selects the last link in the navbar */
+    float: right;
+    /* Float the cart link to the right */
+  }
+
+  /* Add a hover effect to the links */
+  nav ul li a:hover {
+    background-color: #555;
+    /* Change the background color of the link on hover */
+    border-radius: 4px;
+    /* Add rounded corners to the link */
+  }
+
+  h1 {
+    font-family: "Lucida Console", "Menlo", "Monaco", "Courier", monospace;
+    font-size: 4rem;
+    background-blend-mode: lighten;
+    color: white;
+    text-shadow: 5px 5px 1px black;
+  }
+
+  h4 {
+    font-family: "Segoe UI";
+    font-size: 1.1rem;
+    color: black;
+    z-index: 3000;
+
+  }
+
+  .container {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    width: 1000px;
+    height: 700px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+</style>
+
+<head>
+  <script src="./functions.js"></script>
+  <script>
+    var products;
+    var total = 0;
+    var cookie;
+    var user_data;
+    loadJSON('get_products_data', function (response) {
+      // Parsing JSON string into object
+      products = JSON.parse(response);
+    });
+    loadJSON('get_cart', function (response) {
+      // Parsing JSON string into object
+      shopping_cart = JSON.parse(response);
+      for (pk in shopping_cart) {
+        total += shopping_cart[pk].reduce((a, b) => a + b);
+      }
+    });
+    loadJSON('get_cookies', function (response) {
+      // Parsing JSON string into object
+      cookie = JSON.parse(response);
+    });
+    loadJSON('get_users', function (response) {
+      // Parsing JSON string into object
+      user_data = JSON.parse(response);
+    });
+    var this_product_key = ''
+
+
+  </script>
+</head>
+<header>
+  <img src='./images/logo.jpg'>
+  <nav>
+    <ul>
+      <li><a href='index.html'>HOME<a></li>
+      <li>
+        <script>nav_bar(this_product_key, products);</script>
+      </li>
+      <li>You have <span id="cart_total">0</span> items in your shopping cart: <a href='./cart.html'>View Cart</a></li>
+      <script>
+        //Updates the number of items in cart
+        cart_total.innerHTML = total;
+        //Defines user_email to be what email was entered and saved into the cookies
+        user_email = cookie.email;
+        //Defines ifLoggedIn to be 
+        ifLoggedIn = cookie.loggedIn;
+        if (ifLoggedIn == 'true') {
+          document.write('<li><a href="get_to_logout">Logout</a></li>')
+        } else {
+          document.write('<li><a href="get_to_login">Login</a></li>');
+        }
+      </script>
+    </ul>
+  </nav>
+</header>
+
+<body>
+  <div class="container">
+  <center>
+    <h1>Welcome <span id="username"></span> to Island Cycling!</h1>
+    <script>
+      if (ifLoggedIn == 'true') {
+        username.innerHTML = user_data[user_email].name
+        document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
+          '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
+      }
+    </script>
+        <img src="./images/background.webp" alt="image" height="45%" width="35%" class="img">
+    <h4>Please Use The Navigation Bar Above To Begin Shopping</h4>
+  </center>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+/* Zachary Matsudo Assignment 3 */
+/* CSS to style the products page */
+
+/* General */
+/* html, body, header styling was learned in class */
+/* Fonts referenced from https://www.w3schools.com/cssref/css_websafe_fonts.php */
+
+html {
+  font-family: 'Georgia', sans-serif;
+  background-color: #2396FF;
+  font-size: 18px;
+  background: url(https://img.freepik.com/free-photo/tasty-appetizing-party-accessories-bright-blue-background_1220-1696.jpg?w=2000) no-repeat 50% center;
+  background-size: cover;
+}
+
+body {
+  width: 78%;
+  margin: auto;
+  padding-bottom: 100px;
+}
+
+
+/* Fonts */
+
+h1 {
+  font-size: 75px;
+  text-align: center;
+}
+
+section h2 {
+  text-align: center;
+  font-size: 40px;
+}
+
+/* Styling */
+/* referenced Store 1 WOD */
+
+body>div {
+  border: 5px solid black;
+  display: flex;
+}
+
+main {
+  flex: 7;
+}
+
+/* Form Styling */
+/* referenced Store 1 WOD */
+main {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+
+
+/* Styling Products Section*/
+/* Store 1 WOD used as a reference */
+
+.item {
+  margin: auto;
+  padding-bottom: 50px;
+}
+
+
+
+.item img {
+  width: 300px;
+  height: 200px;
+  display: block;
+}
+
+section p {
+  text-align: center;
+  font-size: 30px;
+  background-color: black;
+  color: #2396FF;
+  padding: 10px 10px;
+}
+
+section label {
+  font-size: 25px;
+}
+
+section input {
+  width: 110px;
+  height: 50px;
+  margin-top: 10%;
+  font-size: 14px;
+}
+
+.button {
+  font-size: 50px;
+  color: #2396FF;
+  background-color: black;
+  padding: 10px 30px;
+  margin-bottom: 10px;
+}

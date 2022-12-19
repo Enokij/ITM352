@@ -159,6 +159,11 @@ app.get("/get_products_data", function (request, response) {
     response.json(products_data);
 });
 
+//Gets the product's data file in JSON format
+app.get("/get_products_data", function (request, response) {
+    response.json(products_data);
+});
+
 //Gets the login page
 app.get("/get_to_login", function (request, response) {
     //gets the URL search parameters
@@ -281,26 +286,40 @@ app.get("/add_to_cart", function (request, response) {
     request.session.qty = qtys;
     request.session.favorite = favorite_name;
     let zero_qty = false;
-    console.log(Number(qtys));
     let product = request.query['products_key'];
-    for (i = 0; i < products_data[product].length; i++) { // Runs loop for all products and their respective entered quantities
-        let qty = qtys[i];
-        var favorite = favorite_name[i];
-        if (qty == 0 || qty == '') continue; //if no inputs are entered into a product quantity textbox, then continue to the next product in the qty array.
-        if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty) > 0) {
-            //if the qty meets the above criteria, then update the product's qty sold and available with the respective product quantities entered   
-        } else if (quantityValidation(qty) != true) { // if quantities is not equal to a valid number than it is false 
+    if (favorite_name) {
+        for (i = 0; i < products_data[product].length; i++) {
+          let qty = qtys[i];
+           favorite = favorite_name[i];
+          if (qty == 0 || qty == '') continue;
+          if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty) > 0) {
+            // Update product quantities
+          } else if (quantityValidation(qty) != true) {
             valid_num = false;
-        } else if (Number(qty) >= products_data[product][i].qty_available) { // If the quantities enter are greater then the qty_available, then valid = false (returns)
+          } else if (Number(qty) >= products_data[product][i].qty_available) {
             valid = false;
-        }
-        if (qty > 0) {
+          }
+          if (qty > 0) {
             zero_qty = true;
+          }
         }
-    }
-    //from Lab 13 info_server.new.js. For Individual Requirement 4 Assignment 1 (Erin)
-    /*if the number entered is not a valid number as identified through the quantityValidation(qty) or did not meet the other conditions set in the if statement,
-    then redirect user back to the products_display page and set the submit_button parameter to the respective error message*/
+      } else {
+        for (i = 0; i < products_data[product].length; i++) {
+          let qty = qtys[i];
+           favorite = undefined;
+          if (qty == 0 || qty == '') continue;
+          if (quantityValidation(qty) && Number(qty) <= products_data[product][i].qty_available && Number(qty) > 0) {
+            // Update product quantities
+          } else if (quantityValidation(qty) != true) {
+            valid_num = false;
+          } else if (Number(qty) >= products_data[product][i].qty_available) {
+            valid = false;
+          }
+          if (qty > 0) {
+            zero_qty = true;
+          }
+        }
+      }
     if (valid_num == false) {
         response.redirect(`products_display.html?products_key=${product}&error=Please Enter Valid Quantity`);
         /*if quantity available is less then the amount of quantity ordered, then redirect user back to the products_display page

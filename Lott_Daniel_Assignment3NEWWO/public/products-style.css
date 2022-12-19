@@ -1,0 +1,313 @@
+html {
+  background-color: lightgray;
+  border-color: #ff6961;
+}
+
+
+header {
+  background-color: #333; /* Set the background color of the header */
+  display: flex; /* Display the header as a flex container */
+  align-items: center; /* Center the header items vertically */
+  padding: 20px; /* Add some padding to the header */
+  height: 10px;
+  box-shadow:0px 0px 15px rgb(54, 51, 51);
+}
+    /* Style the logo */
+    header img {
+        height: 50px; /* Set the height of the logo image */
+    }
+
+    
+/* Style the navigation bar */
+nav {
+  margin-left: auto; /* Move the navigation bar to the right side of the header */
+  width: 100%; /* Set the width of the navbar to 100% of the container */
+}
+
+/* Style the links inside the navbar */
+nav ul {
+  list-style-type: none; /* Remove the default bullet points from the list */
+  margin: 0; /* Remove the default margin */
+  padding: 0; /* Remove the default padding */
+  overflow: hidden; /* Hide any elements that overflow the navbar */
+  display: flex; /* Display the navbar as a flex container */
+  align-items: center; /* Center the navbar items vertically */
+}
+
+/* Style the links inside the navbar */
+nav ul li a {
+  color: white; /* Set the text color of the links */
+  text-decoration: none;
+  padding: 10px; /* Add some padding to the links */
+  float: left; /* Float the navbar links to the left by default */
+  font-family: "Segoe UI";
+}
+
+/* Style the home link */
+nav ul li a:first-child {
+  /* The first-child pseudo-class selects the first link in the navbar */
+  float: left; /* Float the home link to the left */
+}
+
+/* Style the cart link */
+nav ul li a:last-child {
+  /* The last-child pseudo-class selects the last link in the navbar */
+  float: right; /* Float the cart link to the right */
+}
+
+/* Add a hover effect to the links */
+nav ul li a:hover {
+  background-color: #555; /* Change the background color of the link on hover */
+  border-radius: 4px; /* Add rounded corners to the link */
+}
+
+
+input[type="checkbox"] {
+  right:10%;
+  top:39%;
+  z-index: 1000;
+  width: 20px;
+  height: 20px;
+  position:absolute;
+}
+
+
+input[type="checkbox"]:checked {
+  background-color: yellow;
+  right:10%;
+  top:39%;
+  width: 20px;
+  height: 20px;
+  z-index: 1000;
+  position:absolute;
+}
+  h1,
+  h2 {
+  font-family: "Segoe UI";
+  margin: 0;
+  text-align: center;
+}
+
+
+h1 {
+  font-size: 3rem;
+  background-blend-mode: lighten;
+  color: rgb(54, 51, 51);
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.808);
+}
+
+h2 {
+  font-family: "Segoe UI";
+  font-size: 1.1rem;
+  color: #331;
+  text-align: center;
+  position: relative;
+  z-index: 3000;
+  text-shadow: 1px 1px  black;
+  line-height: 2rem;
+  padding-bottom: 0rem;
+  display: block;
+  text-shadow: 0px 0px 10px rgba(209, 208, 208, 0.808);
+}
+
+h3 {
+  font-family: "Segoe UI";
+  font-size: 2rem;
+  color: #331;
+  text-align: center;
+  position: relative;
+  z-index: 3000;
+  text-shadow: 1px 1px  black;
+  line-height: 2rem;
+  padding-bottom: 0rem;
+  display: block;
+  text-shadow: 0px 0px 10px rgba(209, 208, 208, 0.808);
+}
+
+
+h4 {
+  font-family: "Segoe UI";
+  font-size: 1.1rem;
+  color: black;
+  text-align: right;
+  position: absolute;
+  right: 30px;
+  z-index: 3000;
+  line-height: 4rem;
+  padding-top: 0.3rem;
+  display: block;
+}
+
+h5 {
+  font-family: "Segoe UI";;
+  font-size: 1.2rem;
+  color: #331;
+  text-align: center;
+  position: relative;
+  z-index: 3000;
+  text-shadow: 1px 1px  black;
+  line-height: 2rem;
+  padding-bottom: 0rem;
+  display: block;
+  text-shadow: 0px 0px 10px rgba(209, 208, 208, 0.808);
+}
+
+
+h6 {
+  font-family: "Segoe UI";
+  font-size: 0.90rem;
+  color: black;
+  text-align: right;
+  position: absolute;
+  top: 6%;
+  right: 30px;
+  z-index: 3000;
+  line-height: 4rem;
+  margin-top: auto;
+  display: block;
+}
+
+h7 {
+  color: black;
+}
+
+.favorite {
+  color: black;
+  position: absolute;
+  top: 39%;
+  right: 18%;
+}
+
+div {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  top: 90px;
+  position:absolute;
+  left:20%;
+  width: 65%;
+}
+
+.total_sold {
+  font-family: "Segoe UI";
+  font-size: 0.90rem;
+  color: black;
+  text-align: right;
+  position: absolute;
+  top: 13%;
+  right: 30px;
+  z-index: 3000;
+  line-height: 4rem;
+  margin-top: auto;
+  display: block;
+  font-weight: bold;
+}
+
+.item img {
+  width: 205px;
+  height: 200px;
+  background-color: grey;
+  display: block;
+  position: absolute;
+  bottom: 0px;
+  border-radius: 25%;
+}
+
+
+.error_msg {
+  font-family: "Segoe UI";
+  font-size: 0.9rem;
+  color: red;
+  text-align: center;
+  width: 75px;
+  height: 20px;
+  position: absolute;
+  right: 85px;
+  z-index: 3000;
+  bottom: 80px;
+  display: block;
+  margin-top: auto;
+  word-wrap: normal;
+}
+.textbox{
+  font-family: "Segoe UI";
+  position: absolute;
+  margin-top: auto;
+}
+
+input[type=text], select {
+  width: 10%;
+  right: 35px;
+  position: absolute;
+  margin-top: 70px;
+  padding-top: 20px;
+  border-radius: 20%;
+  text-align: center;
+}
+
+
+p {
+  font-size: 1rem;
+  top: 90px;
+}
+
+footer {
+  padding-bottom:40px;
+}
+
+/* block styling */
+footer h1 {
+  font-style: italic;
+  font-size: 3rem;
+}
+
+main {
+  flex: 7;
+}
+
+
+/*  Form styling */
+main {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+/* Styling the products */
+
+
+section {
+  font-family: "Segoe UI";
+  width: 30%;
+  margin: 5px;
+  background-color: #ffffff9c;
+  position: sticky;
+  height: 230px;
+  border-radius: 5%;
+  box-shadow: 0px 0px 10px rgb(80, 80, 80);
+}
+
+section p {
+  color: beige;
+  background: #ff0d00;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 20%;
+  position: absolute;
+  right: 35px;
+  top: 155px;
+  z-index: 2000;
+  white-space: normal;
+  border-radius: 50%;
+}
+
+.submit_button {
+  border-radius: 100%;
+  height: 40px;
+  color: White;
+  background-color: #331;
+  box-shadow: 3px 3px 1px black;
+  
+}
+
+

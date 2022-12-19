@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<script src="./functions.js"></script>
+<script>
+  //Fixed to only show one line at a time
+    //  IR2 REQUIREMENT From Assignment 1 Workshop Unzipped file "Design examples for Assignment1", this includes checkquantitytextbox
+    function isNonNegInt(queryString, returnErrors) { //Checks for errors and provides red error message
+        errors = []; // assume no errors at first
+        if (Number(queryString) != queryString) errors.push('<font color="red">Not a number!'); // Checks if string is a number value
+        else if (queryString < 0) errors.push('<font color="red">Negative Value!'); // Check if it is non-negative
+        else if (queryString > 20) errors.push('<font color="red">Not Enough In Stock!</font>');
+        else if (parseInt(queryString) != queryString) errors.push('<font color="red">Not an integer!'); // Check that it is an integer
+        if (returnErrors) {
+                return errors;
+            } else if (errors.length == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    function checkQuantityTextbox(theTextbox) { //Changes error message to You want or Quantity desired and changes frame of textbox
+        /*Returns text of how many items are being purchased if amount in textbox has no errors */
+        var errs = isNonNegInt(theTextbox.value, true);
+        if (errs.length == 0) {
+        errs = ['You want:']; theTextbox.style.borderColor = "black"; // If no errors border is black
+        } else if (theTextbox.value.trim() == '') {
+        errs = ['Quantity Desired'];
+        } else {
+            theTextbox.style.borderColor = "red"; // If there are errors border is red
+        }
+        document.getElementById(theTextbox.name + '_label').innerHTML = errs.join(", ");
+    }
+    // Code from assignment 3 examples https://dport96.github.io/ITM352/morea/180.Assignment3/reading-code-examples.html
+    // get the query string
+    var products;
+    var shopping_cart;
+    var total = 0;
+    loadJSON('./get_products_data', function (response) {
+      // Parsing JSON string into object
+      products_data = JSON.parse(response);
+    });
+    // Code from assignment 3 examples https://dport96.github.io/ITM352/morea/180.Assignment3/reading-code-examples.html
+    loadJSON('./get_cart', function (response) {
+      // Parsing JSON string into object
+      shopping_cart = JSON.parse(response);
+      for (pk in shopping_cart) {
+        total += shopping_cart[pk].reduce((a, b) => a + b);
+      }
+    });
+    //Checks for products key, if there is no product key stop
+    let params = (new URL(document.location)).searchParams;
+        if (params.has('products_key')) {
+            var this_product_key = params.get('products_key');
+        } else {
+          document.stop;
+        }
+    
+  //w3schools cookie function to get cookies https://www.w3schools.com/js/js_cookies.asp
+
+  function getCookie(cname) { 
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+
+
+</script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Manoa Market</title>
+    <link href="https://fonts.googleapis.com/css?family=Cherry+Swash|Raleway" rel="stylesheet">
+    <link href="products-style.css" rel="stylesheet">
+    <link href="nav.css" rel="stylesheet">
+
+    
+
+</head>
+<body> <!--W3schools navbar-->
+    <div class="topnav">
+        <a href="index.html">Home</a>
+        <a href="display_products.html?products_key=Flowers">Products</a>
+        <script>
+        if (getCookie('useremail') != false) { //Checks for cookie "username", if user logged in display logout, else display login
+          var user_cookie = getCookie('useremail');
+          document.write(`<a href="/logout" id="logout">Logout</a>`);
+        } else {
+          document.write(`<a href="/login" id="login">Login</a>`);
+        }
+      </script>
+        <a href="/register">Register</a>
+        <a href="/cart">View Cart (<span id="cart_total">0</span>)</a>
+      </div>
+      <script> //Checks if user_name cookie exists, if user exists welcome!, else ask them to log in
+        if (getCookie('useremail') != false) { 
+              var user_cookie = getCookie('useremail');
+              document.write(`<h5>Welcome ${user_cookie}!</h5>`);
+            } else {
+              document.write(`<h5>Please log in or register if you want to checkout!</h5>`);
+            }
+      </script>
+      <div class="Choice">
+      <b><p>Please choose from our products!</p></b>
+      </div>
+      <script>
+        cart_total.innerHTML = total;
+      </script> 
+      <h5 class="links"><script> //This is from Assignment 3 example code
+        // This makes a navigation bar to other product pages
+        for (let products_key in products_data) {
+            if (products_key == this_product_key) continue;
+            document.write(`<a href='./display_products.html?products_key=${products_key}'>${products_key}<a>&nbsp&nbsp&nbsp;`);
+        }
+    </script></h5> 
+
+    <script>
+
+      x = this_product_key
+      </script>
+    <!--Modified Assignment 1 and 2 display, generate the products-->
+   <FORM action="/add_cart" method="get">    
+    <div>
+      <main>
+        <script>
+        var products = products_data[this_product_key];
+        console.log(this_product_key);
+          for (i = 0; i < products.length; i++) {
+            document.write (`
+            <section class="item">
+                <h2>${products[i].name}</h2>
+                <br>
+                <br>
+                <h3>Price: $${products[i].price}</h3>
+                <br>
+                <br>
+                <h4>In Stock: ${products[i].qtyavl}</h4>
+                <br>
+                <img src=${products[i].image}>
+                <BR>
+                <BR>
+                <br>
+                <br>
+                <h3> 
+                <label id="quantities${i}_label">Enter Quantity</label> 
+                <input type="number" name="quantities${i}" placeholder =0 onkeyup="checkQuantityTextbox(this);">
+                <div id="quantities[${i}]_errordiv"></div>
+            <h3>
+            </section>
+            `);
+        }
+        </script>
+      
+      </main>
+    </div>
+    <div class="makeorder"><script>document.write(`
+      <INPUT TYPE="HIDDEN" NAME="products_key" Value="${x}">
+    <INPUT TYPE="SUBMIT" id="submit" value="Add to Cart"> </p> `)
+      </script>
+    </div>
+  </form>
+</body>
+</html>

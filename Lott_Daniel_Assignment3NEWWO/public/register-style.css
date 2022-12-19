@@ -1,0 +1,104 @@
+body {
+    background-color: lightgray;
+}
+header {
+    background-color: #333; /* Set the background color of the header */
+    display: flex; /* Display the header as a flex container */
+    align-items: center; /* Center the header items vertically */
+    padding: 20px; /* Add some padding to the header */
+    height: 10px;
+  }
+      /* Style the logo */
+      header img {
+          height: 50px; /* Set the height of the logo image */
+      }
+  
+      
+  /* Style the navigation bar */
+  nav {
+    margin-left: auto; /* Move the navigation bar to the right side of the header */
+    width: 100%; /* Set the width of the navbar to 100% of the container */
+  }
+  
+  /* Style the links inside the navbar */
+  nav ul {
+    list-style-type: none; /* Remove the default bullet points from the list */
+    margin: 0; /* Remove the default margin */
+    padding: 0; /* Remove the default padding */
+    overflow: hidden; /* Hide any elements that overflow the navbar */
+    display: flex; /* Display the navbar as a flex container */
+    align-items: center; /* Center the navbar items vertically */
+  }
+  
+  /* Style the links inside the navbar */
+  nav ul li a {
+    color: white; /* Set the text color of the links */
+    text-decoration: none;
+    padding: 10px; /* Add some padding to the links */
+  }
+  
+  /* Style the home link */
+  nav ul li a:first-child {
+    /* The first-child pseudo-class selects the first link in the navbar */
+    float: left; /* Float the home link to the left */
+  }
+
+  nav ul li:last-child a {
+    float: right;
+    margin-right: 10px;
+  }
+  
+  /* Add a hover effect to the links */
+  nav ul li a:hover {
+    background-color: #555; /* Change the background color of the link on hover */
+    border-radius: 4px; /* Add rounded corners to the link */
+  }
+
+  
+h1 {
+    letter-spacing: 1.5vw;
+    font-family: 'system-ui';
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+    margin: 20px;
+}
+
+h2 {
+    font-family: 'system-ui';
+    text-transform: uppercase;
+    text-align: center;
+}
+
+h3 {
+    padding: -40px;
+    margin-top: -50px;
+    letter-spacing: 1.5vw;
+    font-family: 'system-ui';
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+    margin:1px;
+}
+
+h4 {
+    margin-top: -50px;
+    font-family: 'system-ui';
+    text-transform: uppercase;
+    text-align: center;
+    padding: 10px;
+    margin: 20px;
+}
+.submit {
+
+    font-family: 'system-ui';
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 100%;
+    height: 40px;
+    color: white;
+    background-color: #331;
+    box-shadow: 3px 3px 1px black;
+    padding: 10px;
+    margin: 20px;
+}

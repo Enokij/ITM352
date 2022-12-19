@@ -1,0 +1,59 @@
+/* Zachary Matsudo Assignment 3 */
+/* CSS to style the invoice page */
+
+/* General */
+/* html, body, header styling was learned in class */
+/* Fonts referenced from https://www.w3schools.com/cssref/css_websafe_fonts.php */
+
+html {
+  font-family: 'Georgia', sans-serif;
+  background-color: white;
+  font-size: 18px;
+  background: url(https://img.freepik.com/free-photo/tasty-appetizing-party-accessories-bright-blue-background_1220-1696.jpg?w=2000) no-repeat 50% center;
+  background-size: 2000px;
+}
+
+body {
+  width: 70%;
+  margin: auto;
+}
+
+/* Fonts */
+
+h2 {
+  font-size: 50px;
+  text-align: center;
+}
+
+.thank {
+  font-size: 50px;
+  text-align: center;
+}
+
+/* Table Styleing referenced from https://www.w3schools.com/css/css_table.asp */
+/* Store 1 WOD used as a reference */
+
+table, th, td {
+  border: 5px solid black;
+  border-collapse: collapse;
+  font-size: 22px;
+  text-align: center;
+}
+
+.table2 {
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+/* Style buttons */
+
+#checkout {
+  font-size: 20px;
+  color: #2396FF;
+  background-color: black;
+  padding: 5px 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+

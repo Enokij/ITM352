@@ -119,7 +119,7 @@ for (let i = 0; i < product.length; i++) {
       <img src=./images/${product[i].image}>
       <h6>Left in Stock: ${product[i].qty_available}</h6>
       <br>
-      <input type="checkbox" id="favorite-${i}" name="favorite-${i}">
+      <label><input type="checkbox" id="favorite-${i}" name="favorite-${i}"></label>
       <h6>Total Sold: ${product[i].total_sold}</h6>
       <input class="textbox" type="text" name="quantity[${i}]" value="${(typeof cookie.cart[productCatagory] != 'undefined') ? cookie.cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
       <span class="error_msg" id="quantity[${i}]_message">Enter a quantity</span>

@@ -1,0 +1,118 @@
+{
+    "hard": [
+ {
+    "brand": "Skittles",
+    "price": 2.00,
+    "image": "./images/skittles.jpg",
+    "quantity_available": 50
+},
+{
+    "brand": "Starburst",
+    "price": 4.25,
+    "image": "./images/star.jpeg",
+    "quantity_available": 50
+},
+{
+    "brand": "Airheads",
+    "price": 5.00,
+    "image": "./images/airheads.jpeg",
+    "quantity_available": 25
+},
+{
+    "brand": "Gobstoppers",
+    "price": 4.00,
+    "image": "./images/gobstopper.jpg",
+    "quantity_available": 30
+},
+{
+    "brand": "Jolly Rancher",
+    "price": 5.00,
+    "image": "./images/jollyrancher.jpeg",
+    "quantity_available": 20
+},
+{
+    "brand": "Mentos",
+    "price": 8.00,
+    "image": "./images/mentos.jpeg",
+    "quantity_available": 15
+}
+],
+
+"soft": [
+{
+    "brand": "Sour Patch Kids",
+    "price": 3.00, 
+    "image": "./images/sourpatch.jpeg",
+    "quantity_available": 40
+},
+{
+    "brand": "Gummy Bears",
+    "price": 3.75,
+    "image": "./images/haribo.jpeg",
+    "quantity_available": 40
+},
+{
+    "brand": "Swedish Fish",
+    "price": 2.75,
+    "image": "./images/fish.jpg",
+    "quantity_available": 50
+},
+{
+    "brand": "Gummy Worms",
+    "price": 3.75,
+    "image": "./images/worms.jpeg",
+    "quantity_available": 35
+},
+{
+    "brand": "Lifesaver Gummies",
+    "price": 5.00,
+    "image": "./images/lifesavers.jpeg",
+    "quantity_available": 20
+},
+{
+    "brand": "Nerd Clusters",
+    "price": 5.00,
+    "image": "./images/clusters.jpeg",
+    "quantity_available": 15
+}
+],
+
+"chocolate": [
+{
+    "brand": "M&Ms",
+    "price": 2.50,
+    "image": "./images/mnm1.jpg",
+    "quantity_available": 55
+},
+{
+    "brand": "Kit Kat",
+    "price": 4.00,
+    "image": "./images/KK.jpeg",
+    "quantity_available": 30
+},
+{
+    "brand": "Twix",
+    "price": 3.50,
+    "image": "./images/twix.jpeg",
+    "quantity_available": 20
+},
+{
+    "brand": "Reese's",
+    "price": 4.00,
+    "image": "./images/Reese.jpeg",
+    "quantity_available": 35
+},
+{
+    "brand": "Snickers",
+    "price": 3.00,
+    "image": "./images/snickers.jpeg",
+    "quantity_available": 20
+},
+{
+    "brand": "Hershey",
+    "price": 4.00,
+    "image": "./images/Hershey.jpeg",
+    "quantity_available": 20
+}
+]
+}
