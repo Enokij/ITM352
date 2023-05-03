@@ -78,16 +78,14 @@
   }
 
   .container {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     width: 1000px;
     height: 700px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 </style>
 
 <head>
@@ -149,20 +147,20 @@
 
 <body>
   <div class="container">
-  <center>
-    <h1>Welcome <span id="username" style="color: blue;"></span> to Island Cycling!</h1>
-    <script>
-      //if user is logged in, then displays user name in the header and the other user information on the page.
-      if (ifLoggedIn == 'true') {
-        username.innerHTML = user_data[user_email].name
-        document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
-          '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
-      }
-    </script>
-        <img src="./images/background.webp" alt="image" height="45%" width="35%" class="img">
-    <h4>Please Use The Navigation Bar Above To Begin Shopping</h4>
-  </center>
-</div>
+    <center>
+      <h1>Welcome <span id="username" style="color: blue;"></span> to Island Cycling!</h1>
+      <script>
+        //if user is logged in, then displays user name in the header and the other user information on the page.
+        if (ifLoggedIn == 'true') {
+          username.innerHTML = user_data[user_email].name
+          document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
+            '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
+        }
+      </script>
+      <img src="./images/background.webp" alt="image" height="45%" width="35%" class="img">
+      <h4>Please Use The Navigation Bar Above To Begin Shopping</h4>
+    </center>
+  </div>
 </body>
 
 </html>
