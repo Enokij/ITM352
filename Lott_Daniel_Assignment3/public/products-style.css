@@ -157,7 +157,7 @@ h6 {
   color: black;
   text-align: right;
   position: absolute;
-  top: 6%;
+  top: 18%;
   right: 30px;
   z-index: 3000;
   line-height: 4rem;
@@ -167,13 +167,6 @@ h6 {
 
 h7 {
   color: black;
-}
-
-.favorite {
-  color: black;
-  position: absolute;
-  top: 39%;
-  right: 18%;
 }
 
 div {
@@ -190,7 +183,7 @@ div {
   color: black;
   text-align: right;
   position: absolute;
-  top: 13%;
+  top: 25%;
   right: 30px;
   z-index: 3000;
   line-height: 4rem;

@@ -104,9 +104,6 @@ app.all('*', function (request, response, next) {
     if (typeof request.session.email == 'undefined') {
         request.session.email = {};
     }
-    if (typeof request.session.favorite == 'undefined') {
-        request.session.favorite = {};
-     }
     next();
 });
 
@@ -188,24 +185,6 @@ app.get("/decrease_quantity", function (request, response) {
     decreaseQuantity(request, productId, catagory_key, products_data);
     response.redirect("./cart.html");
 });
-
-//For Assignment 3 IR4:
-// To get the favorited items from product_data.html
-app.post("/add_to_fav", function (request, response) {
-    // Initialize the favorite property as an empty object if it is not already defined
-    request.session.favorite = request.session.favorite || {};
-    // Initialize the prod_key property as an empty object if it is not already defined
-    if (!(request.query.prod_key in request.session.favorite)) {
-       request.session.favorite[request.query.prod_key] = {};
-    }
-    // Set the value of the favorite property at the specified pindex to either true or false
-    request.session.favorite[request.query.prod_key][request.query.pindex] = (request.query.favorite.toLowerCase() === 'true') ? true : false;
-    // Set the value of the checked cookie to the value of the favorite property
-    response.cookie("checked", request.session.favorite[request.query.prod_key][request.query.pindex]);
-    // Return an empty JSON object as the response
-    response.json({});
-});
-
 
 // creates the cart for the session
 // From A2 Login validation modifed for the cart 

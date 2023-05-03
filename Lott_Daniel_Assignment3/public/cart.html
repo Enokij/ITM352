@@ -63,7 +63,7 @@
     '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
 }
 </script>
-<center><table border><th>Favorited</th><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
+<center><table border><th>Quantity</th><th>Item</th><th>Price</th><th>Extended Price</th></center>
 
 <script>
 // This script displays the products in a shopping cart and allows the user to increase or decrease
@@ -80,13 +80,8 @@ for(header in products) {
         (subtotal += extended_price)
         if(qty > 0) {
           var product = products[header][i];
-          //INDIVIDUAL REQUIREMENT 4
-          //below displays the cart items as well as the favorited checkbox
           document.write(`
           <tr>
-            <td>
-              <input type="checkbox" id="Term_button" name="Term_button" value="agreed">
-          </td>
             <td><center>
               <button type="button" id="increaseButton" onclick="window.location.href = '/increase_quantity?productId=${product.id}&catagory_key=${header}'">+</button>
               <input type="text" id="textbox" value="${qty}" style="width: 20px">

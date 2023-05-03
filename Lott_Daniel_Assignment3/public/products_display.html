@@ -128,9 +128,7 @@
         <p>$${product[i].price}</p>
         <img src=./images/${product[i].image}>
         <h6>Left in Stock: ${product[i].qty_available}</h6><br>
-        <center> <input type="checkbox" name="fav[${i}]" id="fav${i}" onclick="user_favorite('${productCatagory}','${i}', this)"> </center>
         <span class="total_sold">Total Sold: ${product[i].total_sold}</span>
-        <span class="favorite">Favorite:</span>
         <input class= "textbox" type="text" name="quantity[${i}]" value="${(typeof shopping_cart[productCatagory] != 'undefined') ? shopping_cart[productCatagory][i] : ''}" placeholder="0" onkeyup="checkQuantityTextbox(this);"> 
         <span class= "error_msg" id="quantity[${i}]_message">Enter a quantity</span>
         </section>
@@ -152,44 +150,6 @@
             onclick="getValue(this); return false;"></input>
         </center>
         <script>
-            //FOR INDIVIDUAL REQUIREMENT 4 ASSIGNMENT 3
-            // Loads a JSON file from the specified URL and calls the callback function with the response
-            function loadJSON(url, callback) {
-                let xobj = new XMLHttpRequest();
-                xobj.overrideMimeType("application/json");
-                xobj.open('GET', url, true);
-                xobj.onreadystatechange = function () {
-                    if (xobj.readyState == 4 && xobj.status == "200") {
-                        // Call the callback function with the response text
-                        callback(xobj.responseText);
-                    }
-                };
-                xobj.send(null);
-            }
-
-            // Loads the favorites data from the add_to_fav file and updates the page to reflect the stored favorites
-            loadJSON('./add_to_fav', function (response) {
-                // Parse the JSON string into an object
-                favorites = JSON.parse(response);
-                // If the productCatagory is a property of the favorites object
-                if (typeof favorites[productCatagory] != 'undefined') {
-                    // Iterate through each property of the favorites[productCatagory] object
-                    for (let i in favorites[productCatagory]) {
-                        // Set the checked property of the element with the ID "fav{i}" to the value of the favorites[productCatagory][i] property
-                        document.getElementById(`fav${i}`).checked = favorites[productCatagory][i];
-                    }
-                }
-            });
-
-            // Sends an HTTP request to the add_to_fav URL with the specified prod_key, pindex, and favorite values
-            function user_favorite(prod_key, pindex, fav) {
-                console.log(prod_key, pindex, fav.checked);  // Log the prod_key, pindex, and checked values to the console
-                // Send an HTTP GET request to the add_to_fav URL with the specified prod_key, pindex, and favorite values as query parameters
-                loadJSON(`./add_to_fav?prod_key=${prod_key}&pindex=${pindex}&favorite=${fav.checked}`, function (response) {
-                    // The callback function does nothing with the response
-                });
-            }
-
             //Taken from Lab13 order_page.new.html
             // changes what the button text value 
             //For Individual Requirement 4 of Assignment 1
