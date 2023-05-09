@@ -57,7 +57,8 @@
                 cart_total.innerHTML = total;
                 //Defines ifLoggedIn to be 
                 ifLoggedIn = cookie.loggedIn;
-                if (ifLoggedIn == 'true') {
+                ifAdminIn = cookie.adminIn;
+                if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
                     user_email = cookie.email;
                     user_name = user_data[user_email].name;
                     username.innerHTML = `${user_name}` + ' | ';

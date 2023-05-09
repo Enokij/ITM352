@@ -1,29 +1,32 @@
-  /*Assignment 3. Created by DANIEL LOTT, created a bike store which has several different pages.
-  All pages have navigation bars except for the invoice.html file. These nav bars allow the user to get
-  from one page at any moment in time. 
-  -Utilizes express and express session to store user inputted information into the server's storage.
-  -Cookie-parser is also utilized to parse cookie information so that information will be able to be stored on the client's browser
-  -After all process are made and the User either logs out or checks out through the invoice, the session and all cookies will be destroyed*/                                                       
-                                                        
-                                                        /////////////////////////////////////////////
-                                                        ///*Definitions & Middleware Requirements*///
-                                                        /////////////////////////////////////////////
+/*Assignment 3. Created by DANIEL LOTT, created a bike store which has several different pages.
+ All pages have navigation bars except for the invoice.html file. These nav bars allow the user to get
+ from one page at any moment in time. 
+ -Utilizes express and express session to store user inputted information into the server's storage.
+ -Cookie-parser is also utilized to parse cookie information so that information will be able to be stored on the client's browser
+ -After all process are made and the User either logs out or checks out through the invoice, the session and all cookies will be destroyed*/
+
+/////////////////////////////////////////////
+///*Definitions & Middleware Requirements*///
+/////////////////////////////////////////////
 
 var express = require('express');
 var app = express();
 var myParser = require("body-parser");
 var session = require('express-session');
-var products_data = require('./product_data.json');
 var user_data = require("./user_data.json");
+var admin_data = require("./admin_data.json");
 var fs = require('fs');
 const crypto = require('crypto');
 let secretekey = 'secretekey';
 var cookieParser = require('cookie-parser');
 var nodemailer = require('nodemailer');
+var pricingModule = require('./pricingModule');
+var sales_record = require('./sales_record.json');
+var products_data = require('./product_data.json');
 
-                                                                    /////////////////
-                                                                    ///*FUNCTIONS*///
-                                                                    /////////////////
+/////////////////
+///*FUNCTIONS*///
+/////////////////
 //Encrpytion function
 // reference sites for crypto: I used w3schools for the structure to create the function that will encrypt users password. When running the code I noticed that it would output in my terminal that is depreciated. I used my second reference to find out whether or not createCipher nodejs works. It does so therefore I kept using createCipher. Lastly, found other examples of ways to create crypto in node.js. 
 // https://www.w3schools.com/nodejs/ref_crypto.asp
@@ -56,9 +59,9 @@ for (let key in products_data) {
 }
 
 
-                                                                    ///////////////
-                                                                    ///*APP.USE*///
-                                                                    ///////////////
+///////////////
+///*APP.USE*///
+///////////////
 
 //Used for creating a session for a user. 
 // Set how long we want the users cookies to last for each session created
@@ -87,9 +90,9 @@ app.use(express.static(__dirname + '/public'));
 // parses the request body of an HTTP request if it is in the URL-encoded format
 app.use(express.urlencoded({ extended: true }));
 
-                                                                    ///////////////
-                                                                    ///*APP.ALL*///
-                                                                    ///////////////
+///////////////
+///*APP.ALL*///
+///////////////
 
 // monitor all requests
 app.all('*', function (request, response, next) {
@@ -107,9 +110,9 @@ app.all('*', function (request, response, next) {
     next();
 });
 
-                                                                    ///////////////
-                                                                    ///*APP.GET*///
-                                                                    ///////////////
+///////////////
+///*APP.GET*///
+///////////////
 
 // Logs the cookies for all requests in the console
 app.get('/', function (req, res) {
@@ -126,6 +129,11 @@ app.get("/get_users", function (request, response) {
     response.json(user_data);
 });
 
+// To get the admin data in JSON format
+app.get("/get_admin", function (request, response) {
+    response.json(admin_data);
+});
+
 // To get the session's cart in JSON format
 app.get("/get_cart", function (request, response) {
     response.json(request.session.cart);
@@ -136,6 +144,21 @@ app.get("/get_products_data", function (request, response) {
     response.json(products_data);
 });
 
+var sname = __dirname + '/sales_record.json';
+if (fs.existsSync(sname)) {
+    var salesData = fs.readFileSync(sname, 'utf-8');
+    var salesRecord = JSON.parse(salesData);
+} else {
+    console.log("Sorry file " + sname + " does not exist.");
+}
+
+var aname = __dirname + '/admin_data.json';
+if (fs.existsSync(aname)) {
+    var data = fs.readFileSync(aname, 'utf-8');
+    var users = JSON.parse(data);
+} else {
+    console.log("Sorry file " + aname + " does not exist.");
+}
 
 
 // from lab 14 ex4.js 
@@ -234,10 +257,10 @@ app.get("/add_to_cart", function (request, response) {
 
 // updates the cart 
 app.post("/update_cart", function (request, response) {
-    if (request.cookies.loggedIn == "true") {
+    if (request.cookies.loggedIn == "true" | request.cookies.adminIn == "true") {
         updated_qty = request.session.cart
         response.cookie('cart', updated_qty);
-         // if user changes anything on the cart page send this to let them know the cart has been updated
+        // if user changes anything on the cart page send this to let them know the cart has been updated
         response.redirect('./cart.html?updated=Your Cart Has Been Updated!')
     } else {
         // They need to be logged in if they want to check out, the button will change once logged in }
@@ -246,8 +269,8 @@ app.post("/update_cart", function (request, response) {
 });
 
 // Make sure that user is logged in before sending the user to the invoice, and has the more updated cart quantity
-app.post("/checkout", function(request, response) {
-    if(request.cookies.loggedIn == "true"){
+app.post("/checkout", function (request, response) {
+    if (request.cookies.loggedIn == "true" | request.cookies.adminIn == "true") {
         updated_qty = request.session.cart
         response.cookie('cart', updated_qty);
         response.redirect('./invoice.html')
@@ -287,63 +310,69 @@ app.get("/get_to_login", function (request, response) {
     let str =
 
         `<!DOCTYPE html>
-    <html lang="en">
-    <head> 
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="login-style.css" rel="stylesheet">
-        <script src="./functions.js"></script>
-        </head>
-        <script>
-        var products;
-        var total = 0;
-        loadJSON('get_products_data', function (response) {
-            // Parsing JSON string into object
-            products = JSON.parse(response);
-        });
-        </script>
-      <header>
-        <img src='./images/logo.jpg'>
-        <nav>
-            <ul>
-            <li><a href='index.html'>HOME<a></li>
-            <li><script>nav_bar('', products);</script></li> 
-            <li><a href='./cart.html'>View Cart</a></li>
-        </nav>
-        
-        </header>
-        
-    <h1>Login</h1>
-    <body>
-    <span id="error_msg" style="color: red; font-size: 12px;"">
-        <script>
-            if ('${params.has("error")}'!= 'false') {
-                document.getElementById("error_msg").innerHTML = "<center>Please login or create an account to continue purchase.</center>";
-            };
-        </script>
-        <form action="./get_to_login" method="POST"> 
-           <h2><input type="text" name="email" id="email" value="" size="40" placeholder="Enter email" ><br /></h2>
-               <h2><input type="password" name="password" size="40" placeholder="Enter password"><br /></h2>
-                <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
-        </form>
-        <script>
-        // if the login post finds and returns errors in the URL parameter string
-        // use the id to get the element to change the button to invalid login if there are any errors
-        if ('${params.has("login_error")}' != 'false')  { 
-            document.getElementById("error_button").value = '${params.get("login_error")}';                 
-            console.log('${params.get("login_error")}');
-          }
-          
-            </script>
-            <br>
-            <form action="/register" method="GET">
-                <h4><script>
-                document.write('<p class="register"> Not a member? <a href="/register"> Click here to register</a></p>')
-            </script></h4>
-                </form>       
-    </body>
-    </html>`;
+                                                            <html lang="en">
+                                                            <head> 
+                                                                <meta charset="UTF-8">
+                                                                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                                <link href="login-style.css" rel="stylesheet">
+                                                                <script src="./functions.js"></script>
+                                                                </head>
+                                                                <script>
+                                                                var products;
+                                                                var total = 0;
+                                                                loadJSON('get_products_data', function (response) {
+                                                                    // Parsing JSON string into object
+                                                                    products = JSON.parse(response);
+                                                                });
+                                                                </script>
+                                                              <header>
+                                                                <img src='./images/logo.jpg'>
+                                                                <nav>
+                                                                    <ul>
+                                                                    <li><a href='index.html'>HOME<a></li>
+                                                                    <li><script>nav_bar('', products);</script></li> 
+                                                                    <li><a href='./cart.html'>View Cart</a></li>
+                                                                </nav>
+                                                                
+                                                                </header>
+                                                                
+                                                            <h1>Login</h1>
+                                                            <body>
+                                                            <span id="error_msg" style="color: red; font-size: 12px;"">
+                                                                <script>
+                                                                    if ('${params.has("error")}'!= 'false') {
+                                                                        document.getElementById("error_msg").innerHTML = "<center>Please login or create an account to continue purchase.</center>";
+                                                                    };
+                                                                </script>
+                                                                <form action="./get_to_login" method="POST"> 
+                                                                   <h2><input type="text" name="email" id="email" value="" size="40" placeholder="Enter email" ><br /></h2>
+                                                                       <h2><input type="password" name="password" size="40" placeholder="Enter password"><br /></h2>
+                                                                        <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
+                                                                </form>
+                                                                <script>
+                                                                // if the login post finds and returns errors in the URL parameter string
+                                                                // use the id to get the element to change the button to invalid login if there are any errors
+                                                                if ('${params.has("login_error")}' != 'false')  { 
+                                                                    document.getElementById("error_button").value = '${params.get("login_error")}';                 
+                                                                    console.log('${params.get("login_error")}');
+                                                                  }
+                                                                  
+                                                                    </script>
+                                                                    <br>
+                                                                    <form action="/register" method="GET">
+                                                                        <h4><script>
+                                                                        document.write('<p class="register"> Not a member? <a href="/register"> Click here to register</a></p>')
+                                                                    </script></h4>
+                                                                        </form>   
+                                                                        <br>
+                                                                        <form action="/admin_login" method="GET">
+                                                                            <h4><script>
+                                                                            document.write('<p class="register"> Are you an admin? <a href="/admin_login"> Login </a></p>')
+                                                                        </script></h4>
+                                                                            </form>     
+                                                            </body>
+                                                            </html>`;
     response.send(str);
 });
 
@@ -362,77 +391,300 @@ app.post("/get_to_login", function (request, response) {
             let loggedIn = true;
             if (fs.existsSync(fname)) {
                 // IR4 A2 Daniel Lott - last time user logged in
-                request.session.loginDate = new Date(); 
+                request.session.loginDate = new Date();
                 // IR4 A2 Daniel Lott - counts how many times user logged in 
                 //sends cookie back to the client
-                user_data[entered_email].num_loggedIn += 1; 
+                user_data[entered_email].num_loggedIn += 1;
                 //sends cookies when logged in to session
                 response.cookie('email', entered_email);
                 response.cookie('loggedIn', loggedIn);
                 response.cookie('cart', request.session.cart);
-                response.redirect('loggedIn');  
+                response.redirect('loggedIn');
             } else {
-                response.redirect('get_to_login?login_error=Invalid password!');
+                response.redirect('get_to_login?login_error=Invalid username!');
             }
         } else {
-            response.redirect('get_to_login?login_error=Invalid username!');
-        }} else {
-                console.log("Sorry file " + fname + " does not exist.");
+            response.redirect('get_to_login?login_error=Invalid password!');
+        }
+    } else {
+        response.redirect('get_to_login?login_error=User not found!');
+    }
+});
+
+app.get("/admin_login", function (request, response) {
+    //gets the URL search parameters
+    let params = new URLSearchParams(request.query); // use search params to find the params within the document    
+    console.log(params);
+
+    let str =
+
+        `<!DOCTYPE html>
+                                                            <html lang="en">
+                                                            <head> 
+                                                                <meta charset="UTF-8">
+                                                                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                                <link href="login-style.css" rel="stylesheet">
+                                                                <script src="./functions.js"></script>
+                                                                </head>
+                                                                <script>
+                                                                var products;
+                                                                var total = 0;
+                                                                loadJSON('get_products_data', function (response) {
+                                                                    // Parsing JSON string into object
+                                                                    products = JSON.parse(response);
+                                                                });
+                                                                </script>
+                                                              <header>
+                                                                <img src='./images/logo.jpg'>
+                                                                <nav>
+                                                                    <ul>
+                                                                    <li><a href='index.html'>HOME<a></li>
+                                                                    <li><script>nav_bar('', products);</script></li> 
+                                                                    <li><a href='./cart.html'>View Cart</a></li>
+                                                                </nav>
+                                                                
+                                                                </header>
+                                                                
+                                                            <h1>Admin Login</h1>
+                                                            <body>
+                                                            <span id="error_msg" style="color: red; font-size: 12px;"">
+                                                                <script>
+                                                                    if ('${params.has("error")}'!= 'false') {
+                                                                        document.getElementById("error_msg").innerHTML = "<center>Please login or create an account to continue purchase.</center>";
+                                                                    };
+                                                                </script>
+                                                                <form action="./get_to_admin" method="POST"> 
+                                                                   <h2><input type="text" name="email" id="email" value="" size="40" placeholder="Enter email" ><br /></h2>
+                                                                       <h2><input type="password" name="password" size="40" placeholder="Enter password"><br /></h2>
+                                                                        <h3><input class="submit" type="submit" value="Submit" id="error_button"></h3>
+                                                                </form>
+                                                                <script>
+                                                                // if the login post finds and returns errors in the URL parameter string
+                                                                // use the id to get the element to change the button to invalid login if there are any errors
+                                                                if ('${params.has("login_error")}' != 'false')  { 
+                                                                    document.getElementById("error_button").value = '${params.get("login_error")}';                 
+                                                                    console.log('${params.get("login_error")}');
+                                                                  }
+                                                                  
+                                                                    </script>
+                                                                    <br>
+                                                                    <form action="/get_to_login" method="GET">
+                                                                        <h4><script>
+                                                                        document.write('<p class="register"> Not an admin? <a href="/get_to_login"> Click here to log in as user</a></p>')
+                                                                    </script></h4>
+                                                                        </form>      
+                                                            </body>
+                                                            </html>`;
+    response.send(str);
+});
+
+app.post("/get_to_admin", function (request, response) {
+    // Process login form POST and redirect to logged in page if ok, back to login page if not
+    // User entered inputs are set to the variable POST
+    let POST = request.body;
+    entered_email = POST["email"].toLowerCase();
+    //IR1 we want to encrypt the password entered in the login page
+    var user_pass = generateCipher(POST['password']);
+    console.log("User name=" + entered_email + " password=" + user_pass);
+    if (admin_data[entered_email] != undefined) {
+        if (admin_data[entered_email].password == user_pass) {
+            let loggedIn = true;
+            if (fs.existsSync(aname)) {
+                // IR4 A2 Daniel Lott - last time user logged in
+                request.session.loginDate = new Date();
+                // IR4 A2 Daniel Lott - counts how many times user logged in 
+                //sends cookie back to the client
+                admin_data[entered_email].num_loggedIn += 1;
+                //sends cookies when logged in to session
+                response.cookie('email', entered_email);
+                response.cookie('adminIn', loggedIn);
+                response.cookie('cart', request.session.cart);
+                response.redirect('adminIn');
+            } else {
+                response.redirect('admin_login?login_error=Invalid username!');
             }
-        });
+        } else {
+            response.redirect('admin_login?login_error=Invalid password!');
+        }
+    } else {
+        response.redirect('admin_login?login_error=User not found!');
+    }
+});
+
+app.get('/adminIn', function (request, response) {
+    let str = `
+                                                                    <script src="./functions.js"></script>
+                                                                    <link href="login-style.css" rel="stylesheet">
+                                                                    <script>
+                                                                    var products;
+                                                                    var cookie;
+                                                                    var admin_data;
+                                                                    loadJSON('get_products_data', function (response) {
+                                                                      // Parsing JSON string into object
+                                                                      products = JSON.parse(response);
+                                                                    });
+                                                                    loadJSON('get_cookies', function (response) {
+                                                                        // Parsing JSON string into object
+                                                                        cookie = JSON.parse(response);
+                                                                      });
+                                                                      loadJSON('get_admin', function (response) {
+                                                                        // Parsing JSON string into object
+                                                                        admin_data = JSON.parse(response);
+                                                                        console.log(admin_data);
+                                                                      });
+                                                                      ifadminIn = cookie.loggedIn;
+                                                                    var this_product_key = ''
+                                                                    </script>
+                                                                    <header>
+                                                                    <img src='./images/logo.jpg'>
+                                                                    <nav>
+                                                                        <ul>
+                                                                        <li><a href='index.html'>HOME<a></li>
+                                                                        <li>
+                                                                            <script>nav_bar(this_product_key, products);</script>
+                                                                        </li>
+                                                                        <li><a href='./cart.html'>View Cart</a></li>
+                                                                        <li><a href="get_to_logout">Logout</a></li>
+                                                                        </script>
+                                                                        </ul>
+                                                                    </nav>
+                                                                    </header>
+                                                                    <center><h2>Welcome <span id="username"></span>!</h2>
+                                                                    <br> You last logged in on ${request.session.loginDate}<br>
+                                                                    Number of Logins: <span id="numLog"></span><br> 
+                                                                    <form action="/admin_page" method="GET">
+                                                                    <button type="submit" class="submit">Continue to admin page</button>
+                                                                </form>
+                                                                        <br>
+                                                                        <script>
+                                                                        numLog.innerHTML = admin_data[cookie.email].num_loggedIn
+                                                                        username.innerHTML = admin_data[cookie.email].name
+                                                                        </script>
+                                                                    </center>`
+    response.send(str);
+});
+
+app.get("/admin_page", function (request, response) {
+    //gets the URL search parameters
+    let params = new URLSearchParams(request.query); // use search params to find the params within the document    
+    console.log(params);
+
+    let str =
+
+        `<!DOCTYPE html>
+                                                                    <html lang="en">
+                                                                    <head> 
+                                                                        <meta charset="UTF-8">
+                                                                        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                                        <link href="login-style.css" rel="stylesheet">
+                                                                        <script src="./functions.js"></script>
+                                                                        </head>
+                                                                        <script>
+                                                                        var products;
+                                                                        var total = 0;
+                                                                        loadJSON('get_products_data', function (response) {
+                                                                            // Parsing JSON string into object
+                                                                            products = JSON.parse(response);
+                                                                        });
+                                                                        </script>
+                                                                      <header>
+                                                                        <img src='./images/logo.jpg'>
+                                                                        <nav>
+                                                                            <ul>
+                                                                            <li><a href='index.html'>HOME<a></li>
+                                                                            <li><script>nav_bar('', products);</script></li> 
+                                                                            <li><a href='./cart.html'>View Cart</a></li>
+                                                                        </nav>
+                                                                        
+                                                                        </header>
+                                                                        
+                                                                    <h1>Admin Page</h1>
+                                                                    <body>
+                                                                    <form action="/apply_discount" method="POST">
+                                                                    <label for="item_id">Item ID:</label>
+                                                                    <input type="text" id="item_id" name="item_id" value="*">
+                                                                    <br>
+                                                                    <label for="discount">Discount:</label>
+                                                                    <input type="number" id="discount" name="discount" min="-99" max="99" step="1">
+                                                                    <br>
+                                                                    <label for="dynamic">Dynamic Pricing:</label>
+                                                                    <input type="checkbox" id="dynamic" name="dynamic">
+                                                                    <br>
+                                                                    <input type="submit" value="Apply Discount">
+                                                                </form>
+                                                                </body>
+                                                                    </body>
+                                                                    </html>`;
+    response.send(str);
+});
+
+app.post("/apply_discount", function (request, response) {
+    const item_id = request.body.item_id;
+    const discount = parseFloat(request.body.discount);
+    const dynamic = request.body.dynamic === 'on';
+
+    pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
+
+    // Save the updated products_data to the file
+    fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
+
+    response.redirect('index.html');
+});
 
 // From lab 15 Ex4.js
-//Used to diosplay user's account information
+//Used to display user's account information
 //Used to display loggedIn page after user registers or logs in through the login page
-app.get('/loggedIn', function(request, response){
-    let str= `
-    <script src="./functions.js"></script>
-    <link href="login-style.css" rel="stylesheet">
-    <script>
-    var products;
-    var cookie;
-    var user_data;
-    loadJSON('get_products_data', function (response) {
-      // Parsing JSON string into object
-      products = JSON.parse(response);
-    });
-    loadJSON('get_cookies', function (response) {
-        // Parsing JSON string into object
-        cookie = JSON.parse(response);
-      });
-      loadJSON('get_users', function (response) {
-        // Parsing JSON string into object
-        user_data = JSON.parse(response);
-        console.log(user_data);
-      });
-      ifLoggedIn = cookie.loggedIn;
-    var this_product_key = ''
-    </script>
-    <header>
-    <img src='./images/logo.jpg'>
-    <nav>
-        <ul>
-        <li><a href='index.html'>HOME<a></li>
-        <li>
-            <script>nav_bar(this_product_key, products);</script>
-        </li>
-        <li><a href='./cart.html'>View Cart</a></li>
-        <li><a href="get_to_logout">Logout</a></li>
-        </script>
-        </ul>
-    </nav>
-    </header>
-    <center><h2>Welcome <span id="username"></span>!</h2>
-    <br> You last logged in on ${request.session.loginDate}<br>
-    Number of Logins: <span id="numLog"></span><br> 
-        <button type="button" class="submit" onclick="window.location.href = './index.html'">Continue shopping</button>
-        <br>
-        <script>
-        numLog.innerHTML = user_data[cookie.email].num_loggedIn
-        username.innerHTML = user_data[cookie.email].name
-        </script>
-    </center>`
-response.send(str);
+app.get('/loggedIn', function (request, response) {
+    let str = `
+                                                            <script src="./functions.js"></script>
+                                                            <link href="login-style.css" rel="stylesheet">
+                                                            <script>
+                                                            var products;
+                                                            var cookie;
+                                                            var user_data;
+                                                            loadJSON('get_products_data', function (response) {
+                                                              // Parsing JSON string into object
+                                                              products = JSON.parse(response);
+                                                            });
+                                                            loadJSON('get_cookies', function (response) {
+                                                                // Parsing JSON string into object
+                                                                cookie = JSON.parse(response);
+                                                              });
+                                                              loadJSON('get_users', function (response) {
+                                                                // Parsing JSON string into object
+                                                                user_data = JSON.parse(response);
+                                                                console.log(user_data);
+                                                              });
+                                                              ifLoggedIn = cookie.loggedIn;
+                                                            var this_product_key = ''
+                                                            </script>
+                                                            <header>
+                                                            <img src='./images/logo.jpg'>
+                                                            <nav>
+                                                                <ul>
+                                                                <li><a href='index.html'>HOME<a></li>
+                                                                <li>
+                                                                    <script>nav_bar(this_product_key, products);</script>
+                                                                </li>
+                                                                <li><a href='./cart.html'>View Cart</a></li>
+                                                                <li><a href="get_to_logout">Logout</a></li>
+                                                                </script>
+                                                                </ul>
+                                                            </nav>
+                                                            </header>
+                                                            <center><h2>Welcome <span id="username"></span>!</h2>
+                                                            <br> You last logged in on ${request.session.loginDate}<br>
+                                                            Number of Logins: <span id="numLog"></span><br> 
+                                                                <button type="button" class="submit" onclick="window.location.href = './index.html'">Continue shopping</button>
+                                                                <br>
+                                                                <script>
+                                                                numLog.innerHTML = user_data[cookie.email].num_loggedIn
+                                                                username.innerHTML = user_data[cookie.email].name
+                                                                </script>
+                                                            </center>`
+    response.send(str);
 })
 
 // reads through the json with any errors for the registation page 
@@ -445,79 +697,79 @@ app.get('/get_reg_errors', function (request, response) {
 // Lab 15 Ex4.js 
 app.get("/register", function (request, response) {
     let str = `<!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta http-equiv="X-UA-Compatible" content="IE=edge">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link href="register-style.css" rel="stylesheet">
-          <script src="./functions.js"></script>
-          <title>Register page</title>
-      </head>
-        <script>
-        var products;
-        var total = 0
-        loadJSON('get_products_data', function (response) {
-            // Parsing JSON string into object
-            products = JSON.parse(response);
-        });
-        </script>
-      <header>
-        <img src='./images/logo.jpg'>
-        <nav>
-            <ul>
-            <li><a href='index.html'>HOME<a></li>
-            <li><script>nav_bar('', products);</script></li> 
-            <li><a href='./cart.html'>View Cart</a></li>
-            <li><a href="get_to_login">Login</a></li>
-            </ul>
-        </nav>
-        </header>
-      <h1>Register Here!</h1>
-      <body>
-        <form action="/register" method="POST">
-          <h2>
-          <input type="text" name="name" size="40" placeholder="Enter full name">
-            <br>
-            <span id="name_error" style="color: red; font-size: 12px;"></span> <br>
-            <input type="password" name="password" size="40" placeholder="Enter password">
-            <br />
-            <span id="password_error" style="color: red; font-size: 12px;"></span><br>
-            <input type="password" name="repeat_password" size="40" placeholder="Enter password again">
-            <br />
-            <span id="repassword_error" style="color: red; font-size: 12px;"></span><br>
-            <input type="email" name="email" size="40" placeholder="Enter email">
-            <br />
-            <span id="email_error" style="color: red; font-size: 12px;"></span><br>
-            <center><input class="submit" type="submit" value="Submit" id="submit"></center>
-          </h2>
-        </form>
-        <script>
-        var reg_error;
-        loadJSON('get_reg_errors', function (response) {
-            // Parsing JSON string into object
-            if (typeof reg_error === 'undefined') {
-              reg_error = JSON.parse(response);
-            }
-            console.log(reg_error)
-          });
-        if(reg_error !== undefined){
-            if (typeof reg_error.name !== 'undefined') {
-            document.getElementById("name_error").innerHTML = reg_error.name;
-            }
-            if (typeof reg_error.password !== 'undefined') {
-            document.getElementById("password_error").innerHTML = reg_error.password;
-            }
-            if (typeof reg_error.repeat_password !== 'undefined') {
-            document.getElementById("repassword_error").innerHTML = reg_error.repeat_password;
-            }
-            if (typeof reg_error.email !== 'undefined') {
-            document.getElementById("email_error").innerHTML = reg_error.email;
-            }
-        }
-      </script>
-    </body>
-    </html>`
+                                                              <html lang="en">
+                                                              <head>
+                                                                  <meta charset="UTF-8">
+                                                                  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                                                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                                  <link href="register-style.css" rel="stylesheet">
+                                                                  <script src="./functions.js"></script>
+                                                                  <title>Register page</title>
+                                                              </head>
+                                                                <script>
+                                                                var products;
+                                                                var total = 0
+                                                                loadJSON('get_products_data', function (response) {
+                                                                    // Parsing JSON string into object
+                                                                    products = JSON.parse(response);
+                                                                });
+                                                                </script>
+                                                              <header>
+                                                                <img src='./images/logo.jpg'>
+                                                                <nav>
+                                                                    <ul>
+                                                                    <li><a href='index.html'>HOME<a></li>
+                                                                    <li><script>nav_bar('', products);</script></li> 
+                                                                    <li><a href='./cart.html'>View Cart</a></li>
+                                                                    <li><a href="get_to_login">Login</a></li>
+                                                                    </ul>
+                                                                </nav>
+                                                                </header>
+                                                              <h1>Register Here!</h1>
+                                                              <body>
+                                                                <form action="/register" method="POST">
+                                                                  <h2>
+                                                                  <input type="text" name="name" size="40" placeholder="Enter full name">
+                                                                    <br>
+                                                                    <span id="name_error" style="color: red; font-size: 12px;"></span> <br>
+                                                                    <input type="password" name="password" size="40" placeholder="Enter password">
+                                                                    <br />
+                                                                    <span id="password_error" style="color: red; font-size: 12px;"></span><br>
+                                                                    <input type="password" name="repeat_password" size="40" placeholder="Enter password again">
+                                                                    <br />
+                                                                    <span id="repassword_error" style="color: red; font-size: 12px;"></span><br>
+                                                                    <input type="email" name="email" size="40" placeholder="Enter email">
+                                                                    <br />
+                                                                    <span id="email_error" style="color: red; font-size: 12px;"></span><br>
+                                                                    <center><input class="submit" type="submit" value="Submit" id="submit"></center>
+                                                                  </h2>
+                                                                </form>
+                                                                <script>
+                                                                var reg_error;
+                                                                loadJSON('get_reg_errors', function (response) {
+                                                                    // Parsing JSON string into object
+                                                                    if (typeof reg_error === 'undefined') {
+                                                                      reg_error = JSON.parse(response);
+                                                                    }
+                                                                    console.log(reg_error)
+                                                                  });
+                                                                if(reg_error !== undefined){
+                                                                    if (typeof reg_error.name !== 'undefined') {
+                                                                    document.getElementById("name_error").innerHTML = reg_error.name;
+                                                                    }
+                                                                    if (typeof reg_error.password !== 'undefined') {
+                                                                    document.getElementById("password_error").innerHTML = reg_error.password;
+                                                                    }
+                                                                    if (typeof reg_error.repeat_password !== 'undefined') {
+                                                                    document.getElementById("repassword_error").innerHTML = reg_error.repeat_password;
+                                                                    }
+                                                                    if (typeof reg_error.email !== 'undefined') {
+                                                                    document.getElementById("email_error").innerHTML = reg_error.email;
+                                                                    }
+                                                                }
+                                                              </script>
+                                                            </body>
+                                                            </html>`
     response.send(str);
 });
 
@@ -601,47 +853,48 @@ app.post("/register", function (request, response) {
 app.get("/get_to_logout", function (request, response) {
     let loggedIn = false;
     let str = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-        </head>
-        <script src="./functions.js"></script>
-        <link href="cart-style.css" rel="stylesheet">
-        <script>
-        var products;
-        var total = 0;
-        loadJSON('get_products_data', function (response) {
-        // Parsing JSON string into object
-        products = JSON.parse(response);
-        });
-        var this_product_key = ''
-        </script>
-        <header>
-        <img src='./images/logo.jpg'>
-        <nav>
-            <ul>
-            <li><a href='index.html'>HOME<a></li>
-            <li>
-                <script>nav_bar(this_product_key, products);</script>
-            </li>
-            <li><a href="get_to_login">Login</a></li>    
-            </ul>
-        </nav>
-        </header>
-        <div class = "container">
-            <body>
-                <center>
-                    <h2>Thank you for shopping at Island Cycling! <br> You have been successfully logged out </h2>
-                    <button type="button" class="submit" onclick="window.location.href = './index.html'">logout</button>  
-                </center>
-            </body>
-        </div>
-        </html>`;
+                                                                <!DOCTYPE html>
+                                                                <html lang="en">
+                                                                <head>
+                                                                    <meta charset="UTF-8">
+                                                                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                                                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                                                    <title>Document</title>
+                                                                </head>
+                                                                <script src="./functions.js"></script>
+                                                                <link href="cart-style.css" rel="stylesheet">
+                                                                <script>
+                                                                var products;
+                                                                var total = 0;
+                                                                loadJSON('get_products_data', function (response) {
+                                                                // Parsing JSON string into object
+                                                                products = JSON.parse(response);
+                                                                });
+                                                                var this_product_key = ''
+                                                                </script>
+                                                                <header>
+                                                                <img src='./images/logo.jpg'>
+                                                                <nav>
+                                                                    <ul>
+                                                                    <li><a href='index.html'>HOME<a></li>
+                                                                    <li>
+                                                                        <script>nav_bar(this_product_key, products);</script>
+                                                                    </li>
+                                                                    <li><a href="get_to_login">Login</a></li>    
+                                                                    </ul>
+                                                                </nav>
+                                                                </header>
+                                                                <div class = "container">
+                                                                    <body>
+                                                                        <center>
+                                                                            <h2>Thank you for shopping at Island Cycling! <br> You have been successfully logged out </h2>
+                                                                            <button type="button" class="submit" onclick="window.location.href = './index.html'">logout</button>  
+                                                                        </center>
+                                                                    </body>
+                                                                </div>
+                                                                </html>`;
     response.cookie('loggedIn', loggedIn);
+    response.cookie('adminIn', 'false');
     response.clearCookie('email');
     response.clearCookie('cart');
     request.session.destroy();
@@ -655,10 +908,10 @@ app.post("/email_inv", function (request, response) {
     // prints out invoice on email thread
     subtotal = 0;
     var invoice_str = `Thank you for shopping with us!
-<table border><th style="width:10%">Item</th>
-<th class="text-right" style="width:15%">Quantity</th>
-<th class="text-right" style="width:15%">Price</th>
-<th class="text-right" style="width:15%">Extended Price</th>`;
+                                                        <table border><th style="width:10%">Item</th>
+                                                        <th class="text-right" style="width:15%">Quantity</th>
+                                                        <th class="text-right" style="width:15%">Price</th>
+                                                        <th class="text-right" style="width:15%">Extended Price</th>`;
     var shopping_cart = request.session.cart;
     for (catagory_key in shopping_cart) {
         for (i = 0; i < shopping_cart[catagory_key].length; i++) {
@@ -668,14 +921,27 @@ app.post("/email_inv", function (request, response) {
             subtotal += extended_price;
             if (qty > 0) {
                 invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
-         <td>${qty}</td>
-         <td>$${products_data[catagory_key][i].price}</td>
-         <td>$${extended_price}
-         <tr>`;
+                                                                 <td>${qty}</td>
+                                                                 <td>$${products_data[catagory_key][i].price}</td>
+                                                                 <td>$${extended_price}
+                                                                 <tr>`;
                 products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
                 products_data[catagory_key][i].total_sold += Number(qty);
+
+                Item_Id = products_data[catagory_key][i].id,
+                    salesRecord[Item_Id] = {},
+                    salesRecord[Item_Id].Customer_Id = request.cookies.email,
+                    salesRecord[Item_Id].Quantity_sold = shopping_cart[catagory_key][i],
+                    salesRecord[Item_Id].date = Date()
+
+
             }
+            fs.writeFileSync(sname, JSON.stringify(salesRecord), "utf-8");
+            console.log(salesRecord)
         }
+
+
+
     }
     var tax_rate = 0.0575;
     var tax = tax_rate * subtotal;
@@ -695,11 +961,11 @@ app.post("/email_inv", function (request, response) {
     var total = subtotal + tax + shipping;
 
     invoice_str += `<tr>
-     <tr><td colspan="4" align="right">Subtotal: $${subtotal.toFixed(2)}</td></tr>
-     <tr><td colspan="4" align="right">Shipping: $${shipping.toFixed(2)}</td></tr>
-     <tr><td colspan="4" align="right">Tax: $${tax.toFixed(2)}</td></tr>
-     <tr><td colspan="4" align="right">Grand Total: $${total.toFixed(2)}</td></tr>
-     </table>`;
+                                                             <tr><td colspan="4" align="right">Subtotal: $${subtotal.toFixed(2)}</td></tr>
+                                                             <tr><td colspan="4" align="right">Shipping: $${shipping.toFixed(2)}</td></tr>
+                                                             <tr><td colspan="4" align="right">Tax: $${tax.toFixed(2)}</td></tr>
+                                                             <tr><td colspan="4" align="right">Grand Total: $${total.toFixed(2)}</td></tr>
+                                                             </table>`;
 
     // Cited: display and mail invoice 
     // Set up mail server. Only will work on UH Network due to security restrictions
@@ -731,6 +997,10 @@ app.post("/email_inv", function (request, response) {
         // distroys the session for the user who is signed in
     });
 });
+
+function set_price(item_id, products, sales_record, discount, dynamic) {
+
+}
 
 
 

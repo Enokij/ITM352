@@ -135,7 +135,8 @@
         user_email = cookie.email;
         //Defines ifLoggedIn to be 
         ifLoggedIn = cookie.loggedIn;
-        if (ifLoggedIn == 'true') {
+        ifAdminIn = cookie.adminIn;
+        if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
           document.write('<li><a href="get_to_logout">Logout</a></li>')
         } else {
           document.write('<li><a href="get_to_login">Login</a></li>');

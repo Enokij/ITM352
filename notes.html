@@ -1,0 +1,32 @@
+app.post("/email_inv", function (request, response) {
+    // prints out invoice on email thread
+    subtotal = 0;
+    var invoice_str = `Thank you for shopping with us!
+<table border><th style="width:10%">Item</th>
+<th class="text-right" style="width:15%">Quantity</th>
+<th class="text-right" style="width:15%">Price</th>
+<th class="text-right" style="width:15%">Extended Price</th>`;
+    var shopping_cart = request.session.cart;
+    for (catagory_key in shopping_cart) {
+        for (i = 0; i < shopping_cart[catagory_key].length; i++) {
+            if (typeof shopping_cart[catagory_key] == 'undefined') continue;
+            qty = shopping_cart[catagory_key][i];
+            let extended_price = qty * products_data[catagory_key][i].price;
+            subtotal += extended_price;
+            if (qty > 0) {
+                invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
+         <td>${qty}</td>
+         <td>$${products_data[catagory_key][i].price}</td>
+         <td>$${extended_price}
+         <tr>`;
+                products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
+                products_data[catagory_key][i].total_sold += Number(qty);
+                salesRecord = {
+                    Item_Id : products_data[catagory_key][i].id,
+                    Customer_Id : request.session.email,
+                    Quantity_sold : shopping_cart[catagory_key][i],
+                    date : Date()                    
+                }
+            }    
+        }
+    }
