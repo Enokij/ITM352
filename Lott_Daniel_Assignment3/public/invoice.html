@@ -34,6 +34,10 @@
     // Parsing JSON string into object
     user_data = JSON.parse(response);
   });
+  loadJSON('get_admin', function (response) {
+    // Parsing JSON string into object
+    admin_data = JSON.parse(response);
+  });
 
   //validation on the invoice
   //checks if entered values are valid and will return true or false
@@ -95,11 +99,19 @@
       //create dynamic login/logout button
       user_email = cookie.email;
       ifLoggedIn = cookie.loggedIn;
-      if (ifLoggedIn == 'true') {
+      ifAdminIn = cookie.adminIn;
+      if (ifLoggedIn == 'true'| ifAdminIn == 'true') {
+        if (ifLoggedIn == 'true'){
         document.write('<h4>Welcome ' + user_data[cookie.email].name +
           '<br> Number of Logins: ' + user_data[user_email].num_loggedIn +
           '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>'
         )
+      } else if (ifAdminIn == 'true') {
+        document.write('<h4>Welcome ' + admin_data[cookie.email].name +
+          '<br> Number of Logins: ' + admin_data[user_email].num_loggedIn +
+          '<br> Last date logged on: ' + admin_data[user_email].last_date_loggin + '</h4>'
+        )
+      }
       } 
     </script>
     <table border>

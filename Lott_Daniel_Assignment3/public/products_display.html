@@ -29,6 +29,10 @@
             // Parsing JSON string into object
             user_data = JSON.parse(response);
         });
+        loadJSON('get_admin', function (response) {
+            // Parsing JSON string into object
+            admin_data = JSON.parse(response);
+        });
 
         // get the query string
         let params = (new URL(document.location)).searchParams;
@@ -60,8 +64,13 @@
                 ifAdminIn = cookie.adminIn;
                 if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
                     user_email = cookie.email;
+                    if (ifLoggedIn == "true"){
                     user_name = user_data[user_email].name;
                     username.innerHTML = `${user_name}` + ' | ';
+                }    if (ifAdminIn == "true"){
+                    user_name = admin_data[user_email].name;
+                    username.innerHTML = `${user_name}` + ' | ';
+                }
                     document.write('<li><a href="get_to_logout">Logout</a></li>')
                 } else {
                     document.write('<li><a href="get_to_login">Login</a></li>');

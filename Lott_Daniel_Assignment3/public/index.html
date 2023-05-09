@@ -114,6 +114,10 @@
       // Parsing JSON string into object
       user_data = JSON.parse(response);
     });
+    loadJSON('get_admin', function (response) {
+      // Parsing JSON string into object
+      admin_data = JSON.parse(response);
+    });
     var this_product_key = ''
 
 
@@ -152,11 +156,17 @@
       <h1>Welcome <span id="username" style="color: blue;"></span> to Island Cycling!</h1>
       <script>
         //if user is logged in, then displays user name in the header and the other user information on the page.
-        if (ifLoggedIn == 'true') {
+        if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
+          if(ifLoggedIn == 'true'){
           username.innerHTML = user_data[user_email].name
           document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
             '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
+        } else if (ifAdminIn == 'true'){
+          username.innerHTML = admin_data[user_email].name
+          document.write('<h4><br>Number of Logins: ' + admin_data[user_email].num_loggedIn +
+            '<br> Last date logged on: ' + admin_data[user_email].last_date_loggin + '</h4>')
         }
+      }
       </script>
       <img src="./images/background.webp" alt="image" height="45%" width="35%" class="img">
       <h4>Please Use The Navigation Bar Above To Begin Shopping</h4>
