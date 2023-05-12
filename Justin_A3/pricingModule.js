@@ -1,4 +1,4 @@
-function setPrice(item_id, products, sales_record, discount, dynamic) {
+function setPrice(item_id, products, salesRecordId, discount, dynamic) {
     const now = new Date();
     const discountRates = {
       24: 10,
@@ -6,13 +6,11 @@ function setPrice(item_id, products, sales_record, discount, dynamic) {
       72: 60,
       96: 95,
     };
-  
-  
     for (let category in products) {
       products[category].forEach((product) => {
         if (item_id === '*' || product.id === item_id) {
           if (dynamic) {
-            const sales = sales_record.filter(
+            const sales = salesRecordId.filter(
               (record) =>
                 record.item_id === product.id &&
                 now - new Date(record.date) < 96 * 60 * 60 * 1000
@@ -23,18 +21,14 @@ function setPrice(item_id, products, sales_record, discount, dynamic) {
                 dynamicDiscount = discountRates[hours];
               }
             }
-            product.price = product.price * (1 - dynamicDiscount / 100);
+            product.price = Number((product.price * (1 - dynamicDiscount / 100)).toFixed(2));
           } else {
-            product.price = product.price * (1 - discount / 100);
+            product.price = Number((product.price * (1 - discount / 100)).toFixed(2));
           }
         }
       });
     }
   }
-  
-  
   module.exports = {
     setPrice,
   };
-  
-  

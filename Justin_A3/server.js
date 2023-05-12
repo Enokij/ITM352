@@ -21,7 +21,7 @@ let secretekey = 'secretekey';
 var cookieParser = require('cookie-parser');
 var nodemailer = require('nodemailer');
 var pricingModule = require('./pricingModule');
-var sales_record = require('./sales_record.json');
+const salesRecordId = Object.values(require('./sales_record.json'));
 var products_data = require('./product_data.json');
 
 /////////////////
@@ -219,7 +219,6 @@ app.get("/add_to_cart", function (request, response) {
     let qty_name = 'quantity'; // name of textbox in products_data.html
     let product = request.query['products_key']; // name of productCategory
     let qtys = request.query[qty_name]; // gets the quantities of the entered data 
-    let checkboxValue = {};
     for (i = 0; i < products_data[product].length; i++) { // Runs loop for all products and their respective entered quantities
         let qty = qtys[i];
         if (qty == 0 || qty == '') continue; // if no inputs are entered into a product quantity textbox, then continue to the next product in the qty array.
@@ -622,12 +621,15 @@ app.get("/admin_page", function (request, response) {
     response.send(str);
 });
 
+/*ITM 353 - A6:
+Sets the strings entered into the admin page's textboxes to variables and compares those variables to the sales record file if dynamic=true
+If dynamic=false, meaning the checkbox indicating the admin's choice to select the dynamic discount is not selected, then the manual discount method will be used*/
 app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
     const dynamic = request.body.dynamic === 'on';
 
-    pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
+    pricingModule.setPrice(item_id, products_data, salesRecordId, discount, dynamic);
 
     // Save the updated products_data to the file
     fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
@@ -930,20 +932,17 @@ app.post("/email_inv", function (request, response) {
                 products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
                 products_data[catagory_key][i].total_sold += Number(qty);
 
+                /*A3 for ITM353. Creates sales_record.json file once transaction has been processed and invoice has been sent to customer indicating the transaction's completion. 
+                Records the Items's Id, Customer's email, quantity sold, and date/time of transaction*/
                 Item_Id = products_data[catagory_key][i].id,
                     salesRecord[Item_Id] = {},
                     salesRecord[Item_Id].Customer_Id = request.cookies.email,
                     salesRecord[Item_Id].Quantity_sold = shopping_cart[catagory_key][i],
                     salesRecord[Item_Id].date = Date()
-
-
             }
             fs.writeFileSync(sname, JSON.stringify(salesRecord), "utf-8");
             console.log(salesRecord)
         }
-
-
-
     }
     var tax_rate = 0.0575;
     var tax = tax_rate * subtotal;
@@ -963,7 +962,8 @@ app.post("/email_inv", function (request, response) {
     var total = subtotal + tax + shipping;
 
     invoice_str += `<tr>
-                             <tr><td colspan="4" align="right">Subtotal: $${subtotal.toFixed(2)}</td></tr>                                 <tr><td colspan="4" align="right">Shipping: $${shipping.toFixed(2)}</td></tr>
+                            <tr><td colspan="4" align="right">Subtotal: $${subtotal.toFixed(2)}</td></tr>                                 
+                            <tr><td colspan="4" align="right">Shipping: $${shipping.toFixed(2)}</td></tr>
                             <tr><td colspan="4" align="right">Tax: $${tax.toFixed(2)}</td></tr>
                             <tr><td colspan="4" align="right">Grand Total: $${total.toFixed(2)}</td></tr>
                             </table>`;
