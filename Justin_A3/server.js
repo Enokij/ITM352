@@ -632,9 +632,7 @@ app.get("/admin_page", function (request, response) {
     response.send(str);
 });
 
-/*ITM 353 - A6:
-Sets the strings entered into the admin page's textboxes to variables and compares those variables to the sales record file if dynamic=true
-If dynamic=false, meaning the checkbox indicating the admin's choice to select the dynamic discount is not selected, then the manual discount method will be used*/
+/*ITM 353 - A6:*/
 app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
@@ -812,7 +810,7 @@ app.get("/register", function (request, response) {
 });
 
 
-
+var idNumber = 0;
 // A2 reference reading and writing user info to a JSON file 
 app.post("/register", function (request, response) {
     // once users' information is entered into the register page, post then processes the register form
@@ -862,6 +860,7 @@ app.post("/register", function (request, response) {
     // used object.keys for the array to check that errors equal to zero
     // ref for objectkeys: https://www.w3schools.com/jsref/jsref_object_keys.asp
     if (Object.keys(reg_error).length == 0) {
+        let customerId = (++idNumber).toString().padStart(4, '0');
         var email = POST['email'].toLowerCase();
         user_data[email] = {};
         user_data[email].name = POST['name'];
@@ -869,7 +868,9 @@ app.post("/register", function (request, response) {
         user_data[email]["email"] = POST['email'];
         user_data[email].num_loggedIn = 1;
         user_data[email].last_date_loggin = Date();
+        user_data[email].Customer_Id = customerId;
         request.session.registration_error = undefined;
+        
         loggedIn = true;
         // this creates a string using are variable fname which is from users and then JSON will stringify the data "users"
         fs.writeFileSync(fname, JSON.stringify(user_data), "utf-8");
@@ -943,7 +944,6 @@ app.get("/get_to_logout", function (request, response) {
 // Code modifed from nodemailer from Professor 
 // Generates an invoice for the user 
 app.post("/email_inv", function (request, response) {
-
     // Initialize the salesRecords array with the existing sales data in the sales_record.json file, or an empty array if there is no data.
     var salesRecords = salesData ? JSON.parse(salesData) : [];
 
@@ -969,19 +969,22 @@ app.post("/email_inv", function (request, response) {
                                                  <tr>`;
                 products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
                 products_data[catagory_key][i].total_sold += Number(qty);
-
+                
+                // For every user that is already in the system
+                loggedInEmail = request.cookies.email
                 // Create new sales record
                 var Item_Id = products_data[catagory_key][i].id;
                 salesRecord = {
                     item_id: Item_Id,
-                    Customer_Id: request.cookies.email,
+                    Customer_Id : user_data[loggedInEmail].Customer_Id,
                     Quantity_sold: shopping_cart[catagory_key][i],
                     date: new Date().toISOString()
-                };
+                };idNumber++;
 
                 // Add new sales record to array of existing records
                 salesRecords.push(salesRecord);
             }
+            
         }
     }
 
