@@ -4,17 +4,5 @@
         "Customer_Id": "admin@gmail.com",
         "Quantity_sold": 3,
         "date": "2023-05-12T10:01:26.336Z"
-    },
-    {
-        "item_id": "H1",
-        "Customer_Id": "admin@gmail.com",
-        "Quantity_sold": 1,
-        "date": "2023-05-10T10:26:14.172Z"
-    },
-    {
-        "item_id": "H2",
-        "Customer_Id": "admin@gmail.com",
-        "Quantity_sold": 2,
-        "date": "2023-05-09T10:26:14.172Z"
     }
 ]

@@ -35,6 +35,3 @@ function setPrice(item_id, products, sales_record, discount, dynamic) {
 module.exports = {
   setPrice,
 };
-module.exports = {
-  setPrice,
-};

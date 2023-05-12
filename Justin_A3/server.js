@@ -624,6 +624,9 @@ app.get("/admin_page", function (request, response) {
                                                                     if ('${params.get("error")}' == 'Cannot Apply Discount, Please Enter Item ID') {
                                                                         document.getElementById("error_msg").innerHTML = '${params.get("error")}';
                                                                     }
+                                                                    if ('${params.get("error")}' == 'Cannot Apply Discount, Item ID not Found in Products Data') {
+                                                                        document.getElementById("error_msg").innerHTML = '${params.get("error")}';
+                                                                    }
                                                                     </script>
                                                                     </html>`;
     response.send(str);
@@ -636,16 +639,36 @@ app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
     const dynamic = request.body.dynamic === 'on';
+
+    // Check if item_id is empty
     if (item_id === "") {
-        response.redirect('admin_page?error=Cannot Apply Discount, Please Enter Item ID')
-    } else {
-        pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
-
-        // Save the updated products_data to the file
-        fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
-
-        response.redirect('index.html');
+        response.redirect('admin_page?error=Cannot Apply Discount, Please Enter Item ID');
+        return;
     }
+
+    let itemFound = false;
+    for (let category in products_data) {
+        for (let product of products_data[category]) {
+            if (item_id === product.id) {
+                pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
+                itemFound = true;
+                break;
+            }
+        }
+        if (itemFound) {
+            break;
+        }
+    }
+
+    if (!itemFound) {
+        response.redirect('admin_page?error=Cannot Apply Discount, Item ID not Found in Products Data');
+        return;
+    }
+
+    // Save the updated products_data to the file
+    fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
+
+    response.redirect('index.html');
 });
 
 // From lab 15 Ex4.js
@@ -923,7 +946,7 @@ app.post("/email_inv", function (request, response) {
 
     // Initialize the salesRecords array with the existing sales data in the sales_record.json file, or an empty array if there is no data.
     var salesRecords = salesData ? JSON.parse(salesData) : [];
-    
+
     // prints out invoice on email thread
     subtotal = 0;
     var invoice_str = `Thank you for shopping with us!
@@ -934,38 +957,38 @@ app.post("/email_inv", function (request, response) {
     var shopping_cart = request.session.cart;
     for (catagory_key in shopping_cart) {
         for (i = 0; i < shopping_cart[catagory_key].length; i++) {
-          if (typeof shopping_cart[catagory_key] == 'undefined') continue;
-          qty = shopping_cart[catagory_key][i];
-          let extended_price = qty * products_data[catagory_key][i].price;
-          subtotal += extended_price;
-          if (qty > 0) {
-            invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
+            if (typeof shopping_cart[catagory_key] == 'undefined') continue;
+            qty = shopping_cart[catagory_key][i];
+            let extended_price = qty * products_data[catagory_key][i].price;
+            subtotal += extended_price;
+            if (qty > 0) {
+                invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
                                                  <td>${qty}</td>
                                                  <td>$${products_data[catagory_key][i].price}</td>
                                                  <td>$${extended_price}
                                                  <tr>`;
-            products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
-            products_data[catagory_key][i].total_sold += Number(qty);
-      
-            // Create new sales record
-            var Item_Id = products_data[catagory_key][i].id;
-            salesRecord = {
-              item_id: Item_Id,
-              Customer_Id: request.cookies.email,
-              Quantity_sold: shopping_cart[catagory_key][i],
-              date: new Date().toISOString()
-            };
-            
-            // Add new sales record to array of existing records
-            salesRecords.push(salesRecord);
-          }
+                products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
+                products_data[catagory_key][i].total_sold += Number(qty);
+
+                // Create new sales record
+                var Item_Id = products_data[catagory_key][i].id;
+                salesRecord = {
+                    item_id: Item_Id,
+                    Customer_Id: request.cookies.email,
+                    Quantity_sold: shopping_cart[catagory_key][i],
+                    date: new Date().toISOString()
+                };
+
+                // Add new sales record to array of existing records
+                salesRecords.push(salesRecord);
+            }
         }
-      }
-      
-      // Write updated sales records back to file
-      fs.writeFileSync(sname, JSON.stringify(salesRecords), "utf-8");
-      console.log(salesRecords);
-      
+    }
+
+    // Write updated sales records back to file
+    fs.writeFileSync(sname, JSON.stringify(salesRecords), "utf-8");
+    console.log(salesRecords);
+
     var tax_rate = 0.0575;
     var tax = tax_rate * subtotal;
 
