@@ -1,1 +1,20 @@
-{"J1":{"Customer_Id":"danny@gmail.com","Quantity_sold":3,"date":"Tue May 09 2023 00:41:34 GMT-1000 (Hawaii-Aleutian Standard Time)"}}
+[
+    {
+        "item_id": "B2",
+        "Customer_Id": "admin@gmail.com",
+        "Quantity_sold": 3,
+        "date": "2023-05-12T10:01:26.336Z"
+    },
+    {
+        "item_id": "H1",
+        "Customer_Id": "admin@gmail.com",
+        "Quantity_sold": 1,
+        "date": "2023-05-10T10:26:14.172Z"
+    },
+    {
+        "item_id": "H2",
+        "Customer_Id": "admin@gmail.com",
+        "Quantity_sold": 2,
+        "date": "2023-05-09T10:26:14.172Z"
+    }
+]

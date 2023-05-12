@@ -21,7 +21,7 @@ let secretekey = 'secretekey';
 var cookieParser = require('cookie-parser');
 var nodemailer = require('nodemailer');
 var pricingModule = require('./pricingModule');
-const salesRecordId = Object.values(require('./sales_record.json'));
+var sales_record = require('./sales_record.json');
 var products_data = require('./product_data.json');
 
 /////////////////
@@ -143,13 +143,13 @@ app.get("/get_cart", function (request, response) {
 app.get("/get_products_data", function (request, response) {
     response.json(products_data);
 });
-
 var sname = __dirname + '/sales_record.json';
 if (fs.existsSync(sname)) {
     var salesData = fs.readFileSync(sname, 'utf-8');
     var salesRecord = JSON.parse(salesData);
 } else {
     console.log("Sorry file " + sname + " does not exist.");
+    var salesRecord = {};
 }
 
 var aname = __dirname + '/admin_data.json';
@@ -604,11 +604,14 @@ app.get("/admin_page", function (request, response) {
                                                                     <h1>Admin Page</h1>
                                                                     <body>
                                                                     <form action="/apply_discount" method="POST">
+                                                                    <span class= "error_msg" id="error_msg" style="color:red"></span>
+                                                                    <br>
                                                                     <label for="item_id">Item ID:</label>
+                                                                    <br>
                                                                     <input type="text" id="item_id" name="item_id" value="*">
                                                                     <br>
                                                                     <label for="discount">Discount:</label>
-                                                                    <input type="number" id="discount" name="discount" min="-99" max="99" step="1">
+                                                                    <input type="number" id="discount" name="discount" min="-99" max="99" value="0" step="1">
                                                                     <br>
                                                                     <label for="dynamic">Dynamic Pricing:</label>
                                                                     <input type="checkbox" id="dynamic" name="dynamic">
@@ -617,6 +620,11 @@ app.get("/admin_page", function (request, response) {
                                                                 </form>
                                                                 </body>
                                                                     </body>
+                                                                    <script>
+                                                                    if ('${params.get("error")}' == 'Cannot Apply Discount, Please Enter Item ID') {
+                                                                        document.getElementById("error_msg").innerHTML = '${params.get("error")}';
+                                                                    }
+                                                                    </script>
                                                                     </html>`;
     response.send(str);
 });
@@ -628,13 +636,16 @@ app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
     const dynamic = request.body.dynamic === 'on';
+    if (item_id === "") {
+        response.redirect('admin_page?error=Cannot Apply Discount, Please Enter Item ID')
+    } else {
+        pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
 
-    pricingModule.setPrice(item_id, products_data, salesRecordId, discount, dynamic);
+        // Save the updated products_data to the file
+        fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
 
-    // Save the updated products_data to the file
-    fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
-
-    response.redirect('index.html');
+        response.redirect('index.html');
+    }
 });
 
 // From lab 15 Ex4.js
@@ -909,6 +920,10 @@ app.get("/get_to_logout", function (request, response) {
 // Code modifed from nodemailer from Professor 
 // Generates an invoice for the user 
 app.post("/email_inv", function (request, response) {
+
+    // Initialize the salesRecords array with the existing sales data in the sales_record.json file, or an empty array if there is no data.
+    var salesRecords = salesData ? JSON.parse(salesData) : [];
+    
     // prints out invoice on email thread
     subtotal = 0;
     var invoice_str = `Thank you for shopping with us!
@@ -919,31 +934,38 @@ app.post("/email_inv", function (request, response) {
     var shopping_cart = request.session.cart;
     for (catagory_key in shopping_cart) {
         for (i = 0; i < shopping_cart[catagory_key].length; i++) {
-            if (typeof shopping_cart[catagory_key] == 'undefined') continue;
-            qty = shopping_cart[catagory_key][i];
-            let extended_price = qty * products_data[catagory_key][i].price;
-            subtotal += extended_price;
-            if (qty > 0) {
-                invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
-                                                                 <td>${qty}</td>
-                                                                 <td>$${products_data[catagory_key][i].price}</td>
-                                                                 <td>$${extended_price}
-                                                                 <tr>`;
-                products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
-                products_data[catagory_key][i].total_sold += Number(qty);
-
-                /*A3 for ITM353. Creates sales_record.json file once transaction has been processed and invoice has been sent to customer indicating the transaction's completion. 
-                Records the Items's Id, Customer's email, quantity sold, and date/time of transaction*/
-                Item_Id = products_data[catagory_key][i].id,
-                    salesRecord[Item_Id] = {},
-                    salesRecord[Item_Id].Customer_Id = request.cookies.email,
-                    salesRecord[Item_Id].Quantity_sold = shopping_cart[catagory_key][i],
-                    salesRecord[Item_Id].date = Date()
-            }
-            fs.writeFileSync(sname, JSON.stringify(salesRecord), "utf-8");
-            console.log(salesRecord)
+          if (typeof shopping_cart[catagory_key] == 'undefined') continue;
+          qty = shopping_cart[catagory_key][i];
+          let extended_price = qty * products_data[catagory_key][i].price;
+          subtotal += extended_price;
+          if (qty > 0) {
+            invoice_str += `<tr><td>${products_data[catagory_key][i].item}</td>
+                                                 <td>${qty}</td>
+                                                 <td>$${products_data[catagory_key][i].price}</td>
+                                                 <td>$${extended_price}
+                                                 <tr>`;
+            products_data[catagory_key][i].qty_available -= Number(qty); // makes product quantitty and total sold dynamic IR1 A1 Daniel Lott
+            products_data[catagory_key][i].total_sold += Number(qty);
+      
+            // Create new sales record
+            var Item_Id = products_data[catagory_key][i].id;
+            salesRecord = {
+              item_id: Item_Id,
+              Customer_Id: request.cookies.email,
+              Quantity_sold: shopping_cart[catagory_key][i],
+              date: new Date().toISOString()
+            };
+            
+            // Add new sales record to array of existing records
+            salesRecords.push(salesRecord);
+          }
         }
-    }
+      }
+      
+      // Write updated sales records back to file
+      fs.writeFileSync(sname, JSON.stringify(salesRecords), "utf-8");
+      console.log(salesRecords);
+      
     var tax_rate = 0.0575;
     var tax = tax_rate * subtotal;
 
