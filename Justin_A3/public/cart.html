@@ -43,10 +43,12 @@
           //Defines ifLoggedIn to be 
           ifLoggedIn = cookie.loggedIn;
           ifAdminIn = cookie.adminIn;
-            if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
+          if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
             document.write('<li><a href="get_to_logout">Logout</a></li>')
           } else {
             document.write('<li><a href="get_to_login">Login</a></li>');
+          } if (ifAdminIn == 'true') {
+            document.write('<li><a href="admin_page">Admin Page</a></li>');
           }
         </script>
     </ul>
@@ -61,7 +63,7 @@
       </center>
       <script>
         //displays users information when logged in
-          if (ifLoggedIn == 'true') {
+        if (ifLoggedIn == 'true') {
           document.write('<h4>Welcome ' + user_data[user_email].name +
             '<br>Number of Logins: ' + user_data[user_email].num_loggedIn +
             '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
@@ -181,7 +183,7 @@
 
   <script>
     // Creates button for check out once user logs in, or if already logged 
-        if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
+    if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
       document.write(`
   <form action="checkout" method=post>
     <input type="submit" class="submit" value="Checkout"></input>

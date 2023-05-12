@@ -74,6 +74,8 @@
                     document.write('<li><a href="get_to_logout">Logout</a></li>')
                 } else {
                     document.write('<li><a href="get_to_login">Login</a></li>');
+                } if (ifAdminIn == 'true') {
+                    document.write('<li><a href="admin_page">Admin Page</a></li>');
                 }
             </script>
         </ul>

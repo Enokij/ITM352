@@ -144,6 +144,8 @@
           document.write('<li><a href="get_to_logout">Logout</a></li>')
         } else {
           document.write('<li><a href="get_to_login">Login</a></li>');
+        } if (ifAdminIn == 'true') {
+          document.write('<li><a href="admin_page">Admin Page</a></li>');
         }
       </script>
     </ul>
@@ -157,16 +159,16 @@
       <script>
         //if user is logged in, then displays user name in the header and the other user information on the page.
         if (ifLoggedIn == 'true' | ifAdminIn == 'true') {
-          if(ifLoggedIn == 'true'){
-          username.innerHTML = user_data[user_email].name
-          document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
-            '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
-        } else if (ifAdminIn == 'true'){
-          username.innerHTML = admin_data[user_email].name
-          document.write('<h4><br>Number of Logins: ' + admin_data[user_email].num_loggedIn +
-            '<br> Last date logged on: ' + admin_data[user_email].last_date_loggin + '</h4>')
+          if (ifLoggedIn == 'true') {
+            username.innerHTML = user_data[user_email].name
+            document.write('<h4><br>Number of Logins: ' + user_data[user_email].num_loggedIn +
+              '<br> Last date logged on: ' + user_data[user_email].last_date_loggin + '</h4>')
+          } else if (ifAdminIn == 'true') {
+            username.innerHTML = admin_data[user_email].name
+            document.write('<h4><br>Number of Logins: ' + admin_data[user_email].num_loggedIn +
+              '<br> Last date logged on: ' + admin_data[user_email].last_date_loggin + '</h4>')
+          }
         }
-      }
       </script>
       <img src="./images/background.webp" alt="image" height="45%" width="35%" class="img">
       <h4>Please Use The Navigation Bar Above To Begin Shopping</h4>
