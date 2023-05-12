@@ -1,0 +1,20 @@
+{ 
+    "admin@hawaii.edu": {
+        "name": "Admin",
+        "password": "d0b1c7be57d7b3a8b9987d7f5790c95c",
+        "status": "loggedout",
+        "customer_id": "" 
+    },
+    "itm352@hawaii.edu": {
+        "name": "grader",
+        "password": "70a644a3d0627f4277d387af516c4b48",
+        "status": "loggedout",
+        "customer_id": ""
+    },
+    "bvt@hawaii.edu": {
+        "name": "Vy Tran",
+        "password": "fe140fb0bc2d4b5c5503e8f109aa9a27",
+        "status": "loggedout",
+        "customer_id": ""
+    }
+}

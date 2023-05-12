@@ -1,0 +1,83 @@
+<!--
+Bao Vy Tran
+This file is an HTML thankyou page lets users know that their purchase has been processed
+and that an invoice was sent to their email.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank you || vycstm</title>
+
+    <!-- Loading icon library -->
+    <!-- Bootstrap ICONS: https://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Link to products_style.css -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Importing Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+
+    <!-- Get the product information -->
+    <script type="text/javascript" src="./products_data.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+
+    <script> 
+        // Get the url
+        let params = (new URL(document.location)).searchParams;
+
+        /// GET USER'S COOKIE ///
+        // Code referenced from: https://www.w3schools.com/js/js_cookies.asp
+        // Decode the cookie string to only get the key value pairs from the cookie object
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    var string = c.substring(name.length, c.length);
+                    return JSON.parse(string);
+                }
+            }
+            return "";
+        }
+
+        if (getCookie('user_cookie') != false) {
+            var user_cookie = getCookie('user_cookie');
+            var name = user_cookie['name'];
+            var email = user_cookie['email'];
+        } else {
+            location.href= './login.html';
+            window.stop;
+        }
+
+        window.onload = function() {
+            // User may not access the invoice without logging in
+            // If so, an error message is given and they will be asked to return to index.html
+            if (params.has('error')) {
+                document.getElementById('invoice').innerHTML = `An error occurred and your invoice could not be sent to ${email} :(`
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container" style="padding-top: 40px;">
+        <script>
+            document.write(`
+                <h1>Thank you ${name} for your purchase with vycstm!</h1>
+                <h2 id="invoice">Your invoice has been mailed to ${email}</h2>
+            `)
+        </script>
+        <form method="POST" action="/process_logout">
+            <input type="submit" value="Logout" class="sm-button" style="width: 200px; font-size: 20px;">
+        </form>
+    </div>
+</body>
+</html>

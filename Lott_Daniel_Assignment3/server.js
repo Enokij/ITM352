@@ -395,6 +395,7 @@ app.post("/get_to_login", function (request, response) {
                 // IR4 A2 Daniel Lott - counts how many times user logged in 
                 //sends cookie back to the client
                 user_data[entered_email].num_loggedIn += 1;
+                fs.writeFileSync(fname, JSON.stringify(user_data), "utf-8");
                 //sends cookies when logged in to session
                 response.cookie('email', entered_email);
                 response.cookie('loggedIn', loggedIn);
@@ -496,6 +497,7 @@ app.post("/get_to_admin", function (request, response) {
                 // IR4 A2 Daniel Lott - counts how many times user logged in 
                 //sends cookie back to the client
                 admin_data[entered_email].num_loggedIn += 1;
+                fs.writeFileSync(fname, JSON.stringify(user_data), "utf-8");
                 //sends cookies when logged in to session
                 response.cookie('email', entered_email);
                 response.cookie('adminIn', loggedIn);
@@ -610,10 +612,11 @@ app.get("/admin_page", function (request, response) {
                                                                     <input type="number" id="discount" name="discount" min="-99" max="99" step="1">
                                                                     <br>
                                                                     <label for="dynamic">Dynamic Pricing:</label>
-                                                                    <input type="checkbox" id="dynamic" name="dynamic">
                                                                     <br>
                                                                     <input type="submit" value="Apply Discount">
                                                                 </form>
+                                                                <form action="/set_price" method="POST">
+                                                                <input type="submit" value="Dynamic Discount">
                                                                 </body>
                                                                     </body>
                                                                     </html>`;
@@ -624,14 +627,15 @@ app.post("/apply_discount", function (request, response) {
     const item_id = request.body.item_id;
     const discount = parseFloat(request.body.discount);
     const dynamic = request.body.dynamic === 'on';
+    pricingModule.manualDiscount(item_id, products_data, discount);
 
-    pricingModule.setPrice(item_id, products_data, sales_record, discount, dynamic);
 
     // Save the updated products_data to the file
     fs.writeFileSync('./product_data.json', JSON.stringify(products_data), 'utf-8');
 
     response.redirect('index.html');
 });
+
 
 // From lab 15 Ex4.js
 //Used to display user's account information
@@ -997,11 +1001,5 @@ app.post("/email_inv", function (request, response) {
         // distroys the session for the user who is signed in
     });
 });
-
-function set_price(item_id, products, sales_record, discount, dynamic) {
-
-}
-
-
 
 app.listen(8080, () => console.log('listening on port 8080'))

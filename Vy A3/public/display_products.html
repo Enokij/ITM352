@@ -1,0 +1,458 @@
+<!--
+Bao Vy Tran
+This file is an HTML product display that utilizes data from a JSON file 
+stingified as a products array when a request is made to the server for product_data.js.
+Using a products_key, this file will serve up data for different product categories in the JSON file
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Display || vycstm</title>
+
+    <!-- Used Bootstrap to create responsive site -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
+    <!-- Loading icon library -->
+    <!-- Bootstrap ICONS: https://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Link to products_style.css -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Importing Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+
+    <!-- Get the product information -->
+    <script type="text/javascript" src="./products_data.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+
+    <script>
+        let params = (new URL(document.location)).searchParams;
+
+        /// DIRECT USER TO APPROPRIATE PRODUCT PAGE ///
+        // Referenced from Assignment 3 Example Code
+        if (params.has('products_key')) {
+            var products_key = params.get('products_key');
+        }
+        else {
+            products_key = "Shoes";
+        }
+        var products_data;
+        loadJSON('get_products_data', function(response) {
+            products_data = JSON.parse(response);
+        })
+        var this_product_key = '';
+        
+        /// LOAD SHOPPING CART ///
+        // Referenced from Assignment 3 Example Code
+        var shopping_cart;
+        // Total number of items in the cart
+        var total = 0;
+        loadJSON('./get_cart', function (response) {
+            shopping_cart = JSON.parse(response);
+            for (let key in shopping_cart) {
+                total += shopping_cart[key].reduce((a, b) => a + b);
+            }
+        })
+        
+        window.onload = function() {
+            /// IF THERE IS A SERVER SIDE VALIDATION ERROR ///
+            // Assignment 2 code
+            // If the key 'error' is present, it means that there were no inputs/all inputs were 0
+                // Note: this is now being validated in the cart because users can select no quantities for a page and still submit
+            if (params.has('error')) {
+                document.getElementById('errorMessage').innerHTML = params.get('error');   
+                setTimeout(() => {
+                    document.getElementById('errorMessage').innerHTML = "";   
+                }, 2000);
+            }
+            // If the key 'inputError' is present, it means that the input was not a number, a negative number, or not an integer
+            if (params.has('inputError')) {
+                for (let i in products[products_key]) {
+                    document.getElementById('errorMessage').innerHTML = 'Please fix errors before proceeding.'; 
+                    if (params.get(`quantity${i}`) == 0) {
+                        quantity_form[`quantityEntered${[i]}`].value = '';
+                    } else {
+                        quantity_form[`quantityEntered${[i]}`].value = params.get(`quantity${i}`);
+                    }
+                    document.getElementById(`quantity${i}_error`).innerHTML = params.get(`quantity${i}_error`);
+                }
+            }
+            for (let i in products[products_key]) {
+                // If there are no available quantities, hide the input box and display a sold out message
+                if (products[products_key][i].inventory ==  0) {
+                    document.getElementById(`quantityEntered${[i]}`).style.display = "none";
+                    document.getElementById(`quantity${[i]}_label`).innerHTML = "This item is <u>SOLD OUT</u>";
+                }
+            }
+
+            // Make input boxes sticky
+            if ((typeof shopping_cart[products_key] != 'undefined') && (params.has('inputError') != true)) {
+                for (let i in shopping_cart[products_key]) {
+                    if (shopping_cart[products_key][i] == 0) {
+                        document.getElementById(`quantityEntered${[i]}`).value = '';
+                    } 
+                    else {
+                        document.getElementById(`quantityEntered${[i]}`).value = shopping_cart[products_key][i];
+                    }
+                    
+                }
+            }
+        }
+
+
+    /// DATA VALIDATION ON THE CLIENT SIDE TO DISPLAY ERROR MESSAGE ///
+    // Assignment 2 code
+        function checkInputTextbox(textBox) {
+            str = String(textBox.value);
+            if (str.charAt(0) == 0) {
+                textBox.value = Number(str.slice(0, 0) + str.slice(1, str.length));
+            }
+            errors = notAPosInt(textBox.value, true);
+            document.getElementById(textBox.name + '_error').innerHTML =  errors.join('');
+        };
+
+
+        function notAPosInt(arrayElement, returnErrors=false) {
+            errors = []; 
+
+            if ((Number(arrayElement) != arrayElement) && (arrayElement != '')) { 
+                errors.push('Please enter a number value.');
+            } 
+            else 
+            {                
+                if ((parseInt(arrayElement) == arrayElement) && (arrayElement >= 0)) {
+                    for (i = 0; i < products[products_key].length; i++){
+                        var inputValue = document.getElementById(`quantityEntered${[i]}`).value;
+                        if ((inputValue > 0) && (inputValue > products[products_key][i].inventory)) {
+                            errors.push(`We do not have ${arrayElement} available.`);
+                            var extra = arrayElement - products[products_key][i].inventory;
+                            
+                            document.getElementById(`quantityEntered${[i]}`).value = arrayElement - extra;
+                            document.getElementById(`quantityEntered${[i]}`).style.borderColor = "red";
+                        }  
+                        else {
+                            document.getElementById(`quantityEntered${[i]}`).style.borderColor = "black";  
+                        }
+                    }      
+                }
+                if (arrayElement < 0)  {
+                    errors.push('Please enter a positive value.'); 
+                } else if ((parseInt(arrayElement) != arrayElement) && (arrayElement != 0)) {
+                    errors.push('Please enter an integer value.');
+                }
+            }
+            return (returnErrors ? errors : (errors.length == 0));
+        }
+
+        /// GET USER'S COOKIE ///
+        // Code referenced from: https://www.w3schools.com/js/js_cookies.asp
+        // Decode the cookie string to only get the key value pairs from the cookie object
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    var string = c.substring(name.length, c.length);
+                    return JSON.parse(string);
+                }
+            }
+            return "";
+        }
+
+        /// IR3 SEARCH BAR ///
+        // Code referenced from https://www.w3schools.com/howto/howto_js_filter_lists.asp
+        // Completed with help from Jaden Morga
+        function searchProducts() {
+            // Declare all variables
+            var input, filter, p, i, txtValue;
+            // Get the content of the search bar
+            input = document.getElementById('search');
+            // Convert the search content to uppercase
+            filter = input.value.toUpperCase();
+            // Get the product cards by class name
+            var productCard = document.getElementsByClassName('product_card');
+
+            // Loop through all product cards on the current page
+            for (let i = 0; i < productCard.length; i++) {
+                // Get the names of the product cards
+                p = productCard[i].getElementsByClassName("product_name")[0];
+                txtValue = p.textContent || p.innerText;
+                // If product names match with the search input
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    // Show the product card
+                    productCard[i].style.display = "";
+                }
+                else {
+                    // If not, hide the product cards
+                    productCard[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <header>vycstm</header>
+    <div id="sticky-navbar">
+        <div id="top-nav" class="py-3">
+            <a class="nav-link mx-3" href='javascript:;' onclick="openNav()"><span class="glyphicon glyphicon-shopping-cart"></span> <span id="cart_total"></span> Cart</a>
+            <script>
+                // If the user's cookie exists
+                if (getCookie('user_cookie') != false) {
+                    // Turn the string of key value pairs into an object to be parsed
+                    var user_cookie = getCookie('user_cookie');
+                    // Make the "login" button into a button with the user's name leading to the edit page
+                    document.write(`
+                        <a class="nav-link mx-3" href="edit.html"><span class="glyphicon glyphicon-user"></span> ${user_cookie['name']}</a>
+                    `)
+                    if (user_cookie['name'] == 'Admin') {
+                        document.write(`
+                            <a class="nav-link mx-3" href="discount.html">Discount</a>
+                        `)
+                    }
+                } 
+                else {
+                    document.write(`
+                        <a class="nav-link mx-3" href="login.html"><span class="glyphicon glyphicon-user"></span> Log in</a>
+                    `)
+                }
+            </script>
+            <div class="mx-3" id="search-form">
+                <form class="form-inline">
+                    <button class="search-submit" type="submit" autocomplete="off"><span class="glyphicon glyphicon-search"></span></button>
+                    <input class="search-field mx-1" id="search" autocomplete="off" maxlength="20" type="search" placeholder="Search" aria-label="Search" onclick="document.getElementById('search-form').style.border = '2px solid #58cfe4'" onblur="document.getElementById('search-form').style.border = '2px solid white'" onkeyup="searchProducts()">
+                </form>
+            </div>
+        </div>
+        <!-- EXPANDING NAVBAR WITH MINIMIZED SCREEN -->
+        <nav class="navbar navbar-expand-md">
+            <button class="navbar-toggler" id="toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>  
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav">
+                    <a class="nav-link mx-3" href="./index.html">Home</a></li>
+                    <script>nav_bar(this_product_key, products_data);</script>
+                </div>
+            </div>   
+        </nav>
+    </div>
+
+    <div class="container">
+        <h3 id="errorMessage" style="color: red;"></h3>
+        <h3 id="searchMsg"></h3>
+        <br>
+        <!-- PRODUCT SELECTION -->
+        <form action="/add_to_cart" method="POST" name="quantity_form" novalidate>
+            <script>
+                // Displaying the cart total
+                document.getElementById('cart_total').innerHTML = total;
+                
+                // Storing the products_key to be used on the server
+                document.write(`<input type="hidden" name="products_key" value="${products_key}"">`);
+                for (let i in products[products_key]) {
+                    document.write(`
+                    <div class="col-md-6 product_card" style="margin-bottom: 40px;">
+                        <div>
+                            <h2 style="float: left;" class="product_name">${products[products_key][i].name}</h2>
+                            <h2 style="float: right;">$${(products[products_key][i].price).toFixed(2)}</h2>
+                        </div>  
+                        <img src="${products[products_key][i].image}" class="img-thumbnail" alt="${products[products_key][i].alt}">
+                            
+                        <div style="height: 90px;">
+                            <table style="width: 100%; text-align: center; font-size: 18px;">
+                                <tr>
+                                    <td style="text-align: left; width: 35%;">Available: ${products[products_key][i].inventory}</td>
+                                    <td rowspan="2" style="width: 25%"><div id="quantity${[i]}_error" class="errorBox"></div></td>
+                                    <td style="text-align: right; font-size: 17px; width: 40%;"><label id="quantity${[i]}_label" style="text-align: center; width:70%">Quantity Desired</label></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left; width: 35%;" id="quantitySold${i}">Sold: ${products[products_key][i].quantitySold}</td>
+                                    <td style="text-align: center; width: 40%;">
+                                        <div style="border-radius: 50px; border: 2px solid black; width: 70%; height: 40px; float: right">
+                                            <button type="button" class="inputButton"
+                                                onclick="if (document.getElementById('quantityEntered${[i]}').value == 0) return
+                                                    document.getElementById('quantityEntered${[i]}').value--"
+                                                checkInputTextbox(quantityEntered${[i]})">--</button>
+                                            <input type="number" autocomplete="off" maxlength="2" placeholder="0" max="${products[products_key][i].inventory}" name="quantity${[i]}" id="quantityEntered${i}" class="inputBox" 
+                                                onchange="checkInputTextbox(this)" oninput="this.value = this.value.slice(0, this.maxLength)">
+                                            <button type="button" class="inputButton"
+                                                onclick="if (document.getElementById('quantityEntered${[i]}').value == ${products[products_key][i].inventory}) return
+                                                    document.getElementById('quantityEntered${[i]}').value++" 
+                                                checkInputTextbox(quantityEntered${[i]})">+</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>  
+                    <input type="submit" value="Add to cart" class="sm-button">
+                    </div>
+                    `)
+                }
+            </script>
+            <br>
+        </form>
+        <!-- EXPANDING SHOPPING CART -->
+        <!-- Referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp -->
+        <div id="shoppingNav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <p style="text-transform: uppercase;">Shopping Cart</p>
+            <form method="POST" name="cart_form">
+            <script>
+                document.write(`<input type="hidden" name="products_key" value="${products_key}"">`);
+                var subtotal = 0;
+                
+                for (let key in shopping_cart) {
+                    for (let i in shopping_cart[key]) {
+                        let quantities = shopping_cart[key][i];
+                        if (quantities > 0) {
+                            extended_price = quantities * products[key][i].price;
+                            subtotal += extended_price;
+                            document.write(`
+                                <table class="cartItems">
+                                    <tr><td colspan="3" style="text-align: left; padding: 5px;">${products[key][i].name}</td></tr>
+                                    <tr>
+                                        <td rowspan="4" style="padding: 5px; width: 45%;""><img src="${products[key][i].image}" alt="${products[key][i].alt}" class="img-thumbnail"></td>
+                                        <td style="width: 20%;">$${(products[key][i].price).toFixed(2)} x </td>
+                                        <td style="width: 25%;">
+                                            <div style="border-radius: 50px; border: 1px solid black; height: 30px; max-width: 90px;">
+                                                <button type="button" id="minus${i}" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == 0) return 
+                                                    document.getElementById('cartInput_${key}${i}').value--; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">--</button>
+                                                <input type="number" autocomplete="off" id="cartInput_${key}${i}" value="${quantities}" class="cartBox" name="cartInput_${key}${i}" readonly>
+                                                <button type="button" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == ${products[key][i].inventory}) return
+                                                    document.getElementById('cartInput_${key}${i}').value++; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">+</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="3" style="font-size: 18px;">$${extended_price.toFixed(2)}</td></tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <button type="button" class="removeBtn" onclick="document.getElementById('cartInput_${key}${i}').value = 0; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">Remove</button>
+                                        </td>
+                                    </tr>
+                                </table> 
+                            `)
+                        }
+                    }
+                }
+                if (subtotal == 0) {
+                    document.write(`Empty cart.`);
+                } 
+                else {
+                    document.write(`
+                    <input type="submit" value="Update Cart" class="sm-button" style="margin-bottom: 10px; display: none;" id="cartUpdate" onclick="cart_form.action='/update_shopping_cart'">`);
+                }
+            </script>
+            </form>
+            <form action="/checkout" method="GET">
+                <input type="submit" value="Check Out" class="sm-button" style="margin-bottom: 10px; display: inline-block;" id="cartSubmit">
+                <script>
+                    if (total == 0) {
+                        document.getElementById('cartSubmit').style.display = 'none';
+                    }
+                </script>
+            </form>
+            <script>
+                var taxRate = (4.7/100);
+                var taxAmount = subtotal * taxRate;
+                // Shipping
+                if (subtotal < 300) {
+                    shipping = 5;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else if ((subtotal >= 300) && (subtotal <= 500)) {
+                    shipping = 10;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else {
+                    shipping = 0;
+                    shippingDisplay = 'FREE';
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                }
+            </script>
+            <hr>
+            <div>
+                <script>
+                    document.write(`
+                        <p style="font-size: 13px;">
+                            Subtotal: $${subtotal.toFixed(2)}<br>
+                            Tax Amount: $${taxAmount.toFixed(2)}<br>
+                            Shipping: ${shippingDisplay}
+                        </p>
+                        <p style="text-transform: uppercase;">Total: $${grandTotal.toFixed(2)}</p>
+                        
+                        
+                        <p style="font-size: 10px;">SHIPPING POLICY: 
+                            <br>For orders with subtotal <u>$300 or less</u>, a shipping fee of <u>$5</u> will be added.
+                            <br>For orders with subtotal <u>$500 or less</u>, a shipping fee of <u>$10</u> will be added.
+                            <br>Orders with subtotal <u>above $500</u> will receive <u>free shipping</u> .
+                        </p>
+                    `)
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /// STICKY NAV BAR ///
+        // Referenced from: https://www.w3schools.com/howto/howto_js_navbar_sticky.asp
+        window.onscroll = function() {stickyNav()};
+        // Get the navbar using its id
+        var navbar = document.getElementById("sticky-navbar");
+        // offsetTop returns the top position relative to the parent (documentation: https://www.w3schools.com/jsref/prop_element_offsettop.asp)
+        // the parent of navbar is body
+        var sticky = navbar.offsetTop;
+
+        function stickyNav() {
+            // pageYOffSet returns the pixels a document has scrolled from the upper left corner of the window
+            if (window.pageYOffset >= sticky) {
+                navbar.classList.add("sticky")
+            } else {
+                navbar.classList.remove("sticky");
+            }
+        }
+
+        /// SHOPPING CART ///
+        // Opening side nav for shopping cart referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp
+        function openNav() {
+            document.getElementById('shoppingNav').style.width = "400px";
+        }
+        function closeNav() {
+            document.getElementById('shoppingNav').style.width = "0";
+        }
+        
+    </script>
+    <footer>
+        <table style="width: 50%; text-align:center; margin: auto;">
+            <tr>
+                <td style="width: 30%;">
+                    <a href="https://www.instagram.com/vycstm/" target="_blank" class="contactIcons"><i class="fa fa-instagram" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Follow us to get updates and see behind the scenes content!</p>
+                </td>
+                <td style="width: 5%;"></td>
+                <td style="width: 30%;">
+                    <a href="mailto:vycstm@gmail.com" target="_blank" class="contactIcons"><i class="fa fa-envelope" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Contact us through email if you have any questions or feedback.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><p style="font-size: 15px;">vycstm &copy; 2020</p></td>
+            </tr>
+        </table>
+    </footer>
+</body>
+</html>

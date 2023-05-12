@@ -1,0 +1,134 @@
+{
+    "Shoes": [
+        {
+            "name": "HunterxHunter",
+            "price": 200,
+            "image": "./images/HxHFront.jpg",
+            "alt": "HunterxHunter shoes image",
+            "inventory": 15
+        },
+        {
+            "name": "Fullmetal Alchemist: Brotherhood",
+            "price": 350,
+            "image": "./images/FMAB.jpg",
+            "alt": "Fullmetal Alchemist Brotherhood shoes image",
+            "inventory": 10
+        },
+        {
+            "name": "Jujutsu Kaisen",
+            "price": 350,
+            "image": "./images/JJK.jpg",
+            "alt": "Jujutsu Kaisen shoes image",
+            "inventory": 10
+        },
+        {
+            "name": "Fairy Tail",
+            "price": 350,
+            "image": "./images/FairyTail.jpg",
+            "alt": "Fairy Tail shoes image",
+            "inventory": 8
+        },
+        {
+            "name": "Star Wars",
+            "price": 400,
+            "image": "./images/StarWars.jpg",
+            "alt": "Star Wars shoes image",
+            "inventory": 5
+        },
+        {
+            "name": "Studio Ghibli",
+            "price": 1000,
+            "image": "./images/GhibliFront.jpg",
+            "alt": "Studio Ghibli shoes image",
+            "inventory": 3
+        }
+    ],
+    "Shoelaces": [
+        {
+            "name": "45\" Red Shoelaces",
+            "price": 5,
+            "image": "./images/red.jpeg",
+            "alt": "Red shoe laces image",
+            "inventory": 15
+        },
+        {
+            "name": "45\" Orange Shoelaces",
+            "price": 5,
+            "image": "./images/orange.jpeg",
+            "alt": "Orange shoe laces image",
+            "inventory": 15
+        },
+        {
+            "name": "45\" Yellow Shoelaces",
+            "price": 5,
+            "image": "./images/yellow.jpeg",
+            "alt": "Yellow shoe laces image",
+            "inventory": 20
+        },
+        {
+            "name": "45\" Green Shoelaces",
+            "price": 5,
+            "image": "./images/green.jpg",
+            "alt": "Green shoe laces image",
+            "inventory": 10
+        },
+        {
+            "name": "45\" Blue Shoelaces",
+            "price": 5,
+            "image": "./images/blue.jpg",
+            "alt": "Blue shoe laces image",
+            "inventory": 16
+        },
+        {
+            "name": "45\" Purple Shoelaces",
+            "price": 5,
+            "image": "./images/purple.jpg",
+            "alt": "Purple shoe laces image",
+            "inventory": 14
+        }
+    ],
+    "Paint": [
+        {
+            "name": "Basics Kit",
+            "price": 28,
+            "image": "./images/basicKit.jpg",
+            "alt": "Basics Kit image",
+            "inventory": 20
+        },
+        {
+            "name": "Acrylic Leather Paint - Best Sellers Kit",
+            "price": 40,
+            "image": "./images/bestSellerKit.jpg",
+            "alt": "Best Sellers Kit image",
+            "inventory": 15
+        },
+        {
+            "name": "Pearlescent and Metallic Kit",
+            "price": 42,
+            "image": "./images/pearlescentKit.jpg",
+            "alt": "Pearlescent and Metallic Kit image",
+            "inventory": 10
+        },
+        {
+            "name": "Neon Kit",
+            "price": 46,
+            "image": "./images/neonKit.jpeg",
+            "alt": "Neon Kit image",
+            "inventory": 10
+        },
+        {
+            "name": "Collector's Collection Kit",
+            "price": 162,
+            "image": "./images/collectorsKit.jpeg",
+            "alt": "Collector's Collection Kit image",
+            "inventory": 5
+        },
+        {
+            "name": "Standard Color Kit",
+            "price": 264,
+            "image": "./images/standardColorKit.jpg",
+            "alt": "Standard Color Kit image",
+            "inventory": 5
+        }
+    ]
+}

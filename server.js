@@ -1,4 +1,4 @@
-  /*Assignment 3. Created by DANIEL LOTT, created a bike store which has several different pages.
+ /*Assignment 3. Created by DANIEL LOTT, created a bike store which has several different pages.
   All pages have navigation bars except for the invoice.html file. These nav bars allow the user to get
   from one page at any moment in time. 
   -Utilizes express and express session to store user inputted information into the server's storage.
@@ -1002,3 +1002,16 @@ function set_price(item_id, products, sales_record, discount, dynamic){
 
 
 app.listen(8080, () => console.log('listening on port 8080'))
+function set_price(item_id, products_data, salesRecord, discount, dynamic) {
+    var Id_salesRecord = Object.keys(salesRecord)
+    for (headers in products_data) {
+        for (i=0; i < products_data[headers].length; i++){    
+            if (item_id === "*") {
+                1 + discount * products_data[headers][i].price;
+        } else if (item_id != Id_salesRecord) {
+            discount * products_data[headers][i].price;
+        }
+        }
+    }
+
+}

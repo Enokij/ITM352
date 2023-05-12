@@ -1,0 +1,511 @@
+<!--
+Bao Vy Tran
+This file is an HTML page for admins to apply discounts
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discount || vycstm</title>
+
+    <!-- Used Bootstrap to create responsive site -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
+    <!-- Loading icon library -->
+    <!-- Bootstrap ICONS: https://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Link to products_style.css -->
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="discount_style.css">
+    
+    <!-- Importing Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+
+    <!-- Get the product information -->
+    <script type="text/javascript" src="./products_data.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+    <script type="text/javascript" src="./sales_record.js"></script>
+    
+    <script>
+        let params = (new URL(document.location)).searchParams;
+        
+        /// DIRECT USER TO APPROPRIATE PRODUCT PAGE ///
+        // Referenced from Assignment 3 Example Code
+        if (params.has('products_key')) {
+            var products_key = params.get('products_key');
+        }
+        else {
+            products_key = "Shoes";
+        }
+        var products_data;
+        loadJSON('get_products_data', function(response) {
+            products_data = JSON.parse(response);
+        })
+        var this_product_key = '';
+
+        /// LOAD SHOPPING CART ///
+        // Referenced from Assignment 3 Example Code
+        var shopping_cart;
+        // Total number of items in the cart
+        var total = 0;
+        loadJSON('./get_cart', function (response) {
+            shopping_cart = JSON.parse(response);
+            for (let key in shopping_cart) {
+                total += shopping_cart[key].reduce((a, b) => a + b);
+            }
+        })
+
+        // Get number of active users  
+        var users = 0;
+        loadJSON('./get_users', function (response) {
+            users = response;
+        })
+
+        // When the window loads, perfom the following function:
+        window.onload = function() {
+            // Blank   
+        }
+
+        /// GET USER'S COOKIE ///
+        // Code referenced from: https://www.w3schools.com/js/js_cookies.asp
+        // Decode the cookie string to only get the key value pairs from the cookie object
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    var string = c.substring(name.length, c.length);
+                    return JSON.parse(string);
+                }
+            }
+            return "";
+        }
+    </script>
+
+</head>
+<br>
+<body>   
+    <header>vycstm</header>
+    <div id="sticky-navbar">
+        <div id="top-nav" class="py-3">
+            <a class="nav-link mx-3" href='#' onclick="openNav()"><span class="glyphicon glyphicon-shopping-cart"></span> <span id="cart_total"></span> Cart</a>
+            <script>
+                // If the user's cookie exists
+                if (getCookie('user_cookie') != false) {
+                    // Turn the string of key value pairs into an object to be parsed
+                    var user_cookie = getCookie('user_cookie');
+                    // Make the "login" button into a button with the user's name leading to the edit page
+                    document.write(`
+                        <a class="nav-link mx-3" href="edit.html"><span class="glyphicon glyphicon-user"></span> ${user_cookie['name']}</a>
+                    `)
+                    if (user_cookie['name'] == 'Admin') {
+                        document.write(`
+                            <a class="nav-link mx-3" href="discount.html">Discount</a>
+                        `)
+                    }
+                } 
+                else {
+                    document.write(`
+                        <a class="nav-link mx-3" href="login.html"><span class="glyphicon glyphicon-user"></span> Log in</a>
+                    `)
+                }
+            </script>
+        </div>
+         <!-- EXPANDING NAVBAR WITH MINIMIZED SCREEN -->
+        <nav class="navbar navbar-expand-md">
+            <button class="navbar-toggler" id="toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>  
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav">
+                    <a class="nav-link mx-3" href="./index.html">Home</a></li>
+                    <script>nav_bar(this_product_key, products_data);</script>
+                </div>
+            </div>   
+        </nav>
+    </div>
+    <div class="container" style="min-height: 550px;"> 
+        <h1 style="text-transform: uppercase;">Apply Discount</h1>
+
+        <h3 id="fixProdErr"></h3>
+        <p id="productsErr" style="color: red; font-size: 12px;"></p>
+
+        <h3 id="fixRecordErr"></h3>
+        <p id="salesErr" style="color: red; font-size: 12px;"></p>
+
+        <br>
+        <form action="/set_price" method="POST" name="discount_form" class="discount_form" id="discount_form">
+            <table style="width: 80%; margin: auto;" id="discountTable">
+                <tr>
+                    <td style="text-align: right;">Select a product:</td>
+                    <td>
+                        <select class="form-select" id="productDropdown" style="width: 250px;" name="productDropdown">
+                            <option value="*">All products</option>
+                        </select>
+                    </td>  
+                </tr>
+                <tr>
+                    <td style="text-align: right;">Set a discount:</td>
+                    <td>
+                        <button type="button" class="inputButton"
+                            onclick="decrement()" id="decrementButton">--</button>
+                        <input type="number" autocomplete="off" placeholder="0" max="99" min="-99" name="discountInput" id="discountInput" class="inputBox" oninput="limitChar(this)">
+                        <button type="button" class="inputButton"
+                            onclick="increment()" id="incrementButton">+</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">Apply dynamic pricing:</td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" id="dynamicPricing" name="dynamicPricing" onchange="removeDiscount(this)">
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                </tr>
+
+                <tr style="height: 60px;">
+                    <td colspan="3"></td>
+                </tr>
+
+                <tr style="height: 60px;">
+                    <td colspan="3">
+                        <input class="sm-button" type="submit" value="Apply" name="apply" id="apply">
+                    </td>
+                </tr>
+            </table>
+            <br>
+        </form>
+        <script>
+            var selectElement = document.getElementById("productDropdown");
+            // Generate the dropdown by retrieving the products
+                // The dropdown value is the product's item_id
+                // But the text displayed on the screen is the product's name
+            Object.values(products).forEach(category => {
+                category.forEach(product => {
+                    var optionElement = document.createElement("option");
+                    optionElement.value = product.item_id;
+                    optionElement.textContent = `${product.name} - ${product.item_id}`;
+                    selectElement.appendChild(optionElement);
+                });
+            });
+
+            // Increment the discount
+            function increment() {
+                var input = document.getElementById("discountInput");
+                if (input.value < 99) {
+                    input.value++;
+                }
+            }
+            // Decrement the discount
+            function decrement() {
+                var input = document.getElementById("discountInput");
+                if (input.value > -99) {
+                    input.value--;
+                }
+            }
+            // Limit the number of characters entered in the input box
+                // 3 characters for negative numbers
+                // 2 characters for positive numbers
+            function limitChar(input) {
+                var limit = 2;
+                let value = input.value.trim();
+                if (value.startsWith('-')) limit++;
+                if (value.length > limit) {
+                    value = value.slice(0, limit);
+                    input.value = value;
+                }
+                // May take out
+                // If user enters a character other than - and a number, the input box value is deleted
+                let userInput = input.value;
+                if (isNaN(userInput) || (userInput !== "-" && (Number(userInput) < -99 || Number(userInput) > 99))) {
+                    input.value = "";
+                }
+            }
+
+            // If dynamic pricing is selected, make it so users aren't able to set a custom discount
+            function removeDiscount(checkbox) {
+                if (checkbox.checked) {
+                    checkbox.value = true;
+                    discountInput.disabled = true;
+                    decrementButton.disabled = true;
+                    incrementButton.disabled = true;
+                    discountInput.value = 0;
+                }
+                else {
+                    checkbox.value = false;
+                    discountInput.disabled = false;
+                    decrementButton.disabled = false;
+                    incrementButton.disabled = false;
+                }
+            }
+
+            // To validate the products array
+            function validateProducts(products, returnErrors=false) {
+                const maxProducts = 100; // Put a max number of products 
+                const err = []; // Assume that there are no errors at first
+        
+                if (!products || Object.keys(products).length === 0) {
+                    err.push("Products object is empty.");
+                }
+
+                // Check to see if the number of products exceed maxProducts
+                let totalProducts = 0;
+                for (let category in products) {
+                    if (products.hasOwnProperty(category)) { // If the products object has category arrays
+                        totalProducts += products[category].length; // Calculate totalProducts
+
+                        if (products[category].length == 0) { // If a category array is empty
+                            err.push("This category is empty.");
+                        }
+                    }
+                }
+                if (totalProducts > 100) {
+                    err.push("Maximum number of products allowed is 100.");
+                }
+                
+                // Validate each product's price, quantity, and item_id
+                for (let category in products) {
+                    if (products.hasOwnProperty(category)) {
+                        for (let i in products[category]) {
+                            const product = products[category][i];
+                            const price = parseFloat(product.price);
+                            const inventory = parseInt(product.inventory);
+                            const item_id = Number(product.item_id);
+
+                            if (isNaN(price) || price < 0) {
+                                err.push(`Invalid price for product with item_id ${item_id} in category "${category}".`);
+                            }
+                            if (isNaN(inventory) || inventory < 0) {
+                                err.push(`Invalid inventory amount for product with item_id ${item_id} in category "${category}".`);
+                            }
+                            if (isNaN(item_id) || item_id < 0) {
+                                err.push(`Invalid item_id for product at index ${i} in category "${category}".`);
+                            }
+                        }
+                    }
+                }
+                return (returnErrors ? err : (err.length == 0));
+            }
+
+            err = validateProducts(products, true);
+            if (err.length > 0) {
+                document.getElementById("fixProdErr").innerHTML = "Fix all errors in the products object.";
+                document.getElementById("discount_form").style.display = "none";
+            }
+            document.getElementById("productsErr").innerHTML = err.join('<br>');
+
+            function validateSalesRecord(sales_record, products, returnErrors=false) {
+                const err = []; // Assume that there are no errors at first
+                
+                if (sales_record.length == 0) {
+                    err.push("Sales record is empty.");
+                }
+
+                sales_record.forEach(sale => {
+                    // If a sale is missing data
+                    if (!sale.hasOwnProperty('item_id') || !sale.hasOwnProperty('customer_id') || !sale.hasOwnProperty('date_sold') || !sale.hasOwnProperty('quantity')) {
+                        err.push("A sale within the sales record is missing data.");
+                    }
+                    
+                    // Find the product in the products object that matches the sale.item_id
+                    let product = null;
+                    Object.values(products).forEach(categoryArray => {
+                        const matchingProduct = categoryArray.find(product => Number(product.item_id) === Number(sale.item_id));
+                        if (matchingProduct) {
+                            product = matchingProduct;
+                        }
+                    });
+
+                    // If the item_id in the sales_record does not exist in products 
+                    if (!product) {
+                        err.push(`A sale within the sales record has an invalid/nonexistent item_id.`)
+                    } else {
+                        if (isNaN(sale.quantity) || sale.quantity < 1) {
+                            err.push(`Invalid quantity in sales record for product with item_id ${sale.item_id}.`)
+                        }
+                        if (isNaN(sale.price) || sale.price <= 0)  {
+                            err.push(`Invalid price in sales record for product with item_id ${sale.item_id}.`);
+                        }
+                    }
+                });
+                return (returnErrors ? err : (err.length == 0));
+            }
+
+            err = validateSalesRecord(sales_record, products, true);
+            if (err.length > 0) {
+                document.getElementById("fixRecordErr").innerHTML = "Fix all errors in the sales record array.";
+                document.getElementById("discount_form").style.display = "none";
+            }
+            document.getElementById("salesErr").innerHTML = err.join('<br>');
+        </script>
+        <br>
+        <!-- EXPANDING SHOPPING CART -->
+        <!-- Referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp -->
+        <div id="shoppingNav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <p style="text-transform: uppercase;">Shopping Cart</p>
+            <form method="POST" name="cart_form">
+            <script>
+                // Displaying the cart total
+                document.getElementById('cart_total').innerHTML = total;
+
+                var subtotal = 0;
+                
+                for (let key in shopping_cart) {
+                    for (let i in shopping_cart[key]) {
+                        let quantities = shopping_cart[key][i];
+                        if (quantities > 0) {
+                            extended_price = quantities * products[key][i].price;
+                            subtotal += extended_price;
+                            document.write(`
+                                <table class="cartItems">
+                                    <tr><td colspan="3" style="text-align: left; padding: 5px;">${products[key][i].name}</td></tr>
+                                    <tr>
+                                        <td rowspan="4" style="padding: 5px; width: 45%;""><img src="${products[key][i].image}" alt="${products[key][i].alt}" class="img-thumbnail"></td>
+                                        <td style="width: 20%;">$${(products[key][i].price).toFixed(2)} x </td>
+                                        <td style="width: 25%;">
+                                            <div style="border-radius: 50px; border: 1px solid black; height: 30px; max-width: 90px;">
+                                                <button type="button" id="minus${i}" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == 0) return 
+                                                    document.getElementById('cartInput_${key}${i}').value--; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">--</button>
+                                                <input type="number" autocomplete="off" id="cartInput_${key}${i}" value="${quantities}" class="cartBox" name="cartInput_${key}${i}" readonly>
+                                                <button type="button" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == ${products[key][i].inventory}) return
+                                                    document.getElementById('cartInput_${key}${i}').value++; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">+</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="3" style="font-size: 18px;">$${extended_price.toFixed(2)}</td></tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <button type="button" class="removeBtn" onclick="document.getElementById('cartInput_${key}${i}').value = 0; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">Remove</button>
+                                        </td>
+                                    </tr>
+                                </table> 
+                            `)
+                        }
+                    }
+                }
+                if (subtotal == 0) {
+                    document.write(`Empty cart.`)
+                } 
+                else {
+                    document.write(`
+                        <input type="submit" value="Update Cart" class="sm-button" style="margin-bottom: 10px; display: none;" id="cartUpdate" onclick="cart_form.action='/update_shopping_cart'">`);
+                }
+            </script>
+            </form>
+            <form action="/checkout" method="GET">
+                <input type="submit" value="Check Out" class="sm-button" style="margin-bottom: 10px; display: inline-block;" id="cartSubmit">
+                <script>
+                    if (total == 0) {
+                        document.getElementById('cartSubmit').style.display = 'none';
+                    }
+                </script>
+            </form>
+            <script>
+                var taxRate = (4.7/100);
+                var taxAmount = subtotal * taxRate;
+                // Shipping
+                if (subtotal < 300) {
+                    shipping = 5;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else if ((subtotal >= 300) && (subtotal <= 500)) {
+                    shipping = 10;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else {
+                    shipping = 0;
+                    shippingDisplay = 'FREE';
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                }
+            </script>
+            <hr>
+            <div>
+                <script>
+                    document.write(`
+                        <p style="font-size: 13px;">
+                            Subtotal: $${subtotal.toFixed(2)}<br>
+                            Tax Amount: $${taxAmount.toFixed(2)}<br>
+                            Shipping: ${shippingDisplay}
+                        </p>
+                        <p style="text-transform: uppercase;">Total: $${grandTotal.toFixed(2)}</p>
+                        
+                        
+                        <p style="font-size: 10px;">SHIPPING POLICY: 
+                            <br>For orders with subtotal <u>$300 or less</u>, a shipping fee of <u>$5</u> will be added.
+                            <br>For orders with subtotal <u>$500 or less</u>, a shipping fee of <u>$10</u> will be added.
+                            <br>Orders with subtotal <u>above $500</u> will receive <u>free shipping</u> .
+                        </p>
+                    `)
+                </script>
+            </div>
+        </div>
+    </div>
+    <br>
+    <script>
+        /// STICKY NAV BAR ///
+        // Referenced from: https://www.w3schools.com/howto/howto_js_navbar_sticky.asp
+        window.onscroll = function() {stickyNav()};
+        // Get the navbar using its id
+        var navbar = document.getElementById("sticky-navbar");
+        // offsetTop returns the top position relative to the parent (documentation: https://www.w3schools.com/jsref/prop_element_offsettop.asp)
+        // the parent of navbar is body
+        var sticky = navbar.offsetTop;
+
+        function stickyNav() {
+            // pageYOffSet returns the pixels a document has scrolled from the upper left corner of the window
+            if (window.pageYOffset >= sticky) {
+                navbar.classList.add("sticky")
+            } else {
+                navbar.classList.remove("sticky");
+            }
+        }
+
+        /// SHOPPING CART ///
+        // Opening side nav for shopping cart referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp
+        function openNav() {
+            document.getElementById('shoppingNav').style.width = "350px";
+        }
+        function closeNav() {
+            document.getElementById('shoppingNav').style.width = "0";
+        }
+
+    </script>
+    <footer>
+        <script>
+            document.write(`<p style="font-size: 15px; text-align: center;">Active Users: ${users}</p>`);
+        </script>
+        <table style="width: 50%; text-align:center; margin: auto;">
+            <tr>
+                <td style="width: 30%;">
+                    <a href="https://www.instagram.com/vycstm/" target="_blank" class="contactIcons"><i class="fa fa-instagram" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Follow us to get updates and see behind the scenes content!</p>
+                </td>
+                <td style="width: 5%;"></td>
+                <td style="width: 30%;">
+                    <a href="mailto:vycstm@gmail.com" target="_blank" class="contactIcons"><i class="fa fa-envelope" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Contact us through email if you have any questions or feedback.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><p style="font-size: 15px;">vycstm &copy; 2020</p></td>
+            </tr>
+        </table>
+    </footer>
+</body>
+</html>

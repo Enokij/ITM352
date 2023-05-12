@@ -1,0 +1,392 @@
+<!--
+Bao Vy Tran
+This file is an HTML register page allows users to sign up with their name, email, and password 
+to create a new object in the user_data.json file on the server if there is no input validation error
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register || vycstm</title>
+
+    <!-- Used Bootstrap to create responsive site -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
+    <!-- Loading icon library -->
+    <!-- Bootstrap ICONS: https://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Link to products_style.css -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Importing Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+
+    <!-- Get the product information -->
+    <script type="text/javascript" src="./products_data.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+    
+    <script>
+        let params = (new URL(document.location)).searchParams;
+        
+        /// DIRECT USER TO APPROPRIATE PRODUCT PAGE ///
+        // Referenced from Assignment 3 Example Code
+        if (params.has('products_key')) {
+            var products_key = params.get('products_key');
+        }
+        else {
+            products_key = "Shoes";
+        }
+        var products_data;
+        loadJSON('get_products_data', function(response) {
+            products_data = JSON.parse(response);
+        })
+        var this_product_key = '';
+
+        /// LOAD SHOPPING CART ///
+        // Referenced from Assignment 3 Example Code
+        var shopping_cart;
+        // Total number of items in the cart
+        var total = 0;
+        loadJSON('./get_cart', function (response) {
+            shopping_cart = JSON.parse(response);
+            for (let key in shopping_cart) {
+                total += shopping_cart[key].reduce((a, b) => a + b);
+            }
+        })
+
+        // Get number of active users  
+        var users = 0;
+        loadJSON('./get_users', function (response) {
+            users = response;
+        })
+
+        // When the window loads, perfom the following function:
+        window.onload = function() {
+            // Get the values previously inputted and place them back into the input boxes
+            register_form['name'].value = params.get('name');
+            register_form['email'].value = params.get('email');
+
+            // Get the error messages and display them accordingly
+            for (let i = 0; i <= document.getElementsByClassName('form-group').length; i++) {
+                if (params.has(`${register_form[i].name}_Length`)) {
+                    document.getElementById(`${register_form[i].name}_error`).innerHTML = params.get(`${register_form[i].name}_Length`);
+                    // Change the text of the submit button to Continue if the user inputted invalid information
+                    register_form['register'].value = "Continue";
+                    if (params.has(`${register_form[i].name}_Type`)) {
+                        document.getElementById(`${register_form[i].name}_error`).innerHTML = params.get(`${register_form[i].name}_Length`) + `<br>` + params.get(`${register_form[i].name}_Type`);
+                        register_form['register'].value = "Continue";
+                    }
+                } else if (params.has(`${register_form[i].name}_Type`)) {
+                    document.getElementById(`${register_form[i].name}_error`).innerHTML = params.get(`${register_form[i].name}_Type`);
+                    register_form['register'].value = "Continue";
+                }
+            }            
+        }
+
+        // Toggling passwords
+        // Code from https://www.w3schools.com/howto/howto_js_toggle_password.asp
+        function showPassword() {
+            // Get the password input boxes
+            var pass = document.getElementById('password');
+            // If the type is password
+            if (pass.type == 'password') {
+                // Change it to text when the checkbox is checked
+                pass.type = 'text';
+            } 
+            else {
+                // Change it back to password if the checkbox is not checked
+                pass.type = 'password';
+            }
+        }
+
+        /// GET USER'S COOKIE ///
+        // Code referenced from: https://www.w3schools.com/js/js_cookies.asp
+        // Decode the cookie string to only get the key value pairs from the cookie object
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    var string = c.substring(name.length, c.length);
+                    return JSON.parse(string);
+                }
+            }
+            return "";
+        }
+    </script>
+
+</head>
+<br>
+<body>   
+    <header>vycstm</header>
+    <div id="sticky-navbar">
+        <div id="top-nav" class="py-3">
+            <a class="nav-link mx-3" href='#' onclick="openNav()"><span class="glyphicon glyphicon-shopping-cart"></span> <span id="cart_total"></span> Cart</a>
+            <script>
+                // If the user's cookie exists
+                if (getCookie('user_cookie') != false) {
+                    // Turn the string of key value pairs into an object to be parsed
+                    var user_cookie = getCookie('user_cookie');
+                    // Make the "login" button into a button with the user's name leading to the edit page
+                    document.write(`
+                        <a class="nav-link mx-3" href="edit.html"><span class="glyphicon glyphicon-user"></span> ${user_cookie['name']}</a>
+                    `)
+                    if (user_cookie['name'] == 'Admin') {
+                        document.write(`
+                            <a class="nav-link mx-3" href="discount.html">Discount</a>
+                        `)
+                    }
+                } 
+                else {
+                    document.write(`
+                        <a class="nav-link mx-3" href="login.html"><span class="glyphicon glyphicon-user"></span> Log in</a>
+                    `)
+                }
+            </script>
+        </div>
+         <!-- EXPANDING NAVBAR WITH MINIMIZED SCREEN -->
+        <nav class="navbar navbar-expand-md">
+            <button class="navbar-toggler" id="toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>  
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav">
+                    <a class="nav-link mx-3" href="./index.html">Home</a></li>
+                    <script>nav_bar(this_product_key, products_data);</script>
+                </div>
+            </div>   
+        </nav>
+    </div>
+    <div class="container"> 
+        <h1 style="text-transform: uppercase;">Register</h1>
+        <br>
+        <form action="/process_register" method="POST" name="register_form">
+            <table style="width: 80%; margin: auto;" class="tableContainer">
+                <tr class="form-group">
+                    <td style="width: 30%; text-align: right; padding-right: 10px;"><label>Name</label></td>
+                    <td style="width: 40%;"><input class="input" type="text" name="name" id="name" size="40" placeholder="i.e John Doe" autocomplete="off" maxlength="40"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+                <tr class="error_tr">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 40%;" id="name_error"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+
+                <tr class="form-group">
+                    <td style="width: 30%; text-align: right; padding-right: 10px; font-weight: bold;"><label>Email</label></td>
+                    <td style="width: 40%;"><input class="input" type="text" name="email" id="email" size="40" placeholder="i.e johndoe@gmail.com" autocomplete="off" maxlength="40"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+                <tr class="error_tr">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 40%;" id="email_error"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+                
+                <tr class="form-group">
+                    <td style="width: 30%; text-align: right; padding-right: 10px;"><label>Password</label></td>
+                    <td style="width: 40%;"><input class="input" type="password" name="password" id="password" size="40" placeholder="Enter password" autocomplete="off" maxlength="40"></td>
+                    <td style="width: 30%; text-align: left; padding-left: 10px; font-size: 17px; line-height: 90%;"><input type="checkbox" onclick="showPassword()"> Show password</td>
+                </tr>
+                <tr class="error_tr">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 40%;" id="password_error"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+
+                <tr class="form-group">
+                    <td style="width: 30%; text-align: right; padding-right: 10px;"><label>Confirm Password</label></td>
+                    <td style="width: 40%;"><input class="input" type="password" name="confirm_password" id="conform_password" size="40" placeholder="Re-enter password" autocomplete="off" maxlength="40"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+                <tr class="error_tr">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 40%;" id="confirm_password_error"></td>
+                    <td style="width: 30%;"></td>
+                </tr>
+
+                <tr style="height: 60px;">
+                    <td colspan="3"></td>
+                </tr>
+                <tr style="height: 60px;">
+                    <td colspan="3">
+                        <input class="sm-button" type="submit" value="Sign up" name="register" id="register">
+                    </td>
+                </tr>
+                <tr>
+                    <!-- Go to register page -->
+                    <td colspan="3">Already have an account? <a href="/login.html" style="color: black; text-decoration: underline;">Login</a></td>
+                </tr>
+            </table>
+            <br>
+        </form>
+        <br>
+        <!-- EXPANDING SHOPPING CART -->
+        <!-- Referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp -->
+        <div id="shoppingNav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <p style="text-transform: uppercase;">Shopping Cart</p>
+            <form method="POST" name="cart_form">
+            <script>
+                // Displaying the cart total
+                document.getElementById('cart_total').innerHTML = total;
+
+                var subtotal = 0;
+                
+                for (let key in shopping_cart) {
+                    for (let i in shopping_cart[key]) {
+                        let quantities = shopping_cart[key][i];
+                        if (quantities > 0) {
+                            extended_price = quantities * products[key][i].price;
+                            subtotal += extended_price;
+                            document.write(`
+                                <table class="cartItems">
+                                    <tr><td colspan="3" style="text-align: left; padding: 5px;">${products[key][i].name}</td></tr>
+                                    <tr>
+                                        <td rowspan="4" style="padding: 5px; width: 45%;""><img src="${products[key][i].image}" alt="${products[key][i].alt}" class="img-thumbnail"></td>
+                                        <td style="width: 20%;">$${(products[key][i].price).toFixed(2)} x </td>
+                                        <td style="width: 25%;">
+                                            <div style="border-radius: 50px; border: 1px solid black; height: 30px; max-width: 90px;">
+                                                <button type="button" id="minus${i}" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == 0) return 
+                                                    document.getElementById('cartInput_${key}${i}').value--; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">--</button>
+                                                <input type="number" autocomplete="off" id="cartInput_${key}${i}" value="${quantities}" class="cartBox" name="cartInput_${key}${i}" readonly>
+                                                <button type="button" class="cartButton"
+                                                    onclick="if (document.getElementById('cartInput_${key}${i}').value == ${products[key][i].inventory}) return
+                                                    document.getElementById('cartInput_${key}${i}').value++; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">+</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="3" style="font-size: 18px;">$${extended_price.toFixed(2)}</td></tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <button type="button" class="removeBtn" onclick="document.getElementById('cartInput_${key}${i}').value = 0; document.getElementById('cartUpdate').style.display = 'inline-block'; document.getElementById('cartSubmit').style.display = 'none'">Remove</button>
+                                        </td>
+                                    </tr>
+                                </table> 
+                            `)
+                        }
+                    }
+                }
+                if (subtotal == 0) {
+                    document.write(`Empty cart.`)
+                } 
+                else {
+                    document.write(`
+                        <input type="submit" value="Update Cart" class="sm-button" style="margin-bottom: 10px; display: none;" id="cartUpdate" onclick="cart_form.action='/update_shopping_cart'">`);
+                }
+            </script>
+            </form>
+            <form action="/checkout" method="GET">
+                <input type="submit" value="Check Out" class="sm-button" style="margin-bottom: 10px; display: inline-block;" id="cartSubmit">
+                <script>
+                    if (total == 0) {
+                        document.getElementById('cartSubmit').style.display = 'none';
+                    }
+                </script>
+            </form>
+            <script>
+                var taxRate = (4.7/100);
+                var taxAmount = subtotal * taxRate;
+                // Shipping
+                if (subtotal < 300) {
+                    shipping = 5;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else if ((subtotal >= 300) && (subtotal <= 500)) {
+                    shipping = 10;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else {
+                    shipping = 0;
+                    shippingDisplay = 'FREE';
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                }
+            </script>
+            <hr>
+            <div>
+                <script>
+                    document.write(`
+                        <p style="font-size: 13px;">
+                            Subtotal: $${subtotal.toFixed(2)}<br>
+                            Tax Amount: $${taxAmount.toFixed(2)}<br>
+                            Shipping: ${shippingDisplay}
+                        </p>
+                        <p style="text-transform: uppercase;">Total: $${grandTotal.toFixed(2)}</p>
+                        
+                        
+                        <p style="font-size: 10px;">SHIPPING POLICY: 
+                            <br>For orders with subtotal <u>$300 or less</u>, a shipping fee of <u>$5</u> will be added.
+                            <br>For orders with subtotal <u>$500 or less</u>, a shipping fee of <u>$10</u> will be added.
+                            <br>Orders with subtotal <u>above $500</u> will receive <u>free shipping</u> .
+                        </p>
+                    `)
+                </script>
+            </div>
+        </div>
+    </div>
+    <br>
+    <script>
+        /// STICKY NAV BAR ///
+        // Referenced from: https://www.w3schools.com/howto/howto_js_navbar_sticky.asp
+        window.onscroll = function() {stickyNav()};
+        // Get the navbar using its id
+        var navbar = document.getElementById("sticky-navbar");
+        // offsetTop returns the top position relative to the parent (documentation: https://www.w3schools.com/jsref/prop_element_offsettop.asp)
+        // the parent of navbar is body
+        var sticky = navbar.offsetTop;
+
+        function stickyNav() {
+            // pageYOffSet returns the pixels a document has scrolled from the upper left corner of the window
+            if (window.pageYOffset >= sticky) {
+                navbar.classList.add("sticky")
+            } else {
+                navbar.classList.remove("sticky");
+            }
+        }
+
+        /// SHOPPING CART ///
+        // Opening side nav for shopping cart referenced from: https://www.w3schools.com/howto/howto_js_sidenav.asp
+        function openNav() {
+            document.getElementById('shoppingNav').style.width = "350px";
+        }
+        function closeNav() {
+            document.getElementById('shoppingNav').style.width = "0";
+        }
+
+    </script>
+    <footer>
+        <script>
+            document.write(`<p style="font-size: 15px; text-align: center;">Active Users: ${users}</p>`);
+        </script>
+        <table style="width: 50%; text-align:center; margin: auto;">
+            <tr>
+                <td style="width: 30%;">
+                    <a href="https://www.instagram.com/vycstm/" target="_blank" class="contactIcons"><i class="fa fa-instagram" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Follow us to get updates and see behind the scenes content!</p>
+                </td>
+                <td style="width: 5%;"></td>
+                <td style="width: 30%;">
+                    <a href="mailto:vycstm@gmail.com" target="_blank" class="contactIcons"><i class="fa fa-envelope" style="font-size: 50px;"></i></a>
+                    <p style="font-size: 12px;">Contact us through email if you have any questions or feedback.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><p style="font-size: 15px;">vycstm &copy; 2020</p></td>
+            </tr>
+        </table>
+    </footer>
+</body>
+</html>

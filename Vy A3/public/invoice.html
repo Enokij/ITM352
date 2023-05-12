@@ -1,0 +1,211 @@
+<!--
+Bao Vy Tran
+This file is an HTML invoice that utilizes the user's session data and data from a JSON file 
+stingified as a products array when a request is made to the server for product_data.js
+This file will load if and only if data inputted in the product page passes data validation on the server 
+AND the user successfully logs in with an existing account or register for a new account
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice || vycstm</title>
+    
+    <!-- Used Bootstrap Grid template to create responsive site -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
+    <!-- Loading icon library -->
+    <!-- Bootstrap ICONS: https://www.w3schools.com/bootstrap/bootstrap_ref_comp_glyphs.asp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Link to products_style.css -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Importing Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+
+    <!-- Get the product information -->
+    <script type="text/javascript" src="./products_data.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+
+    <script> 
+        // Get the url
+        let params = (new URL(document.location)).searchParams;
+        
+        /// LOAD SHOPPING CART ///
+        // Referenced from Assignment 3 Example Code
+        var shopping_cart;
+        // Total number of items in the cart
+        var total = 0;
+        loadJSON('./get_cart', function (response) {
+            shopping_cart = JSON.parse(response);
+            for (let key in shopping_cart) {
+                total += shopping_cart[key].reduce((a, b) => a + b);
+            }
+        })
+
+        /// GET USER'S COOKIE ///
+        // Code referenced from: https://www.w3schools.com/js/js_cookies.asp
+        // Decode the cookie string to only get the key value pairs from the cookie object
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    var string = c.substring(name.length, c.length);
+                    return JSON.parse(string);
+                }
+            }
+            return "";
+        }
+
+        if (getCookie('user_cookie') != false) {
+            var user_cookie = getCookie('user_cookie');
+            var name = user_cookie['name'];
+            var email = user_cookie['email'];
+        } else {
+            location.href= './login.html';
+            window.stop;
+        }
+
+        window.onload = function() {
+            // User may not access the invoice without logging in
+            // If so, an error message is given and they will be asked to return to index.html
+            if (!params.has('valid')) {
+                document.write(`
+                    <head>
+                        <link rel="stylesheet" href="products_style.css">
+                        <link href='https://fonts.googleapis.com/css?family=Jost&family=Actor&family=Alef' rel='stylesheet'>
+                    </head>
+                    <body style="text-align: center; margin-top: 10%;">
+                        <h2>ERROR: No form submission detected.</h2>
+                        <h4>Return to <a href="index.html">Products Display</a></h4> 
+                    </body>`)
+            }
+        }
+    </script>
+    <style>
+        table {
+            text-align: left;
+            border: 3px solid black;
+            border-collapse: collapse;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+<body>
+    <header style="background-color: black; color: white;">vycstm</header>
+    
+    <br>
+    <div class="container invoice">
+        <a href="display_products.html?" id="back">&#x2190; Back to products display</a>
+        <br>
+        <br>
+        <div style="font-size: 17px; line-height: 90%;">
+            <p>Please verify that the information shown below is correct: </p>
+            <script>
+                document.write(`
+                    <p>Name: ${name}</p>
+                    <p>Email: ${email}</p>
+                `);
+            </script>
+        </div>
+        <br>
+        <table class="table">
+            <thead style="background-color: black; color: white; font-weight: bolder;">
+                <tr>
+                    <th colspan="2">Item</th>
+                    <th>Quantity Purchased</th>
+                    <th>Remaining Inventory</th>
+                    <th>Price</th>
+                    <th>Extended Price</th>
+                </tr>
+            </thead>
+            <script>
+                var subtotal = 0;
+                for (let key in shopping_cart) {
+                    for (let i in shopping_cart[key]) {
+                        let quantities = shopping_cart[key][i];
+                        if (quantities > 0) {
+                            extended_price = quantities * products[key][i].price;
+                            subtotal += extended_price;
+                            document.write(`
+                                <tr style="border: none;">
+                                    <td width="10%"><img src="${products[key][i].image}" alt="${products[key][i].alt}" style="border-radius: 5px;"></td>
+                                    <td>${products[key][i].name}</td>
+                                    <td>${quantities}</td>
+                                    <td>${products[key][i].inventory - quantities}</td>
+                                    <td>$${products[key][i].price.toFixed(2)}</td>
+                                    <td>$${extended_price}</td>
+                                </tr>
+                            `)
+                        }
+                    }
+                }
+                // Sales tax
+                var taxRate = (4.7/100);
+                var taxAmount = subtotal * taxRate;
+                // Shipping
+                if (subtotal < 300) {
+                    shipping = 5;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else if ((subtotal >= 300) && (subtotal < 500)) {
+                    shipping = 10;
+                    shippingDisplay = `$${shipping.toFixed(2)}`;
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                } else {
+                    shipping = 0;
+                    shippingDisplay = 'FREE';
+                    var grandTotal = Number(taxAmount + subtotal + shipping);
+                }
+            </script>
+            <tr height="20px"></tr>
+            <script>
+                document.write(`
+                    <tr style="border-top: 2px solid black;">
+                        <td colspan="5" style="text-align:center;">Sub-total</td>
+                        <td>$${subtotal.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align:center;">Tax @ ${Number(taxRate) * 100}%</td>
+                        <td>$${taxAmount.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align:center;">Shipping</td>
+                        <td>${shippingDisplay}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align:center;"><b>Total</td>
+                        <td><b>$${grandTotal.toFixed(2)}</td>
+                    </tr>`);
+            </script>
+        </table>
+        <form name="complete_purchase" method="POST" action="/complete_purchase">
+            <input type="submit" value="Complete Purchase" name="complete_purchase" class="sm-button">
+        </form>
+        <br>
+        <!-- A shipping policy that depends on different subtotals -->
+        <p style="font-size: 15px;"><b>SHIPPING POLICY: 
+            <br>
+            For orders with subtotal <u>$300 or less</u>, a shipping fee of <u>$5</u> will be added.
+            <br>
+            For orders with subtotal <u>$500 or less</u>, a shipping fee of <u>$10</u> will be added.
+            <br>
+            Orders with subtotal <u>above $500</u> will receive <u>free shipping</u> .
+        </b></p> 
+        <br>
+    </div>
+</body>
+</html>

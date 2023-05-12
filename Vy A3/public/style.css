@@ -1,0 +1,407 @@
+/* Bao Vy Tran 
+This file is a stylesheet for consistent elements across the pages (navbar, footer, header, etc),
+for responsive media screen sizes, and for additional css */
+
+/* General Styling */
+body {
+    font-family: 'Jost', 'Actor', 'Alef', Helvetica, Arial, sans-serif;
+    margin: 0 auto;
+    font-size: 20px;
+    overflow: auto;
+    position: relative;
+}
+/* Styling image */
+img {
+    max-width: 100px;
+}
+.img-thumbnail {
+    border: none;
+}
+/* Header */
+header {
+    width: 100%;
+    height: 80px;
+    padding-top: 30px;
+    text-align: center;
+    font-size: 2em; 
+    line-height: 80%; 
+    letter-spacing: 0.05em;
+}
+/* Footer */
+footer {
+    width: 100%;
+    background-color: black;
+    position: relative;
+    bottom: 0;
+    padding: 10px;
+    color: white;
+}
+.contactIcons {
+    color: white;
+}
+/* Top portion of nav */
+#top-nav {
+    width: 100%;
+    height: 60px;
+    background-color: white;
+}
+#top-nav a {
+    float: right;
+    color: black;
+}
+#search-form {
+    border-radius: 50px;
+    max-width: 250px;
+    border: 2px solid white;
+}
+.search-field {
+    border: 0;
+    outline: 0 none;
+    color: black;
+    margin-right: 7px;
+}
+.search-submit {
+    background: none;
+    border: none;
+    color: black;
+}
+/* Bottom portion of nav */
+.navbar-toggler {
+    color: white;
+    font-size: 20px;
+}
+#toggler {
+    position: absolute;
+    outline: none;
+}
+#toggler:hover {
+    outline: 2px solid rgb(88, 207, 228);
+}
+.navbar {
+    min-height: 80px;
+    width: 100%;
+    background-color: black;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+.navbar a {
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+.search-submit:hover, .navbar a:hover, #top-nav a:hover, 
+.inputButton:hover, .sm-button:hover, #logout:hover, 
+a:hover, .removeBtn:hover, .cartButton:hover, #back:hover {
+    color: rgb(88, 207, 228);
+}
+/* Making the nav bar sticky on scroll */
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+}
+.sticky + .container {
+    padding-top: 150px;
+}
+/* Shopping side nav */
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    background-color: white;
+    overflow-x: hidden;
+    padding-top: 60px;
+    color: black;
+    border-left: 2px solid black;
+}
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    color: black;
+}
+.sidenav .closebtn:hover {
+    color: rgb(88, 207, 228);
+}
+.cartBox {
+    border: none;
+    text-align: center;
+    width: 20px; 
+    padding: 0;
+}
+.cartButton {
+    background: none;
+    border: none;
+    margin: none;
+    font-size: 25px;
+    line-height: 90%;
+}
+.cartButton:focus, .cartBox:focus {
+    outline: none;
+}
+.cartItems {
+    padding: 5px; 
+    width: 90%; 
+    margin: auto; 
+    border-radius: 5px; 
+    margin-bottom: 5%; 
+    font-size: 13px;
+}
+/* Content */
+.container {
+    text-align: center;
+    position: relative; 
+}
+.inputButton {
+    background: none;
+    border: none;
+    margin: none;
+    font-size: 30px;
+    line-height: 90%;
+}
+.inputBox {
+    border: none;
+    text-align: center;
+    width: 45px; 
+    line-height: 90%;
+}
+.inputButton:focus, .inputBox:focus, .removeBtn:focus {
+    outline: none;
+}
+.errorBox {
+    width: 100%; 
+    height: 40px; 
+    margin-top: 5px;
+    color: #ff2e2e;
+    padding-top: 3px;
+    line-height: 95%;
+}
+#back {
+    float: left;
+    color: black;
+}
+/* Removing default scroll arrows from input type number boxes 
+retrieved from: https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp*/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {  
+    -webkit-appearance: none;
+        appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+        appearance: textfields;
+}
+
+/* User credential inputs */ 
+.input {
+    border: 2px solid black;
+    border-radius: 20px;
+    padding: 0 10px;
+}
+.input:focus {
+    border: 2px solid rgb(88, 207, 228);
+    outline: none;
+}
+.tableContainer .form-group {
+    height: 60px;
+}
+.tableContainer .error_tr {
+    height: 10px;
+    font-size: 15px;
+    color: red;
+}
+
+/* Adjusting responsive screen */
+@media (min-width: 768px) and (max-width: 991px) {
+    .col-md-6 {
+        max-width: 100%;
+    }
+}
+@media (min-width: 0px) and (max-width: 767px) {
+    .input {
+        width: 200px;
+    }
+    .tableContainer .form-group {
+        font-size: 17px;
+    }
+    .tableContainer .error_tr {
+        font-size: 13px;
+    }
+    #search-form {
+        max-width: 200px;
+    }
+    .search-field {
+        margin-right: 3px;
+        width: 150px;
+    }
+    .invoice {
+        font-size: 15px;
+    }
+    .invoice .table {
+        font-size: 15px;
+    }
+}
+
+/* Styling buttons */
+.sm-button {
+    width: 80%;
+    height: 50px; 
+    border-radius: 50px; 
+    border: none;
+    background-color: black; 
+    color: white; 
+    text-transform: uppercase; 
+    letter-spacing: 0.2em;
+}
+#logout {
+    border: none;
+    background-color: inherit;
+    text-decoration: underline;
+}
+.removeBtn {
+    border: none;
+    background-color: white;
+}
+/* Index page */
+/* The actual timeline (the vertical ruler) */
+.timeline {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: white;
+    text-align: left;
+    font-size: 12px;
+}
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    background-color: black;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -3px;
+}
+.tl_img {
+    max-width: 100%;
+}
+/* Container around content */
+.content_container {
+    padding: 10px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+}
+
+/* The circles on the timeline */
+.content_container::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    right: -12px;
+    background-color: white;
+    border: 4px solid rgb(88, 207, 228);
+    top: 15px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Place the container to the left */
+.left {
+    left: 0;
+}
+
+/* Place the container to the right */
+.right {
+    left: 50%;
+}
+
+/* Add arrows to the left container (pointing right) */
+.left::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    right: 30px;
+    border: medium solid black;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent black;
+}
+
+/* Add arrows to the right container (pointing left) */
+.right::before {
+    content: " ";
+    height: 0;
+    position: absolute;
+    top: 22px;
+    width: 0;
+    z-index: 1;
+    left: 30px;
+    border: medium solid black;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent black transparent transparent;
+}
+
+/* Fix the circle for containers on the right side */
+.right::after {
+    left: -13px;
+}
+
+/* The actual content */
+.content {
+    padding: 20px 30px;
+    background-color: black;
+    position: relative;
+    border-radius: 6px;
+}
+.art {
+    max-width: 400px;
+}
+.col-md-6 {
+    margin-bottom: 10px;
+}
+/* Media queries - Responsive timeline on screens less than 600px wide */
+@media screen and (max-width: 600px) {
+    /* Place the timelime to the left */
+    .timeline::after {
+        left: 31px;
+    }
+
+/* Full-width containers */
+    .content_container {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+    }
+
+/* Make sure that all arrows are pointing leftwards */
+    .content_container::before {
+        left: 60px;
+        border: medium solid white;
+        border-width: 10px 10px 10px 0;
+        border-color: transparent white transparent transparent;
+    }
+
+/* Make sure all circles are at the same spot */
+    .left::after, .right::after {
+        left: 18px;
+    }
+
+/* Make all right containers behave like the left ones */
+    .right {
+        left: 0%;
+    }
+}
