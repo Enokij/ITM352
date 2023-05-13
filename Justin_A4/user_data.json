@@ -1,0 +1,26 @@
+{
+    "Student@gmail.com": {
+        "name": "Student",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "danny1@gmail.com",
+        "num_loggedIn": 1,
+        "last_date_loggin": "Fri May 12 2023 02:00:54 GMT-1000 (Hawaii-Aleutian Standard Time)",
+        "Customer_Id": "0000"
+    },
+    "danny@gmail.com": {
+        "name": "Danny",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "danny@gmail.com",
+        "num_loggedIn": 3,
+        "last_date_loggin": "Fri May 12 2023 02:09:08 GMT-1000 (Hawaii-Aleutian Standard Time)",
+        "Customer_Id": "0002"
+    },
+    "test@gmail.com": {
+        "name": "Test",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "Test@gmail.com",
+        "num_loggedIn": 2,
+        "last_date_loggin": "Fri May 12 2023 02:13:48 GMT-1000 (Hawaii-Aleutian Standard Time)",
+        "Customer_Id": "0003"
+    }
+}

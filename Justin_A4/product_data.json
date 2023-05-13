@@ -1,0 +1,134 @@
+{
+    "Bikes": [
+        {
+            "id": "B1",
+            "name": "Raleigh Militis Elite 3",
+            "price": 1500,
+            "image": "bike_raleigh.jpg",
+            "qty_available": "15"
+        },
+        {
+            "id": "B2",
+            "name": "Cannondale Supersix Evo 105",
+            "price": 1500,
+            "image": "bike_cannondale.jpg",
+            "qty_available": "15"
+        },
+        {
+            "id": "B3",
+            "name": "Bianchi Aquila CV",
+            "price": 4000,
+            "image": "bike_bianchi.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B4",
+            "name": "Cervélo P2",
+            "price": 6500,
+            "image": "bike_cervelo.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B5",
+            "name": "Pinarello Bolide TR",
+            "price": 6500,
+            "image": "bike_pinarello.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B6",
+            "name": "The Bridgestone Anchor Sprint",
+            "price": 10000,
+            "image": "bike_bridgestone.jpg",
+            "qty_available": "10"
+        }
+    ],
+    "Helmets": [
+        {
+            "id": "H1",
+            "name": "Banwood Classic",
+            "price": "40",
+            "image": "helmet_banwood.jpg",
+            "qty_available": "50"
+        },
+        {
+            "id": "H2",
+            "name": "Giro Atmos II",
+            "price": "50",
+            "image": "helmet_giro.jpg",
+            "qty_available": "50"
+        },
+        {
+            "id": "H3",
+            "name": "Giro Fixture MIPS Matte",
+            "price": "150",
+            "image": "helmet_hooded.jpg",
+            "qty_available": "40"
+        },
+        {
+            "id": "H4",
+            "name": "Giant Rivet TT",
+            "price": "100",
+            "image": "helmet_giant.jpg",
+            "qty_available": "30"
+        },
+        {
+            "id": "H5",
+            "name": "Giro Tyrant MIPS",
+            "price": "150",
+            "image": "helmet_mountain.jpg",
+            "qty_available": "25"
+        },
+        {
+            "id": "H6",
+            "name": "Giro Air Attack",
+            "price": "200",
+            "image": "helmet_shielded.webp",
+            "qty_available": "25"
+        }
+    ],
+    "Jerseys": [
+        {
+            "id": "J1",
+            "name": "Team Sky Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_sky.jpg",
+            "qty_available": "20"
+        },
+        {
+            "id": "J2",
+            "name": "Team BMC Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_bmc.jpg",
+            "qty_available": "20"
+        },
+        {
+            "id": "J3",
+            "name": "Team BORA Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_bora.jpg",
+            "qty_available": "20"
+        },
+        {
+            "id": "J4",
+            "name": "Team INEOS Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_ineos.webp",
+            "qty_available": "20"
+        },
+        {
+            "id": "J5",
+            "name": "Team Jumbo Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_jumbo.webp",
+            "qty_available": "20"
+        },
+        {
+            "id": "J6",
+            "name": "Team UCI Cycling Jersey and Bib",
+            "price": "150",
+            "image": "jersey_uci.jpg",
+            "qty_available": "20"
+        }
+    ]
+}

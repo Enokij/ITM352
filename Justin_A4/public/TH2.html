@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Harness</title>
+
+    <script>
+        const products = {
+            "Bikes": [
+        {
+            "id": "B1",
+            "name": "Raleigh Militis Elite 3",
+            "price": 1500,
+            "image": "bike_raleigh.jpg",
+            "qty_available": "15"
+        },
+        {
+            "id": "B2",
+            "name": "Cannondale Supersix Evo 105",
+            "price": 1500,
+            "image": "bike_cannondale.jpg",
+            "qty_available": "15"
+        },
+        {
+            "id": "B3",
+            "name": "Bianchi Aquila CV",
+            "price": 4000,
+            "image": "bike_bianchi.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B4",
+            "name": "Cervélo P2",
+            "price": 6500,
+            "image": "bike_cervelo.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B5",
+            "name": "Pinarello Bolide TR",
+            "price": 6500,
+            "image": "bike_pinarello.webp",
+            "qty_available": "10"
+        },
+        {
+            "id": "B6",
+            "name": "The Bridgestone Anchor Sprint",
+            "price": 10000,
+            "image": "bike_bridgestone.jpg",
+            "qty_available": "10"
+        }
+    ],
+    "Helmets": [
+        {
+            "id": "H1",
+            "name": "Banwood Classic",
+            "price": "40",
+            "image": "helmet_banwood.jpg",
+            "qty_available": "50"
+        },
+        {
+            "id": "H2",
+            "name": "Giro Atmos II",
+            "price": "50",
+            "image": "helmet_giro.jpg",
+            "qty_available": "50"
+        },
+        {
+            "id": "H3",
+            "name": "Giro Fixture MIPS Matte",
+            "price": "150",
+            "image": "helmet_hooded.jpg",
+            "qty_available": "40"
+        },
+        {
+            "id": "H4",
+            "name": "Giant Rivet TT",
+            "price": "100",
+            "image": "helmet_giant.jpg",
+            "qty_available": "30"
+        },
+        {
+            "id": "H5",
+            "name": "Giro Tyrant MIPS",
+            "price": "150",
+            "image": "helmet_mountain.jpg",
+            "qty_available": "25"
+        },
+        {
+            "id": "H6",
+            "name": "Giro Air Attack",
+            "price": "200",
+            "image": "helmet_shielded.webp",
+            "qty_available": "25"
+        }
+    ]
+}
+
+        const user_data = {
+    "Student@gmail.com": {
+        "name": "Student",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "danny1@gmail.com",
+        "Customer_Id": "0000"
+    },
+    "danny@gmail.com": {
+        "name": "Danny",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "danny@gmail.com",
+        "Customer_Id": "0002"
+    },
+    "test@gmail.com": {
+        "name": "Test",
+        "password": "2f225efd7442db565690d66de14c6134",
+        "email": "Test@gmail.com",
+        "Customer_Id": "0003"
+    }
+}
+        // Testing for each day for the dynamic discount table
+        var today = new Date();
+        //86400000 milliseconds = 24 hours
+        var oneDay = new Date(today - 86400000);
+        var twoDays = new Date(oneDay - 86400000);
+        var threeDays = new Date(twoDays - 86400000);
+        var fourDays = new Date(threeDays - 86400000);
+
+        const sales_record = [
+        {
+            B1: {
+    Customer_Id: '0000',
+    Quantity_sold: 1,
+    date: today
+                },
+                B2: {
+    Customer_Id: '0002',
+    Quantity_sold: 2,
+    date: oneDay
+                },
+                B3: {
+    Customer_Id: '0002',
+    Quantity_sold: 3,
+    date: twoDays
+                },
+                B4: {
+    Customer_Id: '0003',
+    Quantity_sold: 1,
+    date: threeDays
+                },
+                B5: {
+    Customer_Id: '0003',
+    Quantity_sold: 1,
+    date: fourDays
+                }        
+        }
+]
+
+function updatePrice() {
+            const item_id = document.getElementById('item_id').value;
+            const discount = Number(document.getElementById('discount').value);
+            const dynamic = document.getElementById('dynamic').checked;
+            let results = setPrice(item_id, products, sales_record, discount, dynamic);
+            document.getElementById('test_results').innerHTML = results.join('<br>');
+            displayProducts();
+        }
+
+        function displayProducts() {
+            const output = document.getElementById('products');
+            output.innerHTML = JSON.stringify(products, null, 2);
+        }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            displayProducts();
+        });
+
+    </script>
+
+</head>
+<body>
+    <script>
+        function setPrice(item_id, products, sales_record, discount, dynamic) {
+  const now = new Date();
+  const results = [];
+
+  const discountRates = {
+    24: 10,
+    48: 30,
+    72: 60,
+    96: 95,
+  };
+  for (let category in products) {
+    products[category].forEach((product) => {
+      if (item_id === '*' || product.id === item_id) {
+        if (dynamic) {
+            results.push(`Applied dynamic pricing to ${product.name}. Price went from $${product.price} to $${product.price}`);
+            
+          const sales = sales_record.filter((record) =>
+            record.item_id === product.id &&
+            record.Customer_Id &&
+            record.Quantity_sold > 0 &&
+            record.date &&
+            now - new Date(record.date) < 96 * 60 * 60 * 1000
+            
+          );
+          let dynamicDiscount = 0;
+          for (let hours in discountRates) {
+            if (sales.every((record) => now - new Date(record.date) >= hours * 60 * 60 * 1000)) {
+              dynamicDiscount = discountRates[hours];
+              results.push(`Sales record: ${product.name}. Current date: ${today}. Last purchased: ${sales_record.date}`);
+            }
+          }
+          
+          product.price = Number((product.price * (1 - dynamicDiscount / 100)).toFixed(2));
+        } else {
+            product.price = Number((product.price * (1 - discount / 100)).toFixed(2));
+            results.push(`If '*' was input, all products discounted, or manually input one product to discount.`)
+          results.push(`Applied a ${discount}% discount to ${product.name}. Price went from $${product.price} to $${product.price}`);
+        
+        }
+      }
+    });
+  }
+  return results;
+}
+
+    </script>
+        <h1>Test Harness</h1>
+        <form onsubmit="event.preventDefault(); updatePrice();">
+            <label for="item_id">Select a product: </label>
+            <input type="text" id="item_id" placeholder="Enter the product's item_id" required>
+            <br>
+
+            <label for="discount">Set a discount: </label>
+            <input type="number" id="discount" min="-99" max="99" placeholder="0" >
+            <br>
+
+            <label for="dynamic">Apply dynamic pricing: </label>
+            <input type="checkbox" id="dynamic">
+            <br>
+            <input type="submit" value="Apply">
+        </form>
+
+        <h2>Dynamic pricing table</h2>
+        <table style="border: 1px solid black;">
+            <tr><th>HRS</th><th>DISC</th></tr>
+            <tr><td>24</td><td>10</td></tr>
+            <tr><td>48</td><td>30</td></tr>
+            <tr><td>72</td><td>60</td></tr>
+            <tr><td>96</td><td>95</td></tr>
+        </table>
+
+        <h2>Results</h2>
+        <p id="test_results"></p>
+    
+        <h2>Products</h2>
+        <pre id="products"></pre>
+
+</body>
+</html>

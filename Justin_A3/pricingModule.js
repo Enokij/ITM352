@@ -4,7 +4,7 @@ function setPrice(item_id, products, sales_record, discount, dynamic) {
       24: 10,
       48: 30,
       72: 60,
-      96: 95,
+      96: 95, 
     };
   
   
